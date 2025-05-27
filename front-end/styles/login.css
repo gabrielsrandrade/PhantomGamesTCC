@@ -1,0 +1,26 @@
+.card_login {
+    display: flex;
+    max-width: 60%;
+    max-height: 50%;
+    border-radius: 10%;
+    background-color: black;
+
+    ul {
+        background-color: rgb(255, 255, 255);
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    li {
+        color: white;
+        font-size: medium;
+        
+    }
+
+    h1 {
+      color: white;
+      font-size: medium;  
+    }
+}
