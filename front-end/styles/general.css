@@ -17,6 +17,6 @@
 }
 
 body{
-    background-color: aliceblue;
+    background-color: var(--background-color);
 }
 
