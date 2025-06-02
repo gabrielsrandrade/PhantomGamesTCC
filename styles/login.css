@@ -1,0 +1,136 @@
+@import "general.css";
+
+*{
+    color: var(--selected-text-color);
+}
+
+.card_login { /* card principal */
+    width: 70%; /* largura do card */
+    height: 80%; /* altura do card */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* transform para centralizar o card */
+    border-radius: 25px; /* curvatura das borrdas do card*/
+    background-image: radial-gradient(circle at left, #13212c 40%, #ffffff00 100%), url('../assets/imagens/fundo-login.jpg'); /* imagem de fundo do card */
+    background-size: cover; /* tamanho da imagem de fundo do card */
+    display: flex; /* tipo de display(disposicao dos elementos na tela */
+    flex-direction: column;
+    justify-content: flex-start; /* itens alinhados no começo horizontalmente */
+    padding: 40px;
+
+    ul { /* lista para formar a Navbar */
+        display: flex; /* tipo de display(disposicao dos elementos na tela */
+        justify-content: flex-start; /* itens alinhados no começo horizontalmente */
+        align-items: center; /* itens alinhados no meio verticalmente */
+        gap: 64px; /* distãncia entre os itens */
+    }
+
+    li { /* itens da Navbar */
+        color: var(--non-selected-color); /* cor da fonte, quando o texto não esta selecionado */
+        font-size: medium; /* tamanho da fonte */
+        transition: 0.3s; /* tempo de transição do hover */
+        font-size: 1.1rem; /* tamanho da fonte */
+    }
+
+    li:hover { /* hover */
+        color: var(--selected-text-color); /* cor dos ites após o hover */
+    }
+
+
+    h1 { /* titulo */
+        font-size: 3.5rem; /* tamanho da fonte */
+        margin-top: 50px; /* distância do topo do topo */
+    }
+
+    form { /* formulario */
+        margin-top: 50px; /* distância do topo */
+        width: 35%; /* lagura maxima */
+        display: flex; 
+        flex-direction: column; /* direçaõ dos itens em coluna */
+        align-items: center;
+        gap: 2rem;
+    }
+
+    label { /* nome dos campos do formulario */
+        display: flex;
+        flex-direction: column;
+        font-size: 1.2rem; /* tamanho da fonte */
+        width: 100%;
+    }
+
+    input { /* campos do formulario */
+        width: 100%; /* lagura maxima */
+        height: 40px; /* altura */
+        border-radius: 12px; 
+        font-size: 1rem; /* tamanho da fonte */
+    }
+
+    input[type=button] { /* botao */
+        background-color: var(--button-login-color); /* cor do botao */
+        max-width: 40%; /* lagura maxima */
+        width: 40%;
+        margin: 0px 0px 60px 0px; /* espaço das bordas */
+        align-self: center; /* alinhado no centro do form horizontalmente */
+    }
+}
+
+/* Medias Queri para a tela de login */
+
+/* Laptops e desktops menores (entre 992px e 1199px) */
+@media (max-width: 1199px) {
+    
+    .card_login {
+        width: 80%;
+
+        h1 {
+            font-size: 2.5rem;
+            margin-top: 40px;
+        }
+
+        form{
+            margin-top: 40px;
+        }
+    }
+}
+
+/* Tablets (entre 768px e 991px) */
+@media (max-width: 991px) {
+
+    .card_login {
+        width: 90%;
+        flex-direction: column;
+        padding: 30px;
+
+        h1 {
+            font-size: 2rem;
+        }
+    
+        input[type=button] {
+            max-width: 60%;
+        }
+    }
+}
+
+/* Celulares (menor que 768px) */
+@media (max-width: 767px) {
+
+    .card_login {
+        width: 95%;
+        height: auto;
+        padding: 20px;
+
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+        }
+
+        input[type=button] {
+            width: 100%;
+        }
+    }
+}
