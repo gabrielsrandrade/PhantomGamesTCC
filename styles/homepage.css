@@ -1,37 +1,28 @@
 @import "general.css";
 
 
-nav {
-    background-color: #292D32;
+ul {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 24px;
+
+    margin: auto;
+    margin-top: 8px;
+
+    background-color: var(--navbar-color);
 
     width: 99%;
-    height: 40px;
-    margin-top: 8px;
-    margin-left: 8px;
-    margin-right: 8px;
+    height: 3rem;
+
     border-radius: 10px;
-    display: flex;
-    flex-direction: row;
     padding: 10px 20px;
-
-    align-items: center;
-    gap: 64px;
-    flex-wrap: nowrap;
-}
-
-ul {
-    justify-content: flex-start;
-
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 64px;
 }
 
 li {
     color: var(--non-selected-color);
-    font-size: medium;
+    font-size: small;
     transition: 0.3s;
 
     font-size: 1.1rem;
@@ -57,40 +48,53 @@ li:hover {
     height: 30px;
 }
 
-.gallery_container {
+
+
+.carrosel{
     display: flex;
-    max-width: 500px;
-    max-height: 500px;
-    background-color: #fff;
-    border-radius: 5px;
-    margin: 50px auto;
-    gap: 15px;
+    justify-content: space-between;
+
+    .carrosel_main_image{
+        position: absolute;
+        width: 40%; 
+        height: 65%; 
+        background-color: aqua;
+        border-radius: 15px; 
+        margin: 5% 0 0 10% ;
+    }
+    
+    .right_side{
+        display: flex;
+        flex-direction: column;
+        
+    
+        .carrosel_side_image1{
+            position: absolute;
+            width: 30%; 
+            height: 18%; 
+            background-color: aqua;
+            border-radius: 15px;
+            margin-top: 8%;
+        }
+        
+        .carrosel_side_image2{
+            position: absolute;
+            width: 30%; 
+            height: 18%; 
+            background-color: rgb(0, 255, 98);
+            border-radius: 15px;
+            margin-top: 18%;
+        }
+        
+        .carrosel_side_image3{
+            position: absolute;
+            width: 30%; 
+            height: 18%; 
+            background-color: rgb(54, 15, 8);
+            border-radius: 15px;
+            margin-top: 28%;
+        }
+    }
 }
 
-.image_container {
-    flex-direction: column;
-    display: flex;
-    max-width: 250px;
-    height: auto;
-    background-color: #fff;
-    border-radius: 5px;
-    margin: 50px auto;
-    gap: 15px;
-}
 
-.main-image-display {
-    position: relative;
-    flex: 1;
-    min-width: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.main-image-display img {
-    max-width: 100%;
-    height: auto;
-    display: block;
-    transition: opacity 0.5s ease-in-out;
-    object-fit: cover;
-}

@@ -39,23 +39,30 @@
 
 
     h1 { /* titulo */
-        font-size: 3.5rem; /* tamanho da fonte */
-        margin-top: 50px; /* distância do topo do topo */
+        font-size: 4rem; /* tamanho da fonte */
+        margin-top: 60px; /* distância do topo */
+        font-family: "Comfortaa", sans-serif;
+        font-optical-sizing: auto;
+        font-weight: 700;
     }
 
     form { /* formulario */
         margin-top: 50px; /* distância do topo */
-        width: 35%; /* lagura maxima */
+        width: 30%; /* lagura maxima */
         display: flex; 
         flex-direction: column; /* direçaõ dos itens em coluna */
         align-items: center;
         gap: 2rem;
     }
 
+    .space{
+        margin-bottom: 20px;
+    }
+
     label { /* nome dos campos do formulario */
         display: flex;
         flex-direction: column;
-        font-size: 1.2rem; /* tamanho da fonte */
+        font-size: 1rem; /* tamanho da fonte */
         width: 100%;
     }
 
@@ -70,10 +77,17 @@
         background-color: var(--button-login-color); /* cor do botao */
         max-width: 40%; /* lagura maxima */
         width: 40%;
-        margin: 0px 0px 60px 0px; /* espaço das bordas */
         align-self: center; /* alinhado no centro do form horizontalmente */
+        font-weight: 500;
+    }
+
+    .link-login{
+        color: var(--button-color);
+        text-decoration: underline;
     }
 }
+
+
 
 /* Medias Queri para a tela de login */
 

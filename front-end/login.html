@@ -16,35 +16,31 @@
 
         <nav>
             <ul>
-                <li>Descobrir</li>
+                <a href="../front-end/homepage.html">
+                    <li>Descobrir</li>
+                </a>
                 <li>Navegar</li>
                 <li>Suporte</li>
             </ul>
         </nav>
 
         <header>
-            <h1>Crie uma nova <br> conta</h1>
+            <h1 class="space">Entre em sua<br> conta e aproveite</h1>
         </header>
+        <form action="">
+            <label for="email">Email<input type="text" id="email"></label>
 
-        
-            <form action="">
-                <label for="name">Nome de Usuário<input type="text" id="name"></label>
-                
 
-                <label for="email">Email<input type="text" id="email"></label>
-                
+            <label for="senha">Senha<input type="password" id="senha"></label>
 
-                <label for="senha">Senha<input type="password" id="senha"></label>
-                
 
-                <input type="button" value="CADASTRAR">
-            </form>
+            <input type="button" value="CADASTRAR">
 
-            <p>Não tem uma conta?<a href="">Crie uma conta</a></p>
-        
-
+            <p>Não tem uma conta? <a href="cadastro.html" class="link-login">Crie uma conta</a></p>
+        </form>
     </div>
 
+    <script src="../Script/login.js"></script>
 </body>
 
 </html>
