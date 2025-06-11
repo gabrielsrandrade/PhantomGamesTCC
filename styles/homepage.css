@@ -15,7 +15,7 @@ nav {
     background-color: var(--navbar-color);
 
     width: 99%;
-    height: 3rem;
+    height: 4rem;
 
     border-radius: 10px;
     padding: 10px 20px;
@@ -28,11 +28,12 @@ ul {
 }
 
 nav img {
-    max-width: 1.5rem;
+    max-width: 2.3rem;
+    margin-right: 2rem;
 }
 
 nav button {
-    height: 2rem;
+    height: 2.5rem;
     width: auto;
     padding: 0px 20px;
     background-color: var(--button-color);
@@ -42,10 +43,9 @@ nav button {
 
 li {
     color: var(--non-selected-color);
-    font-size: small;
     transition: 0.3s;
-
-    font-size: 1.1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
 }
 
 li:hover {
@@ -56,7 +56,7 @@ li:hover {
 .search-bar {
     display: flex;
     align-items: center;
-    height: 2rem;
+
 }
 
 .search-bar input[type="search"] {
@@ -64,47 +64,39 @@ li:hover {
     padding: 8px;
     border-radius: 20px;
     border: none;
-    width: 300px;
-    height: 30px;
+    width: 350px;
+    font-size: 1rem;
+    color: white;
 }
 
 
 /*carrosel*/
 .carrosel {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    height: 36rem;
+    margin: 5rem auto;
 
     .carrosel_main_image {
-        position: absolute;
-        width: 50%;
-        height: 40rem;
+        width: 64rem;
+        height: 36rem;
         background-color: aqua;
         border-radius: 15px;
-        margin: 5% 0 0 10%;
     }
 
     .right_side {
         display: flex;
         flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
 
         .carrosel_side_image {
-            position: absolute;
-            width: 30%;
-            height: 10rem;
-            background-color: rgb(255, 0, 0);
+            width: 24rem;
+            height: 18rem;
+            background-color: rgb(255, 9, 9);
             border-radius: 15px;
-        }
-
-        .carrosel_side_image:nth-child(1) {
-            margin-top: 8%;
-        }
-
-        .carrosel_side_image:nth-child(2) {
-            margin-top: 18%;
-        }
-
-        .carrosel_side_image:nth-child(3) {
-            margin-top: 28%;
         }
     }
 }
