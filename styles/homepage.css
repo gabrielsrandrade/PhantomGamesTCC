@@ -82,7 +82,7 @@ li:hover {
     .carrosel_main_image {
         width: 64rem;
         height: 36rem;
-        background-color: aqua;
+        background-color: rgb(255, 255, 255);
         border-radius: 15px;
     }
 
@@ -95,8 +95,47 @@ li:hover {
         .carrosel_side_image {
             width: 24rem;
             height: 18rem;
-            background-color: rgb(255, 9, 9);
+            background-color: rgb(255, 255, 255);
             border-radius: 15px;
         }
     }
 }
+
+.section{
+    display: flex;
+    flex-direction: column;
+    width: 89rem;
+    margin: 5rem auto;
+    gap: 1rem;
+
+    h1{
+        color: var(--selected-text-color);
+        font-weight: 400;
+        font-size: 2rem;
+        marg
+    }
+
+    .card_jogos{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem; 
+    
+        .card_jogo{
+            width: 15.75rem;
+            height: 28rem;
+            background-color: var(--card-color);  
+            border-radius: 20px;
+        }
+        
+    }
+}
+
+
+
+
+    
+
+    
+
+

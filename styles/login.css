@@ -4,7 +4,7 @@
     color: var(--selected-text-color);
 }
 
-.card_login { /* card principal */
+.card_login, .card_cadastro { /* card principal */
     width: 70%; /* largura do card */
     height: 80%; /* altura do card */
     position: absolute;
@@ -86,8 +86,6 @@
         text-decoration: underline;
     }
 }
-
-
 
 /* Medias Queri para a tela de login */
 
