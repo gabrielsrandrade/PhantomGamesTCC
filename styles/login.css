@@ -71,6 +71,8 @@
         height: 40px; /* altura */
         border-radius: 12px; 
         font-size: 1rem; /* tamanho da fonte */
+        color: black;
+        padding-left: 8px;
     }
 
     input[type=button] { /* botao */
@@ -79,6 +81,8 @@
         width: 40%;
         align-self: center; /* alinhado no centro do form horizontalmente */
         font-weight: 500;
+        color: white;
+        padding: 0px;
     }
 
     .link-login{
