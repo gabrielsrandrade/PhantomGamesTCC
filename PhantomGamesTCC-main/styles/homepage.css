@@ -1,0 +1,208 @@
+@import "general.css";
+
+/*nav bar*/
+
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+
+    margin: auto;
+    margin-top: 8px;
+
+    background-color: var(--navbar-color);
+
+    width: 99%;
+    height: 4rem;
+
+    border-radius: 10px;
+    padding: 10px 20px;
+}
+
+ul {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+nav img {
+    max-width: 2.3rem;
+    margin-right: 2rem;
+}
+
+.btn {
+    height: 2.5rem;
+    width: auto;
+    padding: 0 20px;
+    background-color: var(--button-color);
+    border-radius: 7px;
+    font-size: 1rem;
+    color: white;
+    display: flex;
+    align-items: center;
+}
+
+li {
+    color: var(--non-selected-color);
+    transition: 0.3s;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+li:hover {
+    color: var(--selected-text-color);
+}
+
+
+.search-bar {
+    display: flex;
+    align-items: center;
+
+}
+
+.search-bar input[type="search"] {
+    background-color: rgba(128, 128, 128, 0.2);
+    padding: 8px;
+    border-radius: 20px;
+    border: none;
+    width: 350px;
+    font-size: 1rem;
+    color: white;
+}
+
+
+/*carrosel*/
+.carrosel {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    width: 100%;
+    height: 36rem;
+    margin: 5rem auto;
+
+    .carrosel_main_image {
+        width: 64rem;
+        height: 36rem;
+        background-color: rgb(255, 255, 255);
+        border-radius: 15px;
+    }
+
+    .right_side {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+
+        .carrosel_side_image {
+            width: 24rem;
+            height: 18rem;
+            background-color: rgb(255, 255, 255);
+            border-radius: 15px;
+        }
+    }
+}
+
+.section{
+    display: flex;
+    flex-direction: column;
+    max-width: 89rem;
+    margin: 5rem auto;
+    gap: 1rem;
+
+    h1{
+        color: var(--selected-text-color);
+        font-weight: 400;
+        font-size: 2rem;
+
+    }
+
+    .card_jogos{
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 2.5625rem;
+        overflow-x: auto;
+        
+    
+        .card_jogo{
+            min-width: 15.75rem;
+            height: 28rem;
+            background-color: var(--card-color);  
+            border-radius: 20px;
+        }
+        
+    }
+}
+
+.section1{
+    display: flex;
+    flex-direction: column;
+    max-width: 89rem;
+    margin: 5rem auto;
+    gap: 1rem;
+
+    h1{
+        color: var(--selected-text-color);
+        font-weight: 400;
+        font-size: 2rem;
+
+    }
+
+    .card_jogos1{
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 2.5625rem;
+        overflow-x: auto;
+    
+        .card_jogo1{
+            min-width: 43.2rem;
+            height: 48.6rem;
+            background-color: var(--card-color);  
+            border-radius: 20px;
+        }
+    }
+}
+
+.section2{
+    display: flex;
+    flex-direction: column;
+    max-width: 89rem;
+    margin: 5rem auto;
+    gap: 1rem;
+
+    h1{
+        color: var(--selected-text-color);
+        font-weight: 400;
+        font-size: 2rem;
+
+    }
+
+    .card_jogos2{
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 2.5625rem;
+        overflow-x: auto;
+        
+    
+        .card_jogo2{
+            min-width: 27.95rem;
+            height: 27.95rem;
+            background-color: var(--card-color);  
+            border-radius: 20px;
+        }
+        
+    }
+}
+
+
+
+
+    
+
+    
+
+

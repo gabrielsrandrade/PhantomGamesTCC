@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+
+*{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    box-sizing: border-box;
+    border: none;
+    text-decoration: none;
+}
+
+:root{
+    --background-color: #0c151c; /*Cor padrão do fundo*/
+    --search-bar: #3A3D42; /*Cor da barra de pesquisa da navbar*/
+    --selected-text-color: #ffffff;  /*Cor das páginas selecionads e dos textos/titulos das paginas*/
+    --navbar-color: #292D32; /*Cor da navbar*/
+    --non-selected-color: #8A8D91; /*Cor das páginas não selecionadas na nav bar*/
+    --button-color: #2597F5; /*Cor dos botões padroes do site*/
+    --card-color: #091016; /*Cor dos cards do site*/
+    --star-color: #FFE943; /*Cor das estrelas de avaliação*/
+    --button-login-color: #303E48; /*Cor dos botões de login e cadastro*/
+}
+
+body{
+    background-color: var(--background-color);
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
