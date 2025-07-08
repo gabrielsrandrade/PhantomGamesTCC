@@ -21,6 +21,10 @@
     --card-color: #091016; /*Cor dos cards do site*/
     --star-color: #FFE943; /*Cor das estrelas de avaliação*/
     --button-login-color: #303E48; /*Cor dos botões de login e cadastro*/
+    --disc-color: #AEB5FF;
+    --insta-color:#FF96B9;
+    --twitter-color: #212121;
+    --twitch-color: #D2B3FF;
 }
 
 body{
@@ -30,3 +34,54 @@ body{
     font-style: normal;
 }
 
+footer{
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--navbar-color);
+    color: var(--selected-text-color);
+    padding: 1rem;
+    align-items: center;
+    text-align: center;
+    font-size: 1.2rem;
+    height: 8rem;
+    padding: 2rem;
+
+    .social-media{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+
+    img{
+        height: 1.8rem;
+        width: auto;
+    }
+    
+
+        .insta ,.disc ,.twitter ,.twitch{
+            height: 3.5rem;
+            width: 3.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .insta:hover ,.disc:hover , .twitter:hover , .twitch:hover{
+            transform:scale(110%) ;
+            transition: 0.5s;
+        }
+        .insta{
+            background-color: var(--insta-color);
+        }
+        .disc{
+            background-color: var(--disc-color);
+        }
+        .twitter{
+            background-color: var(--twitter-color);
+        }
+        .twitch{
+            background-color: var(--twitch-color);
+        }
+    }
+}
