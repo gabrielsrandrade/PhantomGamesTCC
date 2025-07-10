@@ -32,6 +32,12 @@ body{
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
     font-style: normal;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    min-height: 100vh;
 }
 
 footer{
@@ -43,8 +49,11 @@ footer{
     align-items: center;
     text-align: center;
     font-size: 1.2rem;
+    width: 100%;
     height: 8rem;
     padding: 2rem;
+    margin-top: auto;
+
 
     .social-media{
         display: flex;
@@ -83,5 +92,138 @@ footer{
         .twitch{
             background-color: var(--twitch-color);
         }
+    }
+}
+
+/*navbar*/
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+
+    position: sticky;
+    top: 8px;
+
+    margin: auto;
+    margin-top: 8px;
+
+    background-color: var(--navbar-color);
+
+    width: 99%;
+    height: 4rem;
+
+    border-radius: 10px;
+    padding: 10px 20px;
+}
+
+ul {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+nav img {
+    max-width: 2.3rem;
+    margin-right: 2rem;
+}
+
+nav button {
+    height: 2.5rem;
+    width: auto;
+    padding: 0px 20px;
+    background-color: var(--button-color);
+    border-radius: 7px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+li {
+    color: var(--non-selected-color);
+    transition: 0.3s;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+li:hover {
+    color: var(--selected-text-color);
+}
+
+
+.search-bar {
+    display: flex;
+    align-items: center;
+
+}
+
+.search-bar input[type="search"] {
+    background-color: rgba(128, 128, 128, 0.2);
+    padding: 8px;
+    border-radius: 20px;
+    border: none;
+    width: 350px;
+    font-size: 1rem;
+    color: white;
+}
+
+/*card normais*/
+.cards_principais{
+    display: flex;
+    flex-direction: column;
+    min-width: 89rem;
+    max-width: 89rem;
+    margin: 5rem auto;
+    gap: 1rem;
+
+
+    .card_jogos{
+        width: 100%;
+        display: flex;
+        justify-content: start;
+        align-items: center;
+        gap: 2.5625rem;
+        overflow-x: auto;
+        
+    
+        .card_jogo{
+            min-width: 15.75rem;
+            height: 28rem;
+            background-color:   var(--card-color);  
+            color: white;
+            font-weight: bold;
+            border-radius: 20px;
+            gap: 8px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+
+            .preco{
+                display: flex;
+                gap: 16px;
+
+                .promocao{
+                    color: var(--non-selected-color);
+                    text-decoration: line-through;
+                }
+            }
+
+            .estrelas{
+                color: var(--star-color);
+            }
+        
+
+            .capa_card{
+                width: auto;
+                height: 20rem;
+
+                background-image: url('../assets/imagens/God_of_War_Ragnarök_capa.jpg') ;
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+
+                border-radius: 20px;
+            }
+        }
+        
     }
 }
