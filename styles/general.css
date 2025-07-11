@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300..700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 
 
 *{
@@ -39,6 +40,12 @@ body{
     align-items: start;
     min-height: 100vh;
 }
+
+h1{
+        color: var(--selected-text-color);
+        font-weight: 400;
+        font-size: 2rem;
+    }
 
 footer{
     display: flex;
@@ -96,7 +103,7 @@ footer{
 }
 
 /*navbar*/
-nav {
+.navbar{
     display: flex;
     justify-content: space-between;
     align-items: center;

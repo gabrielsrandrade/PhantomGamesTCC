@@ -18,7 +18,7 @@
     flex-direction: column;
     justify-content: flex-start; /* itens alinhados no começo horizontalmente */
     padding: 40px;
-
+    
     ul { /* lista para formar a Navbar */
         display: flex; /* tipo de display(disposicao dos elementos na tela */
         justify-content: flex-start; /* itens alinhados no começo horizontalmente */
