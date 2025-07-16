@@ -83,6 +83,7 @@
         font-weight: 500;
         color: white;
         padding: 0px;
+        cursor: pointer;
     }
 
     .link-login{
