@@ -1,0 +1,7 @@
+# Node.js
+node_modules/          // Pasta com dependências instaladas via npm/yarn
+.env                   // Arquivo com variáveis sensíveis (como chaves de API)
+dist/                  // Pasta de arquivos "compilados" (caso use TypeScript ou build tools)
+.DS_Store              // Arquivo oculto criado pelo macOS (inútil no projeto)
+*.log                  // Arquivos de log gerados (por exemplo, errors.log)
+npm-debug.log*         // Arquivos de erro criados se algo falhar com o npm
