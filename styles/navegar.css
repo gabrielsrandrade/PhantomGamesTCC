@@ -157,3 +157,27 @@
         }
 
 }
+
+/* faz com que o card vá para baixo ao chegar no width max  */
+    .card_jogos{
+        flex-wrap: wrap;
+        overflow-x: unset;
+    }
+
+    .pagination{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 2rem;
+        color: white;
+    }
+        .first, .numbers, .prev, .next, .last {
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 400;
+            transition: 0.3s;
+        }
+
+        .first:hover, .numbers:hover,.prev:hover, .next:hover, .last:hover {
+           font-weight: 600;
+        }
