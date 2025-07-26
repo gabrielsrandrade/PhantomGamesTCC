@@ -1,43 +1,48 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
-    <link rel="shortcut icon" href="../assets/imagens/logo-ico.ico" type="image/x-icon">
-    <link rel="stylesheet" href="../styles/general.css">
-    <link rel="stylesheet" href="../styles/login.css">
-</head>
+    <link
+      rel="shortcut icon"
+      href="../assets/imagens/logo-ico.ico"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="../styles/general.css" />
+    <link rel="stylesheet" href="../styles/login.css" />
+  </head>
 
-<body>
-
+  <body>
     <div class="card_login">
+      <nav class="nav-login">
+        <ul>
+          <a href="../front-end/homepage-deslogado.html"><li>Descobrir</li></a>
+          <a href="../front-end/navegar-deslogado.html"><li>Navegar</li></a>
+          <li>Suporte</li>
+        </ul>
+      </nav>
 
-        <nav class="nav-login">
-            <ul>
-                <a href="../front-end/homepage.html"><li>Descobrir</li></a>
-                <a href="../front-end/navegar.html"><li>Navegar</li></a>
-                <li>Suporte</li>
-            </ul>
-        </nav>
+      <header>
+        <h1 class="space">
+          Entre em sua<br />
+          conta e aproveite
+        </h1>
+      </header>
+      <form id="formLogin">
+        <label for="email">Email<input type="text" id="email" /></label>
 
-        <header>
-            <h1 class="space">Entre em sua<br> conta e aproveite</h1>
-        </header>
-        <form action="">
-            <label for="email">Email<input type="text" id="email"></label>
+        <label for="senha">Senha<input type="password" id="senha" /></label>
 
+        <input type="submit" value="ENTRAR" />
+        <p>
+          Não tem uma conta?
+          <a href="cadastro.html" class="link-login">Crie uma conta</a>
+        </p>
+      </form>
 
-            <label for="senha">Senha<input type="password" id="senha"></label>
-
-
-            <input type="button" value="ENTRAR">
-
-            <p>Não tem uma conta? <a href="cadastro.html" class="link-login">Crie uma conta</a></p>
-        </form>
+      <script src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
+      <script type="module" src="../Script/login1.js"></script>
     </div>
-
-</body>
-
+  </body>
 </html>

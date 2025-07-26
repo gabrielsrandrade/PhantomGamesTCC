@@ -1,27 +1,42 @@
-require('dotenv').config(); // Carrega as variáveis
-
-// Carregar variáveis para chaves do Clerk
-console.log("CLERK_API_KEY:", process.env.CLERK_API_KEY); // Variável para a chave da API
-console.log("CLERK_FRONTEND_API:", process.env.CLERK_FRONTEND_API); // Variável para a chave do Frontend API
+require("dotenv").config(); // Carrega as variáveis
 
 const express = require("express");
-const { ClerkExpressWithAuth } = require("@clerk/clerk-sdk-node"); // Importa o middleware do Clerk
-const { users } = require("@clerk/clerk-sdk-node"); // Importa o SDK do Clerk
-const app = express();
-const cadastroRoutes = require("./cadastro"); // Rota do Cadastro
+const cors = require("cors");
+const PORT = 3000;
+const { ClerkExpressWithAuth } = require("@clerk/clerk-sdk-node");
+const webhookRoute = require("./routes/clerkwebhook");
+const cadastroRoutes = require("./routes/cadastro");
+const loginRoutes = require("./routes/login");
+const userDataRoutes = require("./routes/UserData");
 
-// Configura o middleware para autenticação
+const app = express(); // Crie o app antes de usar
+
+// Configura CORS antes de qualquer rota
+app.use(
+  cors({
+    origin: ["http://127.0.0.1:5500"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
+
+console.log("CLERK_API_KEY:", process.env.CLERK_API_KEY);
+console.log("CLERK_FRONTEND_API:", process.env.CLERK_FRONTEND_API);
+
 const clerkMiddleware = ClerkExpressWithAuth();
 
-// Usando o middleware para autenticação das rotas (exceto cadastro)
-app.use(express.json()); // Permite que o Express leia JSON na requisição
+app.use(express.json());
 
-// Rota pública (não precisa de autenticação)
+app.use("/webhooks/clerk", webhookRoute);
+
 app.use("/cadastro", cadastroRoutes);
+app.use("/login", loginRoutes);
 
-// Rota protegida (precisa de autenticação)
+// Rota protegida
+app.use("/user", userDataRoutes);
+
 app.get("/profile", clerkMiddleware, (req, res) => {
-  const user = req.auth.user; // Obtendo as informações do usuário autenticado
+  const user = req.auth.user;
 
   res.json({
     message: "Perfil autenticado!",
@@ -29,6 +44,6 @@ app.get("/profile", clerkMiddleware, (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log("Servidor rodando em http://localhost:3000");
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
 });
