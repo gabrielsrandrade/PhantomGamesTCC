@@ -158,11 +158,72 @@
 
 }
 
-/* faz com que o card vá para baixo ao chegar no width max  */
-    .card_jogos{
+.cards_principais {
+    display: flex;
+    flex-direction: column;
+    max-width: 89rem;
+    margin: 5rem auto;
+    gap: 1rem;
+
+
+    .card_jogos {
+        display: flex;
         flex-wrap: wrap;
         overflow-x: unset;
+        max-width: 89rem;
+        gap: 2.5625rem;
+
+
+        .card_jogo {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            max-width: 15.75rem;
+            min-width: 15.75rem;
+            height: 28rem;
+
+            background-color: var(--card-color);
+            color: white;
+            font-weight: bold;
+
+            border-radius: 20px;
+            padding: 8px;
+
+            cursor: pointer;
+
+            .preco {
+                display: flex;
+                gap: 16px;
+
+                .promocao {
+                    color: var(--non-selected-color);
+                    text-decoration: line-through;
+                }
+            }
+
+            .estrelas {
+                color: var(--star-color);
+            }
+
+
+            .capa_card {
+                width: auto;
+                height: 20rem;
+
+                background-image: url('../assets/imagens/God_of_War_Ragnarök_capa.jpg');
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+
+                border-radius: 20px;
+            }
+        }
     }
+
+
+}
+
 
     .pagination{
         display: flex;
