@@ -1,18 +1,22 @@
 const express = require("express");
 const router = express.Router();
-const { ClerkExpressWithAuth, users } = require("@clerk/clerk-sdk-node");
+const { clerkClient, clerkMiddleware } = require("@clerk/express");
 
-const clerkMiddleware = ClerkExpressWithAuth();
 
-router.get("/", clerkMiddleware, async (req, res) => {
+
+router.post("/", async (req, res) => {
   const { userId } = req.auth;
-
+  console.log(req.body)
+  console.log(userId)
+  console.log(req)
   if (!userId) {
     return res.status(401).json({ message: "Não autenticado" });
   }
 
   try {
-    const user = await users.getUser(userId);
+    const user = await clerkClient.users.getUser(userId);
+
+    console.log(res.json(user));
 
     res.status(200).json({
       message: "Login verificado com sucesso",

@@ -8,7 +8,7 @@ form.addEventListener("submit", async (e) => {
   const senha = document.getElementById("senha").value;
 
   try {
-    const response = await fetch("http://localhost:3000/cadastro", {
+    const response = await fetch("http://localhost:3333/cadastro", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -22,7 +22,7 @@ form.addEventListener("submit", async (e) => {
 
     if (response.ok) {
       form.reset();
-      window.location.href = "homepage-logado.html";
+      window.location.href = "homepage.html";
     } else {
       console.error("Erro ao cadastrar:", data);
     }
