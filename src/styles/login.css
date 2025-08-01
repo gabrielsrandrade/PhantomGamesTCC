@@ -1,0 +1,12 @@
+@import "general.css";
+
+body{
+    background-image: radial-gradient(#00000070 100%), url('../../assets/imagens/fundo-login.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+#sing-in{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
