@@ -6,6 +6,7 @@ const clerkPubKey = "pk_test_d29ydGh5LWhhbGlidXQtNjUuY2xlcmsuYWNjb3VudHMuZGV2JA"
 
 const clerk = new Clerk(clerkPubKey)
 await clerk.load({
+  signInUrl: '../front-end/login.html' ,
   localization: ptBR,
   appearance: {
     baseTheme: dark,
@@ -14,4 +15,6 @@ await clerk.load({
 
 const signUpDiv = document.getElementById('sign-up')
 
-clerk.mountSignUp(signUpDiv)
+clerk.mountSignUp(signUpDiv, {
+  forceRedirectUrl: '/login.html'  
+})

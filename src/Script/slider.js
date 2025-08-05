@@ -126,7 +126,7 @@ function startAutoSlide() {
   autoSlideInterval = setInterval(() => {
     currentIndex = (currentIndex + 1) % images.length;
     updateCarousel(currentIndex);
-  }, 10000);
+  }, 3000);
 }
 
 async function initializeCarousel() {

@@ -6,6 +6,7 @@ const clerkPubKey = "pk_test_d29ydGh5LWhhbGlidXQtNjUuY2xlcmsuYWNjb3VudHMuZGV2JA"
 
 const clerk = new Clerk(clerkPubKey)
 await clerk.load({
+  signUpUrl: '../front-end/cadastro.html' ,
   localization: ptBR,
   appearance: {
     baseTheme: dark,
