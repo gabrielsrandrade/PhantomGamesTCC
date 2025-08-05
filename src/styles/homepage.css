@@ -26,8 +26,7 @@ h1 {
             border-radius: 15px;
             background-size: cover;
             background-position: center;
-
-
+            transition: opacity 0.3s ease-in-out;
             display: flex;
             flex-direction: column;
             justify-content: end;
@@ -76,6 +75,7 @@ h1 {
                 border-radius: 15px;
                 background-size: cover;
                 background-position: center;
+                transition: opacity 0.3s ease-in-out;
             }
         }
     }

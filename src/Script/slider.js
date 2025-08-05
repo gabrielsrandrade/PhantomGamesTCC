@@ -136,27 +136,37 @@ async function initializeCarousel() {
 }
 
 function updateCarousel(index) {
-  mainImage.style.backgroundImage = `linear-gradient(to right, rgba(0, 0, 0, 0.39) 30%, rgba(0, 0, 0, 0) 100%), url(${images[index].url})`;
-  priceElement.textContent = images[index].price;
+  // Reduz opacidade para criar efeito de fade
+  mainImage.style.opacity = '0';
 
-  const nextIndices = [
-    (index + 1) % images.length,
-    (index + 2) % images.length,
-    (index + 3) % images.length
-  ];
-  thumbnailsContainer.innerHTML = nextIndices.map((nextIndex, i) => `
-    <div class="carrosel_side_image ${i === 0 ? 'active' : ''}" data-index="${nextIndex}" style="background-image: linear-gradient(to right, rgba(0, 0, 0, 0.39) 30%, rgba(0, 0, 0, 0) 100%), url(${images[nextIndex].thumbnail});"></div>
-  `).join('');
+  // Aguarda a transição de opacidade antes de trocar a imagem
+  setTimeout(() => {
+    mainImage.style.backgroundImage = `linear-gradient(to right, rgba(0, 0, 0, 0.39) 30%, rgba(0, 0, 0, 0) 100%), url(${images[index].url})`;
+    priceElement.textContent = images[index].price;
 
-  const thumbnails = document.querySelectorAll('.carrosel_side_image');
-  thumbnails.forEach(thumb => {
-    thumb.addEventListener('click', () => {
-      const nextIndex = parseInt(thumb.dataset.index);
-      currentIndex = nextIndex;
-      updateCarousel(nextIndex);
-      startAutoSlide();
+    const nextIndices = [
+      (index + 1) % images.length,
+      (index + 2) % images.length,
+      (index + 3) % images.length
+    ];
+    thumbnailsContainer.innerHTML = nextIndices.map((nextIndex, i) => `
+      <div class="carrosel_side_image ${i === 0 ? 'active' : ''}" data-index="${nextIndex}" style="background-image: linear-gradient(to right, rgba(0, 0, 0, 0.39) 30%, rgba(0, 0, 0, 0) 100%), url(${images[nextIndex].thumbnail});"></div>
+    `).join('');
+
+    // Restaura opacidade após a troca
+    mainImage.style.opacity = '1';
+
+    // Adiciona eventos de clique às miniaturas
+    const thumbnails = document.querySelectorAll('.carrosel_side_image');
+    thumbnails.forEach(thumb => {
+      thumb.addEventListener('click', () => {
+        const nextIndex = parseInt(thumb.dataset.index);
+        currentIndex = nextIndex;
+        updateCarousel(nextIndex);
+        startAutoSlide();
+      });
     });
-  });
+  }, 200);
 }
 
 initializeCarousel();

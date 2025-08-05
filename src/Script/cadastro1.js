@@ -2,7 +2,7 @@ import { Clerk } from "@clerk/clerk-js"
 import { dark } from '@clerk/themes'
 import { ptBR } from '@clerk/localizations'
 
-const clerkPubKey = "pk_test_d29ydGh5LWhhbGlidXQtNjUuY2xlcmsuYWNjb3VudHMuZGV2JA"
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
 
 const clerk = new Clerk(clerkPubKey)
 await clerk.load({
@@ -15,6 +15,4 @@ await clerk.load({
 
 const signUpDiv = document.getElementById('sign-up')
 
-clerk.mountSignUp(signUpDiv, {
-  forceRedirectUrl: '/login.html'  
-})
+clerk.mountSignUp(signUpDiv)
