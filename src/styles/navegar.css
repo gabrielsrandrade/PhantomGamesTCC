@@ -3,26 +3,30 @@
 .filtroGeneros{
     display: flex;
     flex-direction: column;
-    min-width: 89rem;
-    max-width: 89rem;
+    min-width: 91rem;
+    max-width: 91rem;
     margin: 5rem auto;
     gap: 1rem;
+    
 
     .generos{
-        width: 100%;
+        width: 91rem;
         display: flex;
         justify-content: start;
         align-items: center;
-        gap: 1rem;
-        overflow-x: auto;
+        padding: 2rem;
         
 
         .g1, .g2, .g3, .g4{
             width: 21.5rem;
             height: 12.09rem;
+
             align-items: center;
+
             background-size: cover;
             background-position: center;
+            background-color: var(--navbar-color);
+
             display: flex;
             justify-content: space-between;
             padding-left: 1rem;
@@ -40,18 +44,7 @@
             }
         }
 
-        .g1{
-                background-image:  radial-gradient(circle,#00000080 100%), url('../../assets/imagens/ação.jpeg');
-            }
-        .g2{
-                background-image: radial-gradient(circle,#00000080 100%), url('../../assets/imagens/aventura.jpg');
-            }
-        .g3{
-                background-image: radial-gradient(circle,#00000080 100%), url('../../assets/imagens/fps.jpg');
-            }
-        .g4{
-                background-image: radial-gradient(circle,#00000080 100%), url('../../assets/imagens/rpg.jpg');
-            }
+        
         
     }
 }

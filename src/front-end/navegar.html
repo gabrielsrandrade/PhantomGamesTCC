@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="../styles/general.css" />
     <link rel="stylesheet" href="../styles/navegar.css" />
     <link rel="shortcut icon" href="../../assets/imagens/logo-ico.ico" type="image/x-icon"/>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
   </head>
 
   <body>
@@ -26,37 +30,56 @@
 
     <section class="filtroGeneros">
       <h1>Descubra por gênero</h1>
-      <div class="generos">
-        <div class="g1">
+      <div class="swiper generos">
+
+        <div class="swiper-wrapper">
+
+        <div class="g1 swiper-slide">
           <span>AÇÃO</span>
           <img src="../../assets/imagens/god of war kratos.png" alt="kratos" />
         </div>
-        <div class="g2">
+
+        <div class="g2 swiper-slide">
           <span>AVENTURA</span>
           <img
             src="../../assets/imagens/tomb raider lara croft.png"
             alt="lara croft"
           />
         </div>
-        <div class="g3">
+
+        <div class="g3 swiper-slide">
           <span>FPS</span>
           <img
             src="../../assets/imagens/battlefield 2042 personagem.png"
             alt="personagem battlefield 2042"
           />
         </div>
-        <div class="g4">
+
+        <div class="g4 swiper-slide">
           <span>RPG</span>
           <img
             src="../../assets/imagens/the witcher personagem.png"
             alt="gerald de rivia"
           />
         </div>
+
+        <div class="g4 swiper-slide">
+          <span>RPG</span>
+          <img
+            src="../../assets/imagens/the witcher personagem.png"
+            alt="gerald de rivia"
+          />
+        </div>
+
+        </div>
+
+        <div class="swiper-button-next swiper-navBtn"></div>
+        <div class="swiper-button-prev swiper-navBtn"></div>
+
       </div>
     </section>
 
 
-    // Filtros de navegação
     <form class="filtros">
       <h1>Filtros</h1>
       <div class="all-filters">
@@ -122,7 +145,6 @@
       </div>
     </form>
 
-    // Cards de jogos
     <section class="cards_principais">
       <div class="card_jogos">
         <div class="card_jogo">
@@ -205,7 +227,6 @@
         </div>
       </div>
 
-      // Paginação
       <div class="pagination">
         <div class="first">&#171;</div>
         <div class="prev">&lt;</div>
@@ -218,7 +239,6 @@
     </section>
 
 
-    //footer
     <footer>
       <p>&copy; 2025 Phantom Games TCC. Todos os direitos reservados.</p>
       <div class="social-media">
@@ -237,6 +257,8 @@
       </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="../Script/dropdawn-filtro.js"></script>
+    <script src="../Script/sliderN.js"></script>
   </body>
 </html>
