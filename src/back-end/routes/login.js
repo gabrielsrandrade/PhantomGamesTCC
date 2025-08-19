@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { clerkClient, clerkMiddleware } = require("@clerk/express");
-
-
+const { clerkClient } = require("@clerk/express");
 
 router.post("/", async (req, res) => {
   const { userId } = req.auth;
@@ -22,8 +20,9 @@ router.post("/", async (req, res) => {
       message: "Login verificado com sucesso",
       user: {
         id: user.id,
+        role: user.publicMetadata,
         email: user.emailAddresses?.[0]?.emailAddress,
-        nome: user.username,
+        nome: user.username
       },
     });
   } catch (error) {
