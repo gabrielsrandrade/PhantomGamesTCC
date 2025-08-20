@@ -1,7 +1,7 @@
 @import "general.css";
 
 body{
-    background-image: radial-gradient(#00000070 100%), url('../../assets/imagens/fundo-login.jpg');
+    background-image: linear-gradient(90deg,rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.5) 100%), url('../../assets/imagens/fundo-login.jpg');
     background-size: cover;
     background-repeat: no-repeat;
 }

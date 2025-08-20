@@ -17,5 +17,5 @@ if (clerk.isSignedIn && user) {
     }
 
 } else {
-    window.location.href = "/src/front-end/login.html"
+    window.location.href = "/src/front-end/homepage.html"
 }
