@@ -1,21 +1,34 @@
 import { Clerk } from '@clerk/clerk-js';
 
-async function initNavbar() {
-  try {
-    const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const clerk = new Clerk(clerkPubKey);
 
-    const clerk = new Clerk(clerkPubKey);
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
     await clerk.load();
 
-    const user = clerk.user;
-    const navbar = document.querySelector('.navbar');
+    clerk.addListener(({ user }) => {
+      renderNavbar(user);
+    });
 
-    if (clerk.isSignedIn && user) {
+    renderNavbar(clerk.user);
+    
+  } catch (error) {
+    console.error('Erro ao inicializar Clerk:', error);
+  }
+});
 
-      const userEmail = user.primaryEmailAddress?.emailAddress;
+function renderNavbar(user) {
+  const navbar = document.querySelector('.navbar');
+  if (!navbar) return;
+  
+  const isSignedIn = !!user;
 
-      if (userEmail === "phantomgamestcc@gmail.com") {
-        navbar.innerHTML = `
+  if (isSignedIn) {
+    const userEmail = user.primaryEmailAddress?.emailAddress;
+
+    if (userEmail === "phantomgamestcc@gmail.com") {
+      navbar.innerHTML = `
         <div class="logadoA">
           <ul>
             <li><img src="../../assets/imagens/logo-png.png" alt="Logo"></li>
@@ -28,9 +41,9 @@ async function initNavbar() {
           <a href="logout.html"><button>Adicionar Jogo</button></a>
           <div id="user-button"></div>
         </div>
-        `;
-      } else {
-        navbar.innerHTML = `
+      `;
+    } else {
+      navbar.innerHTML = `
         <div class="logadoM">
           <ul>
             <li><img src="../../assets/imagens/logo-png.png" alt="Logo"></li>
@@ -42,11 +55,20 @@ async function initNavbar() {
           <form class="search-bar">
             <input type="search" placeholder="Pesquisar...">
           </form>
+            <div class="left">
+          <li><img class="carrinho" src="../../assets/imagens/carrinho.png" alt="Logo"></li>
           <div id="user-button"></div>
-        `;
-      }
-    } else {
-      navbar.innerHTML = `
+           </div>
+        </div>
+      `;
+    }
+
+    const userButtonDiv = document.getElementById('user-button');
+    if (userButtonDiv) {
+      clerk.mountUserButton(userButtonDiv);
+    }
+  } else {
+    navbar.innerHTML = `
       <div class="deslogado">
         <ul>
           <li><img src="../../assets/imagens/logo-png.png" alt="Logo"></li>
@@ -58,12 +80,7 @@ async function initNavbar() {
           <input type="search" placeholder="Pesquisar...">
         </form>
         <a href="login.html"><button>Entrar</button></a>
-     </div>
-     `;
-    }
-  } catch (error) {
-    console.error('Erro ao inicializar Clerk ou navbar:', error);
+      </div>
+    `;
   }
 }
-
-document.addEventListener('DOMContentLoaded', initNavbar);
