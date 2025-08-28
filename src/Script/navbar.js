@@ -105,34 +105,34 @@ function createAddGameModal() {
         <div class="modal-content">
             <button class="close-modal-btn">&times;</button>
             <h2>Adicionar Novo Jogo</h2>
-            <form id="add-game-form">
+            <form id="add-game-form" >
                 <div class="form-group">
-                    <label for="game-name">Nome do Jogo:</label>
-                    <input type="text" id="game-name" name="game-name" required>
+                    <label for="Nome_jogo">Nome do Jogo:</label>
+                    <input type="text" id="Nome_jogo" name="Nome_jogo" required>
                 </div>
                 <div class="form-group">
-                    <label for="game-description">Descrição:</label>
-                    <textarea id="game-description" name="game-description" required></textarea>
+                    <label for="Descricao_jogo">Descrição:</label>
+                    <textarea id="Descricao_jogo" name="Descricao_jogo" required></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="game-price">Preço (R$):</label>
-                    <input type="number" id="game-price" name="game-price" step="0.01" required>
+                    <label for="Preco_jogo">Preço (R$):</label>
+                    <input type="number" id="Preco_jogo" name="Preco_jogo" step="0.01" required>
                 </div>
                 <div class="form-group">
-                    <label for="game-logo">Logo (URL da Imagem):</label>
-                    <input type="url" id="game-logo" name="game-logo">
+                    <label for="Logo_jogo">Logo (URL da Imagem):</label>
+                    <input type="url" id="Logo_jogo" name="Logo_jogo">
                 </div>
                 <div class="form-group">
-                    <label for="game-cover">Capa (URL da Imagem):</label>
-                    <input type="url" id="game-cover" name="game-cover" required>
+                    <label for="Capa_jogo">Capa (URL da Imagem):</label>
+                    <input type="url" id="Capa_jogo" name="capa_jogo" required>
                 </div>
                 <div class="form-group">
-                    <label for="game-media">Imagens/Vídeos (URLs, separadas por vírgula):</label>
-                    <textarea id="game-media" name="game-media"></textarea>
+                    <label for="Midias_jogo">Imagens/Vídeos (URLs, separadas por vírgula):</label>
+                    <textarea id="Midias_jogo" name="Midias_jogo"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="game-rating">Faixa Etária:</label>
-                    <select id="game-rating" name="game-rating" required>
+                    <label for="Faixa_etaria">Faixa Etária:</label>
+                    <select id="Faixa_etaria" name="Faixa_etaria" required>
                         <option value="L">L - Livre</option>
                         <option value="10">10+</option>
                         <option value="12">12+</option>

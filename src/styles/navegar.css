@@ -1,5 +1,7 @@
 @import "general.css";
 
+/*swiper genros*/
+
 .filtroGeneros{
     display: flex;
     flex-direction: column;
@@ -44,10 +46,22 @@
             }
         }
 
-        
-        
+        .g1{
+            background-image: radial-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(../../assets/imagens/ação.jpeg);
+        }
+        .g2{
+            background-image: radial-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(../../assets/imagens/aventura.jpg);
+        }
+        .g3{
+            background-image: radial-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(../../assets/imagens/fps.jpg);
+        }
+        .g4{
+            background-image: radial-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(../../assets/imagens/rpg.jpg);
+        } 
     }
 }
+
+/*filtros*/
 
 .filtros{
     display: flex;
@@ -148,8 +162,9 @@
                 font-size: 0.9em;
             }
         }
-
 }
+
+/*cards*/
 
 .cards_principais {
     display: flex;
@@ -213,9 +228,9 @@
             }
         }
     }
-
-
 }
+
+/*paginação*/
 
 
     .pagination{
