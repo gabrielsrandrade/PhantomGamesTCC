@@ -136,7 +136,7 @@ footer {
     position: sticky;
     top: 8px;
 
-    margin: auto;
+    margin: 0 auto;
 
     background-color: var(--navbar-color);
 
