@@ -96,7 +96,6 @@
 //   const modal = document.createElement('div');
 //   modal.classList.add('add-game-modal');
 
-//   // Arrays de opções para Gênero e Categoria
 //   const genres = ["Ação", "Aventura", "Casual", "Corrida", "Esportes", "Estratégia", "Indie", "Luta", "Musical", "Narrativo", "Plataforma", "Puzzle", "RPG", "Simulação", "Sobrevivência", "Terror", "Tiro"];
 //   const categories = ["Singleplayer", "Multiplayer Local", "Multiplayer Online", "Co-op", "PvP", "PvE", "MMO", "Cross-Plataform", "2D", "3D", "2.5D", "Top-Down", "Side-Scrooling", "Isométrico", "Primeira Pessoa", "Terceira Pessoa", "Linear", "Mundo Aberto", "Sandbox", "Campanha", "Missões/Fases", "Permadeath", "Rouguelike"];
 
@@ -142,7 +141,7 @@
 //               </div>
               
 //               <div class="form-group">
-//                   <label>Gênero:</label>
+//                   <label>Gêneros:</label>
 //                   <div class="multiselect-container" id="multiselect-genre">
 //                       <div class="multiselect-tags" id="genre-tags"></div>
 //                       <div class="multiselect-dropdown hidden" id="genre-dropdown">
@@ -152,7 +151,7 @@
 //               </div>
 
 //               <div class="form-group">
-//                   <label>Categoria:</label>
+//                   <label>Categorias:</label>
 //                   <div class="multiselect-container" id="multiselect-category">
 //                       <div class="multiselect-tags" id="category-tags"></div>
 //                       <div class="multiselect-dropdown hidden" id="category-dropdown">
@@ -162,7 +161,7 @@
 //               </div>
               
 //               <div class="form-buttons">
-//                   <button type="reset" class="clear-btn">Limpar</button>
+//                   <button type="button" class="clear-btn">Limpar</button>
 //                   <button type="submit" class="submit-btn">Adicionar</button>
 //               </div>
 //           </form>
@@ -185,30 +184,13 @@
 //     }
 //   });
 
-//   // Funções para o novo componente de seleção múltipla
 //   function setupMultiselect(containerId) {
 //     const container = document.getElementById(containerId);
 //     const tagsDiv = container.querySelector('.multiselect-tags');
 //     const dropdown = container.querySelector('.multiselect-dropdown');
 //     let selectedValues = [];
 
-//     tagsDiv.addEventListener('click', () => {
-//       dropdown.classList.toggle('hidden');
-//     });
-
-//     dropdown.addEventListener('click', (e) => {
-//       const option = e.target.closest('.multiselect-option');
-//       if (!option) return;
-      
-//       const value = option.dataset.value;
-//       if (!selectedValues.includes(value)) {
-//         selectedValues.push(value);
-//         renderTags();
-//       }
-//       dropdown.classList.add('hidden');
-//     });
-
-//     function renderTags() {
+//     const renderTags = () => {
 //       tagsDiv.innerHTML = '';
 //       if (selectedValues.length === 0) {
 //         tagsDiv.textContent = "Clique para adicionar...";
@@ -226,29 +208,66 @@
 //             e.stopPropagation();
 //             selectedValues = selectedValues.filter(v => v !== value);
 //             renderTags();
+//             updateDropdown(); // Atualiza o dropdown ao remover uma tag
 //           });
 //           tag.appendChild(closeBtn);
 //           tagsDiv.appendChild(tag);
 //         });
 //       }
-//     }
-    
-//     renderTags(); // Renderiza o estado inicial
+//     };
 
-//     // Retorna a função para obter os valores selecionados
-//     return () => selectedValues;
+//     const updateDropdown = () => {
+//       const options = dropdown.querySelectorAll('.multiselect-option');
+//       options.forEach(option => {
+//         if (selectedValues.includes(option.dataset.value)) {
+//           option.classList.add('selected');
+//         } else {
+//           option.classList.remove('selected');
+//         }
+//       });
+//     };
+
+//     tagsDiv.addEventListener('click', () => {
+//       dropdown.classList.toggle('hidden');
+//     });
+
+//     dropdown.addEventListener('click', (e) => {
+//       const option = e.target.closest('.multiselect-option');
+//       if (!option || option.classList.contains('selected')) return;
+      
+//       const value = option.dataset.value;
+//       if (!selectedValues.includes(value)) {
+//         selectedValues.push(value);
+//         renderTags();
+//         updateDropdown(); // Atualiza o dropdown ao adicionar uma tag
+//       }
+//       dropdown.classList.add('hidden');
+//     });
+
+//     const reset = () => {
+//         selectedValues = [];
+//         renderTags();
+//         updateDropdown(); // Atualiza o dropdown ao resetar
+//     };
+
+//     renderTags();
+//     updateDropdown(); // Atualiza o dropdown no estado inicial
+
+//     return {
+//         getValues: () => selectedValues,
+//         reset: reset
+//     };
 //   }
   
-//   const getSelectedGenres = setupMultiselect('multiselect-genre');
-//   const getSelectedCategories = setupMultiselect('multiselect-category');
+//   const multiselectGenre = setupMultiselect('multiselect-genre');
+//   const multiselectCategory = setupMultiselect('multiselect-category');
 
-//   // Adiciona o evento de submissão do formulário
 //   const addGameForm = modal.querySelector('#add-game-form');
 //   addGameForm.addEventListener('submit', (e) => {
 //     e.preventDefault();
 
-//     const selectedGenres = getSelectedGenres();
-//     const selectedCategories = getSelectedCategories();
+//     const selectedGenres = multiselectGenre.getValues();
+//     const selectedCategories = multiselectCategory.getValues();
 
 //     console.log('Dados do jogo a serem enviados:', {
 //       name: addGameForm.Nome_jogo.value,
@@ -265,6 +284,13 @@
 //     alert('Jogo adicionado com sucesso! (Simulação)');
 //     document.body.removeChild(modal);
 //     document.body.removeChild(overlay);
+//   });
+  
+//   const clearButton = modal.querySelector('.clear-btn');
+//   clearButton.addEventListener('click', () => {
+//       addGameForm.reset();
+//       multiselectGenre.reset();
+//       multiselectCategory.reset();
 //   });
 // }
 
@@ -392,7 +418,7 @@ function createAddGameModal() {
               </div>
               <div class="form-group">
                   <label for="Capa_jogo">Capa (URL da Imagem):</label>
-                  <input type="url" id="Capa_jogo" name="capa_jogo" required>
+                  <input type="url" id="Capa_jogo" name="Capa_jogo" required>
               </div>
               <div class="form-group">
                   <label for="Midias_jogo">Imagens/Vídeos (URLs, separadas por vírgula):</label>
@@ -478,7 +504,7 @@ function createAddGameModal() {
             e.stopPropagation();
             selectedValues = selectedValues.filter(v => v !== value);
             renderTags();
-            updateDropdown(); // Atualiza o dropdown ao remover uma tag
+            updateDropdown();
           });
           tag.appendChild(closeBtn);
           tagsDiv.appendChild(tag);
@@ -509,7 +535,7 @@ function createAddGameModal() {
       if (!selectedValues.includes(value)) {
         selectedValues.push(value);
         renderTags();
-        updateDropdown(); // Atualiza o dropdown ao adicionar uma tag
+        updateDropdown();
       }
       dropdown.classList.add('hidden');
     });
@@ -517,11 +543,11 @@ function createAddGameModal() {
     const reset = () => {
         selectedValues = [];
         renderTags();
-        updateDropdown(); // Atualiza o dropdown ao resetar
+        updateDropdown();
     };
 
     renderTags();
-    updateDropdown(); // Atualiza o dropdown no estado inicial
+    updateDropdown();
 
     return {
         getValues: () => selectedValues,
@@ -533,33 +559,56 @@ function createAddGameModal() {
   const multiselectCategory = setupMultiselect('multiselect-category');
 
   const addGameForm = modal.querySelector('#add-game-form');
-  addGameForm.addEventListener('submit', (e) => {
+  
+  // *** AQUI É O TRECHO PRINCIPAL QUE FOI MODIFICADO PARA ENVIAR OS DADOS ***
+  addGameForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const selectedGenres = multiselectGenre.getValues();
-    const selectedCategories = multiselectCategory.getValues();
+    // Cria um objeto com os dados do formulário
+    const gameData = {
+      Nome_jogo: addGameForm.Nome_jogo.value,
+      Descricao_jogo: addGameForm.Descricao_jogo.value,
+      Preco_jogo: parseFloat(addGameForm.Preco_jogo.value), // Converte para número
+      Logo_jogo: addGameForm.Logo_jogo.value,
+      Capa_jogo: addGameForm.Capa_jogo.value,
+      Midias_jogo: addGameForm.Midias_jogo.value,
+      Faixa_etaria: addGameForm.Faixa_etaria.value,
+      // ID_categoria: addGameForm.ID_categoria.value,
+      // ID_genero: addGameForm.ID_genero.value,
+    };
 
-    console.log('Dados do jogo a serem enviados:', {
-      name: addGameForm.Nome_jogo.value,
-      description: addGameForm.Descricao_jogo.value,
-      price: addGameForm.Preco_jogo.value,
-      logo: addGameForm.Logo_jogo.value,
-      cover: addGameForm.Capa_jogo.value,
-      media: addGameForm.Midias_jogo.value.split(',').map(url => url.trim()),
-      rating: addGameForm.Faixa_etaria.value,
-      genre: selectedGenres,
-      category: selectedCategories
-    });
+    try {
+      // Envia os dados para a sua API usando a rota '/adicionar-jogo'
+      const response = await fetch('http://localhost:3000/adicionar-jogo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(gameData),
+      });
 
-    alert('Jogo adicionado com sucesso! (Simulação)');
-    document.body.removeChild(modal);
-    document.body.removeChild(overlay);
+      const result = await response.text();
+
+      if (response.ok) {
+        alert(result);
+        addGameForm.reset();
+        multiselectGenre.reset();
+        multiselectCategory.reset();
+        document.body.removeChild(modal);
+        document.body.removeChild(overlay);
+      } else {
+        alert('Erro ao adicionar jogo: ' + result);
+      }
+    } catch (error) {
+      console.error('Erro na requisição:', error);
+      alert('Ocorreu um erro ao conectar com o servidor.');
+    }
   });
   
   const clearButton = modal.querySelector('.clear-btn');
   clearButton.addEventListener('click', () => {
-      addGameForm.reset();
-      multiselectGenre.reset();
-      multiselectCategory.reset();
+    addGameForm.reset();
+    multiselectGenre.reset();
+    multiselectCategory.reset();
   });
 }

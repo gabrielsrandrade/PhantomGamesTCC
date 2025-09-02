@@ -25,16 +25,20 @@ Nome varchar(20) not null);
 /*tabela jogos */
 create table jogos(
 ID_jogo int(5) primary key not null auto_increment, 
+ID_categoria int(2) not null, 
+ID_genero int(2) not null, 
 Nome_jogo varchar(20) not null,
 Preco_jogo decimal(5,2) not null,
 Logo_jogo text not null,
 Descricao_jogo text,
 Capa_jogo text not null,
 Midias_jogo text not null,
-data_jogo date not null,
 Faixa_etaria text not null,
-Media_nota decimal(10,2) not null
+Media_nota decimal(10,2) not null,
+foreign key (ID_categoria) REFERENCES categoria(ID_categoria),
+foreign key (ID_genero) REFERENCES genero(ID_genero)
 );
+
 
 create table categoria_jogos(
 ID_categoria_jogos int(2) primary key not null auto_increment, 
