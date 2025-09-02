@@ -1,98 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Jogo</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
-    <link rel="shortcut icon" href="../../assets/imagens/logo-ico.ico" type="image/x-icon"/>
-    <link rel="stylesheet" href="../styles/general.css">
-    <link rel="stylesheet" href="../styles/jogo.css">
-</head>
-<body>
-    <nav class="navbar">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <link
+      rel="shortcut icon"
+      href="../../assets/imagens/logo-ico.ico"
+      type="image/x-icon"
+    />
+    <link rel="stylesheet" href="../styles/general.css" />
+    <link rel="stylesheet" href="../styles/jogo.css" />
+  </head>
+  <body>
+    <nav class="navbar"></nav>
 
-    </nav>
+    <a href="homepage.html" class="seta-retorno"
+      ><img src="../../assets/imagens/chevron-left.png" alt="retorno"
+    /></a>
 
-   <section>
-    <h1 id="nome_jogo">Nome Jogo</h1>
+    <span id="nome-jogo">Minecraft</span>
 
-    <div class="swiper-wrapper">
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-1.jpg" />
+    <main>
+      <div class="imagem-jogo">
+        <div
+          style="
+            --swiper-navigation-color: #fff;
+            --swiper-pagination-color: #fff;
+          "
+          class="swiper jogo-main-image"
+        >
+          <div class="swiper-wrapper">
+            <div class="swiper-slide">
+              <img src="https://xboxwire.thesourcemediaassets.com/sites/8/2024/05/Hero-bdef2532984d6fcafc40.jpg" />
+            </div>
+            <div class="swiper-slide">
+              <img src="https://xboxwire.thesourcemediaassets.com/sites/8/2025/07/Hero-6c04e1b759a006009ce7.jpg" />
+            </div>
+            <div class="swiper-slide">
+              <img src="https://assets.nintendo.com/image/upload/ar_16:9,c_lpad,w_1240/b_white/f_auto/q_auto/ncom/software/switch/70010000000964/a28a81253e919298beab2295e39a56b7a5140ef15abdb56135655e5c221b2a3a" />
+            </div>
+            <div class="swiper-slide">
+              <img src="https://jogospc.com.br/wp-content/uploads/2025/01/Minecraft.jpg" />
+            </div>
+          </div>
+          <!-- <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div> -->
         </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-2.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-3.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-4.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-5.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-6.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-7.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-8.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-9.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-10.jpg" />
+
+        <div thumbsSlider="" class="swiper jogo-side-image">
+          <div class="swiper-wrapper">
+            <div class="swiper-slide">
+              <img src="https://xboxwire.thesourcemediaassets.com/sites/8/2024/05/Hero-bdef2532984d6fcafc40.jpg" />
+            </div>
+            <div class="swiper-slide">
+              <img src="https://xboxwire.thesourcemediaassets.com/sites/8/2025/07/Hero-6c04e1b759a006009ce7.jpg" />
+            </div>
+            <div class="swiper-slide">
+              <img src="https://assets.nintendo.com/image/upload/ar_16:9,c_lpad,w_1240/b_white/f_auto/q_auto/ncom/software/switch/70010000000964/a28a81253e919298beab2295e39a56b7a5140ef15abdb56135655e5c221b2a3a" />
+            </div>
+            <div class="swiper-slide">
+              <img src="https://jogospc.com.br/wp-content/uploads/2025/01/Minecraft.jpg" />
+            </div>
+          </div>
         </div>
       </div>
-      <div class="swiper-button-next"></div>
-      <div class="swiper-button-prev"></div>
-    </div>
-    <div thumbsSlider="" class="swiper mySwiper">
-      <div class="swiper-wrapper">
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-1.jpg" />
+
+      <div class="sobre-jogo">
+        <div id="logo-jogo"></div>
+        <span id="descrição"
+          >Lorem ipsum dolor sit amet consectetur, adipisicing elit. Debitis non
+          adipisci omnis vero quos facere eos perspiciatis consequatur sed ipsa
+          deserunt impedit reprehenderit fugit similique nisi, quidem harum
+          accusamus dolor.</span
+        >
+        <div id="faixa-etaria"></div>
+
+        <div class="detalhes-jogo">
+          <div class="preco-avaliacao">
+            <span id="preco">R$89,90</span>
+            <div id="avaliacao">
+              <span class="star">&#9733;</span>
+              <span class="star">&#9733;</span>
+              <span class="star">&#9733;</span>
+              <span class="star">&#9733;</span>
+              <span class="star">&#9733;</span>
+            </div>
+          </div>
+
+          <button id="editar">Editar Jogo</button>
+          <button id="remover">Remover Jogo</button>
         </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-2.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-3.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-4.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-5.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-6.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-7.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-8.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-9.jpg" />
-        </div>
-        <div class="swiper-slide">
-          <img src="https://swiperjs.com/demos/images/nature-10.jpg" />
-        </div>
+
       </div>
-    </div>
-
-</section>
-
+    </main>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="../Script/jogoSwiper.js"></script>
     <script type="module" src="../Script/navbar.js"></script>
     <script type="module" src="../Script/userbutton.js"></script>
-</body>
+  </body>
 </html>
