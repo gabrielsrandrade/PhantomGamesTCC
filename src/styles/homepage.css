@@ -294,8 +294,92 @@ h1 {
 }
 
 @media (max-width: 1480px) {}
+    
 
-/* Estilos para a modal de adicionar jogo */
+
+/* Estilos para o componente de seleção múltipla (tags) */
+
+.multiselect-container {
+    position: relative;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.multiselect-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    min-height: 40px; /* Altura do input normal */
+    padding: 5px 10px;
+    border: 1px solid var(--non-selected-color); /* Borda equivalente à dos inputs */
+    border-radius: 5px;
+    background-color: var(--card-color); /* Fundo equivalente à dos inputs */
+    gap: 8px; /* Aumentei o espaçamento entre as tags */
+}
+
+.multiselect-tags.placeholder {
+    color: var(--non-selected-color); /* Cor para o texto "Clique para adicionar..." */
+    font-style: italic;
+    font-size: 1rem;
+}
+
+.multiselect-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    background-color: var(--button-color); /* Cor de destaque para as tags */
+    color: var(--selected-text-color);
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.tag-close {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.8);
+    transition: color 0.2s ease;
+}
+
+.tag-close:hover {
+    color: var(--selected-text-color);
+}
+
+.multiselect-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: var(--card-color); /* Fundo equivalente aos inputs */
+    border: 1px solid var(--non-selected-color); /* Borda equivalente aos inputs */
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+    z-index: 50;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.multiselect-dropdown.hidden {
+    display: none;
+}
+
+.multiselect-option {
+    display: block;
+    padding: 10px;
+    cursor: pointer;
+    color: var(--selected-text-color); /* Texto das opções com a cor padrão */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.multiselect-option:hover {
+    background-color: var(--navbar-color); /* Cor de hover equivalente à navbar */
+    color: var(--selected-text-color);
+}
+.multiselect-option.selected {
+    display: none;
+}
+
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -314,7 +398,7 @@ h1 {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: var(--background-color);
+    background-color: var(--navbar-color);
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -322,6 +406,9 @@ h1 {
     max-width: 600px;
     width: 90%;
     color: var(--selected-text-color);
+    
+    max-height: 90vh;
+    overflow-y: auto; 
 }
 
 .modal-content h2 {
@@ -409,3 +496,5 @@ h1 {
 .modal-content .clear-btn:hover {
     background-color: #303e48;
 }
+
+
