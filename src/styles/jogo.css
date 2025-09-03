@@ -1,9 +1,4 @@
 @import "general.css";
-
-body {
-  gap: 1rem;
-}
-
 .seta-retorno {
   height: 2.5rem;
   padding: 0 4rem;
@@ -120,7 +115,8 @@ main {
 
         #avaliacao {
           font-size: 1.5rem;
-          .star{
+
+          .star {
             color: var(--star-color);
           }
         }
@@ -137,28 +133,88 @@ main {
         font-weight: 600;
       }
 
-      #editar, #comprar, #jogar {
+      #editar,
+      #comprar,
+      #jogar {
         background-color: var(--button-color);
       }
 
-      #editar:hover, #comprar:hover, #jogar:hover {
+      #editar:hover,
+      #comprar:hover,
+      #jogar:hover {
         background-color: #1979c9;
         transition: 0.3s;
 
       }
-      #carrinho, #desejos{
+
+      #carrinho,
+      #desejos {
         background-color: var(--search-bar);
       }
-      #carrinho:hover, #desejos:hover {
+
+      #carrinho:hover,
+      #desejos:hover {
         background-color: #555555;
         transition: 0.3s;
       }
+
       #remover {
         background-color: #e53232;
       }
+
       #remover:hover {
         background-color: #b12222;
         transition: 0.3s;
+      }
+    }
+  }
+}
+
+.genero-categoria {
+  display: flex;
+  padding: 2rem 6rem;
+  width: 100%;
+  color: white;
+  margin-top: 2rem;
+  font-size: 1.5rem;
+
+  .generos {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 30%;
+
+    #genero {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+
+      span {
+        background-color: var(--search-bar);
+        border-radius: 10px;
+        padding: 4px 6px;
+      }
+    }
+  }
+
+  .categorias {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 30%;
+    padding-left: 1rem;
+    border-left: solid 2px var(--search-bar);
+    
+
+    #categoria {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+
+      span {
+        background-color: var(--search-bar);
+        border-radius: 10px;
+        padding: 4px 6px;
       }
     }
   }

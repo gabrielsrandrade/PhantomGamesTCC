@@ -38,6 +38,8 @@
 }
 
 body {
+    position: relative;
+
     background-color: var(--background-color);
     font-family: "Montserrat", sans-serif;
     font-optical-sizing: auto;
@@ -45,7 +47,7 @@ body {
 
     display: flex;
     flex-direction: column;
-    justify-content: start;
+    justify-content: space-between;
     align-items: start;
 
     min-height: 100vh;
@@ -70,6 +72,7 @@ footer {
     width: 100%;
     height: 8rem;
     padding: 2rem;
+
     /* margin-top: auto; */
 
 
