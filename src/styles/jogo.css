@@ -220,6 +220,91 @@ main {
   }
 }
 
+.avaliacao{
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 6rem;
+  gap: 1rem;
+  width: 100%;
+  #adicionar-comentario{
+    display: flex;
+    flex-direction: column;
+    background-color: var(--card-color);
+    padding: 1rem;
+    border-radius: 1rem;
+    color: white;
+    gap: 6px;
+    .image-perfil{
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      img{
+        background-color: #555555;
+        height: 2rem;
+        width: 2rem;
+        border-radius: 50%;
+      }
+    }
+    .nota{
+      font-size: 1.5rem;
+    }
+    #comentario{
+      width: 100%;
+      .inputComentario{
+        background-color: var(--search-bar);
+        border-radius: 10px;
+        height: 2rem;
+        width: 94%;
+        font-size: 1rem;
+        padding: 6px;
+        color: white;
+      }
+      button{
+        height: 2rem;
+        width: 5%;
+        border-radius: 10px;
+        background-color: var(--button-color);
+        font-size: 1rem;
+        color: white;
+        font-weight: 600;
+      }
+      button:hover{
+        background-color: #1979c9;
+        transition: 0.3s;
+      }
+    }
+  }
+  .comentariosJaFeito{
+    display: flex;
+    flex-direction: column;
+    background-color: var(--card-color);
+    padding: 1rem;
+    border-radius: 1rem;
+    color: white;
+    gap: 6px;
+    .image-perfil{
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      img{
+        background-color: #555555;
+        height: 2rem;
+        width: 2rem;
+        border-radius: 50%;
+      }
+    }
+    .nota{
+      font-size: 1.5rem;
+    }
+    #cometarioFeito{
+      margin-top: 1rem;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+  }
+}
+
+
 .swiper-button-next {
   right: 10px;
 }
