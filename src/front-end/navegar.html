@@ -4,13 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Página Principal</title>
-
+    
     <link rel="stylesheet" href="../styles/navegar.css" />
-    <link
-      rel="shortcut icon"
-      href="../../assets/imagens/logo-ico.ico"
-      type="image/x-icon"
-    />
+    <link rel="shortcut icon" href="../../assets/imagens/logo-ico.ico" type="image/x-icon"/>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
@@ -20,57 +16,61 @@
   </head>
 
   <body>
-    <nav class="navbar"></nav>
+    <nav class="navbar">
+      
+    </nav>
 
     <section class="filtroGeneros">
       <h1>Descubra por gênero</h1>
       <div class="swiper generos">
+
         <div class="swiper-wrapper">
-          <div class="g1 swiper-slide">
-            <span>AÇÃO</span>
-            <img
-              src="../../assets/imagens/god of war kratos.png"
-              alt="kratos"
-            />
-          </div>
 
-          <div class="g2 swiper-slide">
-            <span>AVENTURA</span>
-            <img
-              src="../../assets/imagens/tomb raider lara croft.png"
-              alt="lara croft"
-            />
-          </div>
+        <div class="g1 swiper-slide">
+          <span>AÇÃO</span>
+          <img src="../../assets/imagens/god of war kratos.png" alt="kratos" />
+        </div>
 
-          <div class="g3 swiper-slide">
-            <span>FPS</span>
-            <img
-              src="../../assets/imagens/battlefield 2042 personagem.png"
-              alt="personagem battlefield 2042"
-            />
-          </div>
+        <div class="g2 swiper-slide">
+          <span>AVENTURA</span>
+          <img
+            src="../../assets/imagens/tomb raider lara croft.png"
+            alt="lara croft"
+          />
+        </div>
 
-          <div class="g4 swiper-slide">
-            <span>RPG</span>
-            <img
-              src="../../assets/imagens/the witcher personagem.png"
-              alt="gerald de rivia"
-            />
-          </div>
+        <div class="g3 swiper-slide">
+          <span>FPS</span>
+          <img
+            src="../../assets/imagens/battlefield 2042 personagem.png"
+            alt="personagem battlefield 2042"
+          />
+        </div>
 
-          <div class="g4 swiper-slide">
-            <span>RPG</span>
-            <img
-              src="../../assets/imagens/the witcher personagem.png"
-              alt="gerald de rivia"
-            />
-          </div>
+        <div class="g4 swiper-slide">
+          <span>RPG</span>
+          <img
+            src="../../assets/imagens/the witcher personagem.png"
+            alt="gerald de rivia"
+          />
+        </div>
+
+        <div class="g4 swiper-slide">
+          <span>RPG</span>
+          <img
+            src="../../assets/imagens/the witcher personagem.png"
+            alt="gerald de rivia"
+          />
+        </div>
+
         </div>
 
         <div class="swiper-button-next swiper-navBtn"></div>
         <div class="swiper-button-prev swiper-navBtn"></div>
+
       </div>
     </section>
+
 
     <form class="filtros">
       <h1>Filtros</h1>
@@ -78,11 +78,7 @@
         <div class="filtro">
           <div class="select">
             <span class="select-text">Gênero</span>
-            <img
-              class="select-icon"
-              src="../../assets/imagens/seta-filtro.png"
-              alt="seta"
-            />
+            <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
           </div>
           <div class="filtro-content">
             <ul>
@@ -97,11 +93,7 @@
         <div class="filtro">
           <div class="select">
             <span class="select-text">Categoria</span>
-            <img
-              class="select-icon"
-              src="../../assets/imagens/seta-filtro.png"
-              alt="seta"
-            />
+            <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
           </div>
           <div class="filtro-content">
             <ul>
@@ -116,11 +108,7 @@
         <div class="filtro">
           <div class="select">
             <span class="select-text">Preço</span>
-            <img
-              class="select-icon"
-              src="../../assets/imagens/seta-filtro.png"
-              alt="seta"
-            />
+            <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
           </div>
           <div class="filtro-content">
             <ul>
@@ -135,11 +123,7 @@
         <div class="filtro">
           <div class="select">
             <span class="select-text">Avaliação</span>
-            <img
-              class="select-icon"
-              src="../../assets/imagens/seta-filtro.png"
-              alt="seta"
-            />
+            <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
           </div>
           <div class="filtro-content">
             <ul>
@@ -153,7 +137,7 @@
       </div>
     </form>
 
-    <!-- <section class="cards_principais" id="cards-container">
+    <section class="cards_principais">
       <div class="card_jogos">
         <div class="card_jogo">
           <div class="capa_card"></div>
@@ -244,11 +228,8 @@
         <div class="next">&gt;</div>
         <div class="last">&#187;</div>
       </div>
-    </section> -->
-
-    <section class="cards_principais" id="cards-container">
-      <!-- Os cards serão inseridos aqui via JS -->
     </section>
+
 
     <footer>
       <p>&copy; 2025 Phantom Games TCC. Todos os direitos reservados.</p>
@@ -272,6 +253,5 @@
     <script type="module" src="../Script/navbar.js"></script>
     <script src="../Script/dropdawn-filtro.js"></script>
     <script src="../Script/sliderN.js"></script>
-    <script src="../Script/carregar-jogos.js"></script>
   </body>
 </html>

@@ -87,7 +87,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "Verdao2007@@",
+    password: "",
     database: "PhantomGames"
 });
 
@@ -129,21 +129,6 @@ app.post('/adicionar-jogo', (req, res) => {
       res.status(200).send("Jogo adicionado com sucesso!");
   });
 });
-
-app.get('/jogos', (req, res) => {
-    const sql = "SELECT * FROM jogos";
-    connection.query(sql, (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).send("Erro ao buscar jogos");
-        }
-        res.json(results);
-    });
-});
-
-connection.query('SELECT * FROM jogos', (err, res)=>{
-    return console.log(res)
-})
 
 // Inicia o servidor
 app.listen(port, () => {
