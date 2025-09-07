@@ -77,9 +77,9 @@ function createAddGameModal() {
             // Pega os valores dos campos
             // Usar 'form.querySelector' é melhor pois limita a busca ao formulário
             const Nome_jogo = form.querySelector("#Nome_jogo").value;
+            const Descricao_jogo = form.querySelector("#Descricao_jogo").value;
             const Preco_jogo = form.querySelector("#Preco_jogo").value;
             const Logo_jogo = form.querySelector("#Logo_jogo").value;
-            const Descricao_jogo = form.querySelector("#Descricao_jogo").value;
             const Capa_jogo = form.querySelector("#Capa_jogo").value;
             const Midias_jogo = form.querySelector("#Midias_jogo").value;
             const Faixa_etaria = form.querySelector("#Faixa_etaria").value;
@@ -93,9 +93,9 @@ function createAddGameModal() {
             // Cria o objeto com os dados
             const gameData = {
                 Nome_jogo: Nome_jogo,
+                Descricao_jogo: Descricao_jogo,
                 Preco_jogo: Preco_jogo,
                 Logo_jogo: Logo_jogo,
-                Descricao_jogo: Descricao_jogo,
                 Capa_jogo: Capa_jogo,
                 Midias_jogo: Midias_jogo,
                 Faixa_etaria: Faixa_etaria,
