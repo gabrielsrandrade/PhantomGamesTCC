@@ -316,7 +316,7 @@ function createAddGameModal() {
         reset: reset
     };
   }
-  
+
   const multiselectGenre = setupMultiselect('multiselect-genre');
   const multiselectCategory = setupMultiselect('multiselect-category');
 
@@ -331,8 +331,10 @@ function createAddGameModal() {
       Preco_jogo: parseFloat(addGameForm.Preco_jogo.value),
       Logo_jogo: addGameForm.Logo_jogo.value,
       Capa_jogo: addGameForm.Capa_jogo.value,
-      Midias_jogo: addGameForm.Midias_jogo.value,
+      Midias_jogo: addGameForm.Midias_jogo.value, 
       Faixa_etaria: addGameForm.Faixa_etaria.value,
+      categorias: multiselectCategory.getValues(),
+      generos: multiselectGenre.getValues()
     };
 
     try {
@@ -343,6 +345,88 @@ function createAddGameModal() {
         },
         body: JSON.stringify(gameData),
       });
+
+
+// async function urlToBlob(url) {
+//   try {
+//       const response = await fetch(url);
+//       if (!response.ok) {
+//           throw new Error(`HTTP error! Status: ${response.status}`);
+//       }
+//       return await response.blob();
+//   } catch (error) {
+//       console.error(`Erro ao converter a URL ${url} para Blob:`, error);
+//       return null;
+//   }
+// }
+
+// const multiselectGenre = setupMultiselect('multiselect-genre');
+// const multiselectCategory = setupMultiselect('multiselect-category');
+
+// const addGameForm = modal.querySelector('#add-game-form');
+
+// addGameForm.addEventListener('submit', async (e) => {
+//   e.preventDefault();
+
+//   // 1. Processar as mídias
+//   const midiasString = addGameForm.Midias_jogo.value;
+//   const urlsArray = midiasString.split(',').map(url => url.trim()).filter(url => url.length > 0);
+
+//   // 2. Criar o objeto FormData
+//   const formData = new FormData();
+
+//   // 3. Adicionar campos de texto
+//   formData.append('Nome_jogo', addGameForm.Nome_jogo.value);
+//   formData.append('Descricao_jogo', addGameForm.Descricao_jogo.value);
+//   formData.append('Preco_jogo', parseFloat(addGameForm.Preco_jogo.value));
+//   formData.append('Logo_jogo', addGameForm.Logo_jogo.value);
+//   formData.append('Capa_jogo', addGameForm.Capa_jogo.value);
+//   formData.append('Faixa_etaria', addGameForm.Faixa_etaria.value);
+
+//   // 4. Lidar com as mídias: verificar se é URL ou Base64
+//   for (const item of urlsArray) {
+//       if (item.startsWith('http://') || item.startsWith('https://')) {
+//           // É uma URL de rede, então converte para Blob e anexa
+//           const blob = await urlToBlob(item);
+//           if (blob) {
+//               formData.append('Midias_jogo[]', blob, item.substring(item.lastIndexOf('/') + 1));
+//           }
+//       } else if (item.startsWith('data:')) {
+//           // === NOVO CÓDIGO AQUI ===
+//           // Lidar com strings Base64 de forma mais segura
+//           try {
+//               const mimeType = item.split(';')[0].split(':')[1];
+//               const base64Data = item.split(',')[1];
+              
+//               // Converte a string Base64 em um ArrayBuffer e depois em Blob
+//               const byteCharacters = atob(base64Data);
+//               const byteNumbers = new Array(byteCharacters.length);
+//               for (let i = 0; i < byteCharacters.length; i++) {
+//                   byteNumbers[i] = byteCharacters.charCodeAt(i);
+//               }
+//               const byteArray = new Uint8Array(byteNumbers);
+//               const blob = new Blob([byteArray], { type: mimeType });
+
+//               formData.append('Midias_jogo[]', blob, 'base64-media.jpg');
+//           } catch (e) {
+//               console.error('Erro ao decodificar Base64:', e);
+//               continue; // Pula este item e continua o loop
+//           }
+//           // ========================
+//       } else {
+//           console.warn(`Formato de mídia inválido: ${item}`);
+//       }
+//   }
+  
+//   // 5. Adicionar categorias e gêneros como strings JSON
+//   formData.append('generos', JSON.stringify(multiselectGenre.getValues()));
+//   formData.append('categorias', JSON.stringify(multiselectCategory.getValues()));
+
+  // try {
+  //     const response = await fetch('http://localhost:3000/adicionar-jogo', {
+  //         method: 'POST',
+  //         body: formData,
+  //     });
 
       const result = await response.text();
 

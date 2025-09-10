@@ -1,6 +1,6 @@
-create database PhantomGames;
-
 drop database PhantomGames;
+
+create database PhantomGames;
  
 use PhantomGames;
  
@@ -12,21 +12,21 @@ email varchar(50) not null,
 senha varchar(20) not null,
 classe varchar(1) not null);
  
-/*tabela categoria e categoria_jogos */
+/* tabela categoria */
 create table categoria(
-ID_categoria int(2) primary key not null auto_increment, 
-Nome varchar(20) not null);
- 
-/*tabela genero e genero_jogos */
-create table genero(
-ID_genero int(2) primary key not null auto_increment, 
-Nome varchar(20) not null);
+ID_categoria int(2) primary key not null auto_increment,
+Nome varchar(20) not null
+);
 
-/*tabela jogos */
+/* tabela genero */
+create table genero(
+ID_genero int(2) primary key not null auto_increment,
+Nome varchar(20) not null
+);
+
+/* tabela jogos */
 create table jogos(
-ID_jogo int(5) primary key not null auto_increment, 
-ID_categoria int(2) not null, 
-ID_genero int(2) not null, 
+ID_jogo int(5) primary key not null auto_increment,
 Nome_jogo varchar(20) not null,
 Preco_jogo decimal(5,2) not null,
 Logo_jogo text not null,
@@ -34,25 +34,27 @@ Descricao_jogo text,
 Capa_jogo text not null,
 Midias_jogo text not null,
 Faixa_etaria text not null,
-Media_nota decimal(10,2) not null,
-foreign key (ID_categoria) REFERENCES categoria(ID_categoria),
-foreign key (ID_genero) REFERENCES genero(ID_genero)
+Media_nota decimal(10,2) not null
 );
 
-
+/* tabela categoria_jogos (relacionamento entre jogos e categorias) */
 create table categoria_jogos(
-ID_categoria_jogos int(2) primary key not null auto_increment, 
-ID_categoria int(2),
-ID_jogo int(5),
-foreign key (ID_categoria) REFERENCES categoria(ID_categoria),
-foreign key (ID_jogo) REFERENCES jogos(ID_jogo));
- 
+  ID_categoria int(2) not null,
+  ID_jogo int(5) not null,
+  primary key (ID_categoria, ID_jogo),
+  foreign key (ID_categoria) references categoria(ID_categoria),
+  foreign key (ID_jogo) references jogos(ID_jogo)
+);
+
+/* tabela genero_jogos (relacionamento entre jogos e generos) */
 create table genero_jogos(
-ID_genero_jogos int(2) primary key not null auto_increment, 
-ID_genero int(2),
-ID_jogo int(5),
-foreign key (ID_genero) REFERENCES genero(ID_genero),
-foreign key (ID_jogo) REFERENCES jogos(ID_jogo));
+  ID_genero int(2) not null,
+  ID_jogo int(5) not null,
+  primary key (ID_genero, ID_jogo),
+  foreign key (ID_genero) references genero(ID_genero),
+  foreign key (ID_jogo) references jogos(ID_jogo)
+);
+
  
 /*tabela lista_desejos */
 create table lista_desejos(
@@ -101,3 +103,14 @@ VALUES ('Singleplayer'), ('Multiplayer Local'), ('Multiplayer Online'), ('Co-op'
 ('Linear'), ('Mundo Aberto'), ('Sandbox'), ('Campanha'), ('Missões/Fases'), ('Permadeath'), ('Rouguelike');
 
 
+SELECT
+    j.Nome_jogo,
+    c.Nome AS Nome_categoria
+FROM
+    jogos AS j
+INNER JOIN
+    categoria_jogos AS cj ON j.ID_jogo = cj.ID_jogo
+INNER JOIN
+    categoria AS c ON cj.ID_categoria = c.ID_categoria
+WHERE
+    j.ID_jogo = 1;
