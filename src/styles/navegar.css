@@ -168,6 +168,7 @@
 .cards_principais {
     display: flex;
     flex-direction: column;
+    justify-content: start;
     max-width: 89rem;
     margin: 5rem auto;
     gap: 1rem;
@@ -177,7 +178,7 @@
         display: flex;
         flex-wrap: wrap;
         overflow-x: unset;
-        max-width: 89rem;
+        min-width: 89rem;
         gap: 2.5625rem;
 
 

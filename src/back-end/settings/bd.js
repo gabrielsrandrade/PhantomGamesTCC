@@ -1,141 +1,3 @@
-// const mysql = require('mysql2');
-
-
-// const connection = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "PhantomGames"
-// })
-
-// connection.connect(function (err) {
-//   console.log("conexão feita")
-// });
-
-// // connection.query("Select Nome from genero", function (err, rows, fields) {
-// //   if (!err) {
-// //     console.log("Resultado:", rows);
-// //   } else {
-// //     console.log("Erro na consulta de dados");
-// //   }
-// // });
-
-// // Rota para a página principal (que exibe o formulário)
-
-// const Nome_jogo = document.querySelector("#Nome_jogo").value
-// const Preco_jogo = document.querySelector("#Nome_jogo").value
-// const Logo_jogo = document.querySelector("#Nome_jogo").value
-// const Descricao_jogo = document.querySelector("#Nome_jogo").value
-// const Capa_jogo = document.querySelector("#Nome_jogo").value
-// const Midias_jogo = document.querySelector("#Nome_jogo").value
-// const Faixa_etaria = document.querySelector("#Nome_jogo").value
-
-// form.addEventListener( 'submit' , ()=> 
-//  fetch('/register', {method: "POST", body: JSON.stringify({})}) 
-// )
-
-
-// // Rota POST para processar o formulário
-
-// app.post('/registrar', (req, res) => {
-
-  
-//   const { Nome_jogo, Descricao_jogo, Preco_jogo, Logo_jogo, Capa_jogo, Midias_jogo, Faixa_etaria } = req.body;
-//   // Verifica se os campos estão preenchidos
-//   if (!Nome_jogo || !Descricao_jogo || !Preco_jogo || !Logo_jogo || !Capa_jogo || !Midias_jogo || !Faixa_etaria) {
-//     return res.status(400).send('Os campos são obrigatórios.')
-//   }
-
-//   // Query SQL para inserir os dados na tabela
-//   const sql = 'INSERT INTO jogos (Nome_jogo, Descricao_jogo, Preco_jogo, Logo_jogo, Capa_jogo, Midias_jogo, Faixa_etaria ) VALUES (?, ?)';
-//   const values = [Nome_jogo, Descricao_jogo, Preco_jogo, Logo_jogo, Capa_jogo, Midias_jogo, Faixa_etaria];
-
-//   // Executa a query
-//   db.query(sql, values, (err, result) => {
-//     if (err) {
-//       console.error('Erro ao inserir dados:', err);
-      
-//       return res.status(500).send('Erro ao registrar os dados.');
-//   }
-//     console.log('Dados inseridos com sucesso! ID:',
-//       result.insertId);
-//     res.status(200).send('Jogo registrado com sucesso!');
-//   });
-// });
-
-// // Inicia o servidor
-// app.listen(port, () => {
-//   console.log(`Servidor rodando em http://localhost:${port}`);
-// });
-
-
-// const express = require('express');
-// const mysql = require('mysql2');
-// const bodyParser = require('body-parser'); // Usado para analisar o corpo da requisição POST
-// const cors = require('cors');
-
-// const app = express();
-// const port = 3000;
-
-// app.use(cors());
-
-// // Configura o body-parser para entender dados JSON e de formulários
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
-
-// // Cria a conexão com o banco de dados
-// const connection = mysql.createConnection({
-//     host: "localhost",
-//     user: "root",
-//     password: "",
-//     database: "PhantomGames"
-// });
-
-// // Conecta ao banco de dados
-// connection.connect(function (err) {
-//     if (err) {
-//         console.error("Erro ao conectar ao banco de dados:", err);
-//         return;
-//     }
-//     console.log("Conexão com o banco de dados feita!");
-// });
-
-// // Rota POST para processar o formulário
-// // Use um nome de rota claro, como '/adicionar-jogo'
-// app.post('/adicionar-jogo', (req, res) => {
-//   // 1. Log os dados recebidos do frontend
-//   console.log('Dados recebidos:', req.body);
-
-//   const { Nome_jogo, Descricao_jogo, Preco_jogo, Logo_jogo, Capa_jogo, Midias_jogo, Faixa_etaria} = req.body;
-
-//   // 2. Crie sua query SQL
-//   const sql = `INSERT INTO jogos (Nome_jogo, Descricao_jogo, Preco_jogo, Logo_jogo, Capa_jogo, Midias_jogo, Faixa_etaria) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-
-//   // 3. Verifique a ordem dos valores
-//   const values = [Nome_jogo, Descricao_jogo, Preco_jogo, Logo_jogo, Capa_jogo, Midias_jogo, Faixa_etaria];
-  
-//   // 4. Log a query e os valores para verificar
-//   console.log('Query SQL:', sql);
-//   console.log('Valores:', values);
-
-//   connection.query(sql, values, (err, result) => {
-//       // 5. O Erro 500 acontece aqui!
-//       if (err) {
-//           console.error('Erro na query SQL:', err);
-//           return res.status(500).send("Erro interno do servidor ao adicionar jogo.");
-//       }
-      
-//       console.log('Jogo adicionado com sucesso:', result);
-//       res.status(200).send("Jogo adicionado com sucesso!");
-//   });
-// });
-
-// // Inicia o servidor
-// app.listen(port, () => {
-//     console.log(`Servidor rodando em http://localhost:${port}`);
-// });
-
-
 const express = require('express');
 const mysql = require('mysql2/promise'); // Usando a versão de promessas
 const bodyParser = require('body-parser');
@@ -296,6 +158,89 @@ app.post('/adicionar-jogo', async (req, res) => {
     }
 });
 
+// Rota GET para buscar todos os jogos com suas categorias e gêneros
+app.get('/jogos', async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+
+        const [jogosRows] = await connection.execute('SELECT * FROM jogos');
+
+        const jogosComDetalhes = await Promise.all(jogosRows.map(async (jogo) => {
+            // Busca categorias do jogo
+            const [categoriasRows] = await connection.execute(
+                `SELECT c.Nome FROM categoria_jogos AS cj
+                 INNER JOIN categoria AS c ON cj.ID_categoria = c.ID_categoria
+                 WHERE cj.ID_jogo = ?`,
+                [jogo.ID_jogo]
+            );
+            const categorias = categoriasRows.map(row => row.Nome);
+
+            // Busca gêneros do jogo
+            const [generosRows] = await connection.execute(
+                `SELECT g.Nome FROM genero_jogos AS gj
+                 INNER JOIN genero AS g ON gj.ID_genero = g.ID_genero
+                 WHERE gj.ID_jogo = ?`,
+                [jogo.ID_jogo]
+            );
+            const generos = generosRows.map(row => row.Nome);
+
+            return {
+                ...jogo,
+                categorias,
+                generos
+            };
+        }));
+
+        res.status(200).json(jogosComDetalhes);
+        console.log('Dados dos jogos enviados com sucesso.');
+
+    } catch (err) {
+        console.error('Erro ao buscar jogos:', err.message);
+        res.status(500).send("Erro interno do servidor ao buscar os jogos.");
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+});
+
+// Rota GET para pesquisar os jogos no banco de dados
+app.get('/buscar-jogo', async (req, res) => { // Adicione 'async' aqui
+    let connection;
+    try {
+        // Obtenha uma conexão do pool
+        connection = await pool.getConnection();
+ 
+        const { query } = req.query;
+ 
+        if (!query) {
+            return res.status(400).json({ message: 'Parâmetro de busca "query" é obrigatório.' });
+        }
+ 
+        const searchQuery = `%${query}%`;
+        const sql = `SELECT * FROM jogos WHERE Nome_jogo LIKE ?`;
+ 
+        // Use o método .execute() com await, que é a forma correta para mysql2/promise
+        const [results] = await connection.execute(sql, [searchQuery]);
+ 
+        if (results.length === 0) {
+            return res.status(404).json({ message: 'Nenhum jogo encontrado com esse nome.' });
+        }
+ 
+        res.status(200).json(results);
+    } catch (err) {
+        console.error('Erro na rota /buscar-jogo:', err);
+        return res.status(500).json({ message: 'Erro interno do servidor ao buscar jogos.' });
+    } finally {
+        // Sempre libere a conexão de volta ao pool no final
+        if (connection) {
+            connection.release();
+        }
+    }
+});
+ 
+
 // Rota de teste para verificar se o servidor está funcionando
 app.get('/', (req, res) => {
     res.status(200).send('Servidor está rodando.');
@@ -306,88 +251,3 @@ app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });
 
-
-// const mysql = require('mysql2/promise');
-
-// async function testInsertWithChosenCategoriesAndGenres() {
-//   const dbConfig = {
-//     host: 'localhost',
-//     user: 'root',
-//     password: '',
-//     database: 'PhantomGames',
-//     waitForConnections: true,
-//     connectionLimit: 10,
-//     queueLimit: 0
-//   };
-
-//   const pool = mysql.createPool(dbConfig);
-//   let connection;
-
-//   // Categorias e gêneros que você quer associar (exemplo)
-//   const categoriasEscolhidas = ['Singleplayer'];
-//   const generosEscolhidos = ['Aventura', 'RPG'];
-
-//   try {
-//     connection = await pool.getConnection();
-
-//     // Insere o jogo
-//     const insertJogoSql = `
-//       INSERT INTO jogos
-//       (Nome_jogo, Preco_jogo, Logo_jogo, Descricao_jogo, Capa_jogo, Midias_jogo, Faixa_etaria, Media_nota)
-//       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-//     `;
-
-//     const jogoValues = [
-//       'Jogo Teste 2',
-//       79.90,
-//       'logo-teste2.png',
-//       'Descrição do jogo teste 2.',
-//       'capa-teste2.png',
-//       'midia1.png, midia2.png',
-//       '16+',
-//       0.0
-//     ];
-
-//     const [jogoResult] = await connection.execute(insertJogoSql, jogoValues);
-//     const jogoId = jogoResult.insertId;
-//     console.log(`Jogo inserido com ID: ${jogoId}`);
-
-//     // Para cada categoria escolhida, pega o ID e insere o vínculo
-//     for (const nomeCategoria of categoriasEscolhidas) {
-//         const [rowsCat] = await connection.execute('SELECT ID_categoria FROM categoria WHERE Nome = ?', [nomeCategoria]);
-      
-//         if (rowsCat.length === 0) {
-//           console.log(`Categoria '${nomeCategoria}' não encontrada. Ignorando.`);
-//           continue;
-//         }
-      
-//         const categoriaId = rowsCat[0].ID_categoria;
-//         await connection.execute('INSERT INTO categoria_jogos (ID_categoria, ID_jogo) VALUES (?, ?)', [categoriaId, jogoId]);
-//         console.log(`Vínculo criado: jogo ${jogoId} -> categoria ${categoriaId}`);
-//       }
-      
-
-//     // Para cada gênero escolhido, pega o ID e insere o vínculo
-//     for (const nomeGenero of generosEscolhidos) {
-//       const [rowsGen] = await connection.execute('SELECT ID_genero FROM genero WHERE Nome = ?', [nomeGenero]);
-
-//       if (rowsGen.length === 0) {
-//         console.log(`Gênero '${nomeGenero}' não encontrado. Ignorando.`);
-//         continue;
-//       }
-
-//       const generoId = rowsGen[0].ID_genero;
-//       await connection.execute('INSERT INTO genero_jogos (ID_genero, ID_jogo) VALUES (?, ?)', [generoId, jogoId]);
-//       console.log(`Vínculo criado: jogo ${jogoId} -> gênero ${generoId}`);
-//     }
-
-//     console.log('Teste com categorias e gêneros escolhidos concluído!');
-//   } catch (error) {
-//     console.error('Erro durante teste:', error);
-//   } finally {
-//     if (connection) connection.release();
-//     pool.end();
-//   }
-// }
-
-// testInsertWithChosenCategoriesAndGenres();
