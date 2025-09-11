@@ -2,12 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cardsContainer = document.querySelector('.card_jogos');
     const searchInput = document.getElementById('search-input');
-    // Note: searchForm e clearButton não são mais necessários neste arquivo,
-    // pois a lógica de busca é gerenciada pelo navbar.js.
-    // Eles foram removidos para evitar redundância.
 
     // Função para atualizar a URL do navegador sem recarregar a página.
-    // Esta função é importante para manter o estado da página.
     const updateUrl = (query) => {
         const url = new URL(window.location.href);
         if (query) {
@@ -28,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const response = await fetch(url);
             if (!response.ok) {
+                // Se a API não encontrar resultados (status 404), tratamos aqui.
+                if (response.status === 404) {
+                    displayGames([], query);
+                    return; 
+                }
                 throw new Error('Erro ao buscar dados dos jogos');
             }
             const games = await response.json();
@@ -56,12 +57,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         games.forEach(game => {
             const preco = parseFloat(game.Preco_jogo);
-            const gameCard = document.createElement('a'); // Corrigido para 'a' para ser clicável
+            const gameCard = document.createElement('a');
             gameCard.className = 'card_jogo';
-            gameCard.href = `pagina_jogo.html?id=${game.id}`;
+            gameCard.href = `pagina_jogo.html?id=${game.ID_jogo}`;
             
+            // Lógica para definir o texto do preço
+            let precoText;
+            if (preco === 0) {
+                precoText = 'Grátis';
+            } else {
+                precoText = `R$${preco.toFixed(2).replace('.', ',')}`;
+            }
+
             // Lógica de avaliação por estrelas
-            // Assume que 'Media_nota' é um valor de 1 a 10.
             const rating = Math.round(game.Media_nota / 2); 
             let starHtml = '';
             for (let i = 0; i < 5; i++) {
@@ -74,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="estrelas">
                     ${starHtml}
                 </div>
-                <span class="preco">R$${preco.toFixed(2).replace('.', ',')}</span>
+                <span class="preco">${precoText}</span>
             `;
 
             cardsContainer.appendChild(gameCard);
@@ -83,7 +91,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Lógica de comunicação com navbar.js ---
 
-    // Ouve o evento 'searchSubmitted' disparado pelo navbar.js.
+    document.addEventListener('gameUpdated', () => {
+        fetchGames();
+    });
+
     document.addEventListener('searchSubmitted', (event) => {
         const query = event.detail.query;
         updateUrl(query);
@@ -92,15 +103,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Lógica de inicialização da página ---
 
-    // Lógica para verificar o termo de busca na URL ao carregar a página.
     const urlParams = new URLSearchParams(window.location.search);
-    const initialQuery = urlParams.get('query') || ''; // Garante que é sempre uma string
+    const initialQuery = urlParams.get('query') || '';
     
-    // Sincroniza o input com a URL inicial.
     if (searchInput) {
         searchInput.value = initialQuery;
     }
 
-    // Chama a função de busca com a query inicial.
     fetchGames(initialQuery);
 });

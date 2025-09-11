@@ -209,10 +209,16 @@ function createAddGameModal() {
     addGameForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const precoValue = addGameForm.Preco_jogo.value;
+        const preco = precoValue === '' ? 0 : parseFloat(precoValue);
+        
+        const midiasValue = addGameForm.Midias_jogo.value;
+        const midiasArray = midiasValue.split(',').map(item => item.trim()).filter(item => item.length > 0);
+
         const gameData = {
             Nome_jogo: addGameForm.Nome_jogo.value,
             Descricao_jogo: addGameForm.Descricao_jogo.value,
-            Preco_jogo: parseFloat(addGameForm.Preco_jogo.value),
+            Preco_jogo: (addGameForm.Preco_jogo.value),
             Logo_jogo: addGameForm.Logo_jogo.value,
             Capa_jogo: addGameForm.Capa_jogo.value,
             Midias_jogo: addGameForm.Midias_jogo.value, 
@@ -239,6 +245,10 @@ function createAddGameModal() {
                 multiselectCategory.reset();
                 document.body.removeChild(modal);
                 document.body.removeChild(overlay);
+                
+                // Dispara o evento 'gameUpdated' para notificar outras páginas
+                document.dispatchEvent(new Event('gameUpdated'));
+
             } else {
                 showCustomMessage('Erro ao adicionar jogo: ' + result);
             }
@@ -362,10 +372,15 @@ function renderNavbar(user) {
     // Adiciona um listener para monitorar o input e o evento de "enter"
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
+        // Evento para a tecla 'Enter'
         searchInput.addEventListener('keyup', (event) => {
             if (event.key === 'Enter') {
                 handleSearch(event);
             }
+        });
+
+        // Evento para monitorar a limpeza do input (seja por digitação ou pelo 'X')
+        searchInput.addEventListener('input', () => {
             if (searchInput.value.trim() === '') {
                 // Dispara um evento vazio para limpar a busca
                 if (window.location.pathname.includes('navegar.html')) {

@@ -139,7 +139,7 @@ app.post('/adicionar-jogo', async (req, res) => {
 
         // Se tudo der certo, efetiva a transação
         await connection.commit();
-        res.status(200).send("Jogo, categorias e gêneros adicionados com sucesso!");
+        res.status(200).alert("Jogo, categorias e gêneros adicionados com sucesso!");
 
     } catch (err) {
         // Se houver qualquer erro, desfaz a transação para evitar dados parciais

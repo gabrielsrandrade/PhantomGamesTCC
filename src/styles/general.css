@@ -618,3 +618,53 @@ footer {
 .modal-content .clear-btn:hover {
     background-color: #303e48;
 }
+
+/* Estilo para a caixa de mensagem */
+.custom-message-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Garante que fique por cima de outros elementos */
+}
+
+/* Estilo para o conteúdo da mensagem */
+.modal-content-message {
+    background-color: var(--navbar-color); /* Cor de fundo escura, similar ao seu tema */
+    color: #ffffff; /* Cor do texto branca */
+    padding: 25px 35px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    max-width: 400px;
+    position: relative;
+    border: 1px solid #444;
+}
+
+/* Estilo para o botão de fechar */
+.close-message-btn {
+    position: absolute;
+    top: 0px;
+    right: 5px;
+    color: var(--button-color);
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-message-btn:hover {
+    color: #0a6dbe;
+}
+
+/* Estilo para o parágrafo da mensagem */
+.modal-content-message p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
