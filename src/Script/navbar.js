@@ -66,10 +66,10 @@ function createAddGameModal() {
                     <label for="Capa_jogo">Capa (URL da Imagem):</label>
                     <input type="url" id="Capa_jogo" name="Capa_jogo" required>
                 </div>
-                <div class="form-group">
-                    <label for="Midias_jogo">Imagens/Vídeos (URLs, separadas por vírgula):</label>
-                    <textarea id="Midias_jogo" name="Midias_jogo"></textarea>
-                </div>
+               <div class="form-group">
+    <label for="Midias_jogo">Imagens/Vídeos (Cole o "Endereço da Imagem" separado por hífen):</label>
+    <textarea id="Midias_jogo" name="Midias_jogo" placeholder="Ex: https://url-da-imagem.com/imagem.jpg - https://url-do-video.com/video.mp4"></textarea>
+</div>
                 <div class="form-group">
                     <label for="Faixa_etaria">Faixa Etária:</label>
                     <select id="Faixa_etaria" name="Faixa_etaria" required>
@@ -176,7 +176,7 @@ function createAddGameModal() {
         dropdown.addEventListener('click', (e) => {
             const option = e.target.closest('.multiselect-option');
             if (!option || option.classList.contains('selected')) return;
-            
+
             const value = option.dataset.value;
             if (!selectedValues.includes(value)) {
                 selectedValues.push(value);
@@ -205,27 +205,38 @@ function createAddGameModal() {
     const multiselectCategory = setupMultiselect('multiselect-category');
 
     const addGameForm = modal.querySelector('#add-game-form');
-    
+
     addGameForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const precoValue = addGameForm.Preco_jogo.value;
-        const preco = precoValue === '' ? 0 : parseFloat(precoValue);
-        
+        // Validar campos obrigatórios
+        const nomeJogo = addGameForm.Nome_jogo.value.trim();
+        const precoJogo = parseFloat(addGameForm.Preco_jogo.value);
+        const capaJogo = addGameForm.Capa_jogo.value.trim();
+
+        if (!nomeJogo || isNaN(precoJogo) || !capaJogo) {
+            showCustomMessage("Por favor, preencha todos os campos obrigatórios (Nome, Preço e Capa).");
+            return;
+        }
+
         const midiasValue = addGameForm.Midias_jogo.value;
-        const midiasArray = midiasValue.split(',').map(item => item.trim()).filter(item => item.length > 0);
+        const midiasArray = midiasValue.split('-').map(item => item.trim()).filter(item => item.length > 0);
 
         const gameData = {
-            Nome_jogo: addGameForm.Nome_jogo.value,
+            Nome_jogo: nomeJogo,
             Descricao_jogo: addGameForm.Descricao_jogo.value,
-            Preco_jogo: (addGameForm.Preco_jogo.value),
+            Preco_jogo: precoJogo,
             Logo_jogo: addGameForm.Logo_jogo.value,
-            Capa_jogo: addGameForm.Capa_jogo.value,
-            Midias_jogo: addGameForm.Midias_jogo.value, 
+            Capa_jogo: capaJogo,
+            Midias_jogo: midiasArray,
             Faixa_etaria: addGameForm.Faixa_etaria.value,
             categorias: multiselectCategory.getValues(),
             generos: multiselectGenre.getValues()
         };
+
+        const submitBtn = addGameForm.querySelector('.submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Adicionando...';
 
         try {
             const response = await fetch('http://localhost:3000/adicionar-jogo', {
@@ -245,8 +256,7 @@ function createAddGameModal() {
                 multiselectCategory.reset();
                 document.body.removeChild(modal);
                 document.body.removeChild(overlay);
-                
-                // Dispara o evento 'gameUpdated' para notificar outras páginas
+
                 document.dispatchEvent(new Event('gameUpdated'));
 
             } else {
@@ -255,9 +265,12 @@ function createAddGameModal() {
         } catch (error) {
             console.error('Erro na requisição:', error);
             showCustomMessage('Ocorreu um erro ao conectar com o servidor.');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Adicionar';
         }
     });
-    
+
     const clearButton = modal.querySelector('.clear-btn');
     clearButton.addEventListener('click', () => {
         addGameForm.reset();
@@ -284,7 +297,7 @@ function handleSearch(event) {
         }
         return;
     }
-    
+
     if (window.location.pathname.includes('navegar.html')) {
         // Se estiver, dispara um evento personalizado com a query
         const customEvent = new CustomEvent('searchSubmitted', { detail: { query } });
@@ -368,7 +381,7 @@ function renderNavbar(user) {
     if (searchForm) {
         searchForm.addEventListener('submit', handleSearch);
     }
-    
+
     // Adiciona um listener para monitorar o input e o evento de "enter"
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
@@ -406,7 +419,7 @@ function renderNavbar(user) {
             }
         }
     }
-    
+
     // Preenche o input de busca se houver um parâmetro na URL
     const urlParams = new URLSearchParams(window.location.search);
     const query = urlParams.get('query');
