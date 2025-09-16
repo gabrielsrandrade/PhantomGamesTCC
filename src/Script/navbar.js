@@ -1,47 +1,45 @@
-import { Clerk } from '@clerk/clerk-js';
+import { Clerk } from "@clerk/clerk-js";
 
 // Chave pública do Clerk. A variável de ambiente é usada para manter a chave segura.
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerk = new Clerk(clerkPubKey);
 
-// Função para exibir uma mensagem personalizada ao usuário, substituindo 'alert()'.
+let selectedMediaFiles = []; // Array para armazenar os arquivos de mídia selecionados
+
+// Função para exibir uma mensagem personalizada ao usuário.
 function showCustomMessage(message) {
-    const modalContainer = document.createElement('div');
-    modalContainer.className = 'custom-message-modal';
-    modalContainer.innerHTML = `
+  const modalContainer = document.createElement("div");
+  modalContainer.className = "custom-message-modal";
+  modalContainer.innerHTML = `
         <div class="modal-content-message">
             <span class="close-message-btn">&times;</span>
             <p>${message}</p>
         </div>
     `;
-    document.body.appendChild(modalContainer);
+  document.body.appendChild(modalContainer);
 
-    const closeBtn = modalContainer.querySelector('.close-message-btn');
-    closeBtn.addEventListener('click', () => {
-        document.body.removeChild(modalContainer);
-    });
+  const closeBtn = modalContainer.querySelector(".close-message-btn");
+  closeBtn.addEventListener("click", () => {
+    document.body.removeChild(modalContainer);
+  });
 
-    // Remove o modal se o usuário clicar fora do conteúdo da mensagem.
-    modalContainer.addEventListener('click', (e) => {
-        if (e.target === modalContainer) {
-            document.body.removeChild(modalContainer);
-        }
-    });
+  modalContainer.addEventListener("click", (e) => {
+    if (e.target === modalContainer) {
+      document.body.removeChild(modalContainer);
+    }
+  });
 }
 
 // Cria e configura o modal para adicionar um novo jogo.
 function createAddGameModal() {
-    const overlay = document.createElement('div');
-    overlay.classList.add('modal-overlay');
+  const overlay = document.createElement("div");
+  overlay.classList.add("modal-overlay");
 
-    const modal = document.createElement('div');
-    modal.classList.add('add-game-modal');
+  const modal = document.createElement("div");
+  modal.classList.add("add-game-modal");
 
-    const genres = ["Ação", "Aventura", "Casual", "Corrida", "Esportes", "Estratégia", "Indie", "Luta", "Musical", "Narrativo", "Plataforma", "Puzzle", "RPG", "Simulação", "Sobrevivência", "Terror", "Tiro"];
-    const categories = ["Singleplayer", "Multiplayer Local", "Multiplayer Online", "Co-op", "PvP", "PvE", "MMO", "Cross-Plataform", "2D", "3D", "2.5D", "Top-Down", "Side-Scrooling", "Isométrico", "Primeira Pessoa", "Terceira Pessoa", "Linear", "Mundo Aberto", "Sandbox", "Campanha", "Missões/Fases", "Permadeath", "Rouguelike"];
-
-    // A estrutura do HTML do modal permanece a mesma
-    modal.innerHTML = `
+  // Primeira tela do formulário
+  const firstPageHTML = `
         <div class="modal-content">
             <button class="close-modal-btn">&times;</button>
             <h2>Adicionar Novo Jogo</h2>
@@ -66,10 +64,6 @@ function createAddGameModal() {
                     <label for="Capa_jogo">Capa (URL da Imagem):</label>
                     <input type="url" id="Capa_jogo" name="Capa_jogo" required>
                 </div>
-               <div class="form-group">
-    <label for="Midias_jogo">Imagens/Vídeos (Cole o "Endereço da Imagem" separado por hífen):</label>
-    <textarea id="Midias_jogo" name="Midias_jogo" placeholder="Ex: https://url-da-imagem.com/imagem.jpg - https://url-do-video.com/video.mp4"></textarea>
-</div>
                 <div class="form-group">
                     <label for="Faixa_etaria">Faixa Etária:</label>
                     <select id="Faixa_etaria" name="Faixa_etaria" required>
@@ -81,247 +75,453 @@ function createAddGameModal() {
                         <option value="18">18+</option>
                     </select>
                 </div>
-                
                 <div class="form-group">
                     <label>Gêneros:</label>
                     <div class="multiselect-container" id="multiselect-genre">
                         <div class="multiselect-tags" id="genre-tags"></div>
                         <div class="multiselect-dropdown hidden" id="genre-dropdown">
-                            ${genres.map(g => `<span class="multiselect-option" data-value="${g}">${g}</span>`).join('')}
+                            ${[
+                              "Ação",
+                              "Aventura",
+                              "Casual",
+                              "Corrida",
+                              "Esportes",
+                              "Estratégia",
+                              "Indie",
+                              "Luta",
+                              "Musical",
+                              "Narrativo",
+                              "Plataforma",
+                              "Puzzle",
+                              "RPG",
+                              "Simulação",
+                              "Sobrevivência",
+                              "Terror",
+                              "Tiro",
+                            ]
+                              .map(
+                                (g) =>
+                                  `<span class="multiselect-option" data-value="${g}">${g}</span>`
+                              )
+                              .join("")}
                         </div>
                     </div>
                 </div>
-
                 <div class="form-group">
                     <label>Categorias:</label>
                     <div class="multiselect-container" id="multiselect-category">
                         <div class="multiselect-tags" id="category-tags"></div>
                         <div class="multiselect-dropdown hidden" id="category-dropdown">
-                            ${categories.map(c => `<span class="multiselect-option" data-value="${c}">${c}</span>`).join('')}
+                            ${[
+                              "Singleplayer",
+                              "Multiplayer Local",
+                              "Multiplayer Online",
+                              "Co-op",
+                              "PvP",
+                              "PvE",
+                              "MMO",
+                              "Cross-Plataform",
+                              "2D",
+                              "3D",
+                              "2.5D",
+                              "Top-Down",
+                              "Side-Scrooling",
+                              "Isométrico",
+                              "Primeira Pessoa",
+                              "Terceira Pessoa",
+                              "Linear",
+                              "Mundo Aberto",
+                              "Sandbox",
+                              "Campanha",
+                              "Missões/Fases",
+                              "Permadeath",
+                              "Rouguelike",
+                            ]
+                              .map(
+                                (c) =>
+                                  `<span class="multiselect-option" data-value="${c}">${c}</span>`
+                              )
+                              .join("")}
                         </div>
                     </div>
                 </div>
-                
                 <div class="form-buttons">
                     <button type="button" class="clear-btn">Limpar</button>
-                    <button type="submit" class="submit-btn">Adicionar</button>
+                    <button type="button" class="next-btn">Próximo</button>
                 </div>
             </form>
         </div>
     `;
 
-    document.body.appendChild(overlay);
-    document.body.appendChild(modal);
+  // Segunda tela do formulário para seleção de mídias
+  const secondPageHTML = `
+        <div class="modal-content">
+            <button class="close-modal-btn">&times;</button>
+            <h2>Adicionar Mídias</h2>
+            <div class="form-group">
+        <label for="media-upload">Selecionar Imagens/Vídeos:</label>
+        <id="media-count"> <input type="file" id="media-upload" name="media-upload" multiple accept="image/*,video/*">
+    </div>
+    <div id="media-preview-container" class="media-preview-container"></div>
+            <div id="media-preview-container" class="media-preview-container"></div>
+            <div class="form-buttons">
+                <button type="button" class="back-btn">Voltar</button>
+                <button type="submit" class="submit-btn" form="media-form">Adicionar Jogo</button>
+            </div>
+        </div>
+    `;
 
-    const closeModalBtn = modal.querySelector('.close-modal-btn');
-    closeModalBtn.addEventListener('click', () => {
-        document.body.removeChild(modal);
-        document.body.removeChild(overlay);
-    });
+  // Inicialmente exibe a primeira página
+  modal.innerHTML = firstPageHTML;
+  document.body.appendChild(overlay);
+  document.body.appendChild(modal);
 
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-            document.body.removeChild(modal);
-            document.body.removeChild(overlay);
-        }
-    });
+  // Variáveis para armazenar os dados do formulário da primeira página
+  let gameData = {};
 
-    function setupMultiselect(containerId) {
-        const container = document.getElementById(containerId);
-        const tagsDiv = container.querySelector('.multiselect-tags');
-        const dropdown = container.querySelector('.multiselect-dropdown');
-        let selectedValues = [];
+  function setupMultiselect(containerId) {
+    // ... (código existente para o multiselect)
+    const container = document.getElementById(containerId);
+    const tagsDiv = container.querySelector(".multiselect-tags");
+    const dropdown = container.querySelector(".multiselect-dropdown");
+    let selectedValues = [];
 
-        const renderTags = () => {
-            tagsDiv.innerHTML = '';
-            if (selectedValues.length === 0) {
-                tagsDiv.textContent = "Clique para adicionar...";
-                tagsDiv.classList.add('placeholder');
-            } else {
-                tagsDiv.classList.remove('placeholder');
-                selectedValues.forEach(value => {
-                    const tag = document.createElement('span');
-                    tag.classList.add('multiselect-tag');
-                    tag.textContent = value;
-                    const closeBtn = document.createElement('span');
-                    closeBtn.classList.add('tag-close');
-                    closeBtn.innerHTML = '&times;';
-                    closeBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        selectedValues = selectedValues.filter(v => v !== value);
-                        renderTags();
-                        updateDropdown();
-                    });
-                    tag.appendChild(closeBtn);
-                    tagsDiv.appendChild(tag);
-                });
-            }
-        };
-
-        const updateDropdown = () => {
-            const options = dropdown.querySelectorAll('.multiselect-option');
-            options.forEach(option => {
-                if (selectedValues.includes(option.dataset.value)) {
-                    option.classList.add('selected');
-                } else {
-                    option.classList.remove('selected');
-                }
-            });
-        };
-
-        tagsDiv.addEventListener('click', () => {
-            dropdown.classList.toggle('hidden');
-        });
-
-        dropdown.addEventListener('click', (e) => {
-            const option = e.target.closest('.multiselect-option');
-            if (!option || option.classList.contains('selected')) return;
-
-            const value = option.dataset.value;
-            if (!selectedValues.includes(value)) {
-                selectedValues.push(value);
-                renderTags();
-                updateDropdown();
-            }
-            dropdown.classList.add('hidden');
-        });
-
-        const reset = () => {
-            selectedValues = [];
+    const renderTags = () => {
+      tagsDiv.innerHTML = "";
+      if (selectedValues.length === 0) {
+        tagsDiv.textContent = "Clique para adicionar...";
+        tagsDiv.classList.add("placeholder");
+      } else {
+        tagsDiv.classList.remove("placeholder");
+        selectedValues.forEach((value) => {
+          const tag = document.createElement("span");
+          tag.classList.add("multiselect-tag");
+          tag.textContent = value;
+          const closeBtn = document.createElement("span");
+          closeBtn.classList.add("tag-close");
+          closeBtn.innerHTML = "&times;";
+          closeBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            selectedValues = selectedValues.filter((v) => v !== value);
             renderTags();
             updateDropdown();
-        };
+          });
+          tag.appendChild(closeBtn);
+          tagsDiv.appendChild(tag);
+        });
+      }
+    };
 
+    const updateDropdown = () => {
+      const options = dropdown.querySelectorAll(".multiselect-option");
+      options.forEach((option) => {
+        if (selectedValues.includes(option.dataset.value)) {
+          option.classList.add("selected");
+        } else {
+          option.classList.remove("selected");
+        }
+      });
+    };
+
+    tagsDiv.addEventListener("click", () => {
+      dropdown.classList.toggle("hidden");
+    });
+
+    dropdown.addEventListener("click", (e) => {
+      const option = e.target.closest(".multiselect-option");
+      if (!option || option.classList.contains("selected")) return;
+
+      const value = option.dataset.value;
+      if (!selectedValues.includes(value)) {
+        selectedValues.push(value);
         renderTags();
         updateDropdown();
+      }
+      dropdown.classList.add("hidden");
+    });
 
-        return {
-            getValues: () => selectedValues,
-            reset: reset
-        };
-    }
+    const reset = () => {
+      selectedValues = [];
+      renderTags();
+      updateDropdown();
+    };
 
-    const multiselectGenre = setupMultiselect('multiselect-genre');
-    const multiselectCategory = setupMultiselect('multiselect-category');
+    renderTags();
+    updateDropdown();
 
-    const addGameForm = modal.querySelector('#add-game-form');
+    return {
+      getValues: () => selectedValues,
+      reset: reset,
+    };
+  }
 
-    addGameForm.addEventListener('submit', async (e) => {
+  const multiselectGenre = setupMultiselect("multiselect-genre");
+  const multiselectCategory = setupMultiselect("multiselect-category");
+
+  // Lógica para alternar entre as telas do modal
+  function navigateToSecondPage() {
+    modal.innerHTML = secondPageHTML;
+    setupMediaUpload();
+    attachEventListeners();
+  }
+
+  function navigateToFirstPage() {
+    modal.innerHTML = firstPageHTML;
+    // Restaurar os valores dos campos
+    modal.querySelector("#Nome_jogo").value = gameData.Nome_jogo || "";
+    modal.querySelector("#Descricao_jogo").value =
+      gameData.Descricao_jogo || "";
+    modal.querySelector("#Preco_jogo").value = gameData.Preco_jogo || "";
+    modal.querySelector("#Logo_jogo").value = gameData.Logo_jogo || "";
+    modal.querySelector("#Capa_jogo").value = gameData.Capa_jogo || "";
+    modal.querySelector("#Faixa_etaria").value = gameData.Faixa_etaria || "L";
+
+    // Restaurar multiselects
+    const multiselectGenre = setupMultiselect("multiselect-genre");
+    const multiselectCategory = setupMultiselect("multiselect-category");
+
+    multiselectGenre.selectedValues = gameData.generos || [];
+    multiselectCategory.selectedValues = gameData.categorias || [];
+    multiselectGenre.renderTags();
+    multiselectCategory.renderTags();
+
+    attachEventListeners();
+  }
+
+  // Anexar event listeners dinamicamente
+  function attachEventListeners() {
+    const closeModalBtn = modal.querySelector(".close-modal-btn");
+    closeModalBtn.addEventListener("click", () => {
+      document.body.removeChild(modal);
+      document.body.removeChild(overlay);
+    });
+
+    const form = modal.querySelector("#add-game-form");
+    if (form) {
+      form.querySelector(".next-btn").addEventListener("click", (e) => {
         e.preventDefault();
-
-        // Validar campos obrigatórios
-        const nomeJogo = addGameForm.Nome_jogo.value.trim();
-        const precoJogo = parseFloat(addGameForm.Preco_jogo.value);
-        const capaJogo = addGameForm.Capa_jogo.value.trim();
+        const nomeJogo = form.Nome_jogo.value.trim();
+        const precoJogo = parseFloat(form.Preco_jogo.value);
+        const capaJogo = form.Capa_jogo.value.trim();
 
         if (!nomeJogo || isNaN(precoJogo) || !capaJogo) {
-            showCustomMessage("Por favor, preencha todos os campos obrigatórios (Nome, Preço e Capa).");
-            return;
+          showCustomMessage(
+            "Por favor, preencha os campos antes de continuar."
+          );
+          return;
         }
 
-        const midiasValue = addGameForm.Midias_jogo.value;
-        const midiasArray = midiasValue.split('-').map(item => item.trim()).filter(item => item.length > 0);
-
-        const gameData = {
-            Nome_jogo: nomeJogo,
-            Descricao_jogo: addGameForm.Descricao_jogo.value,
-            Preco_jogo: precoJogo,
-            Logo_jogo: addGameForm.Logo_jogo.value,
-            Capa_jogo: capaJogo,
-            Midias_jogo: midiasArray,
-            Faixa_etaria: addGameForm.Faixa_etaria.value,
-            categorias: multiselectCategory.getValues(),
-            generos: multiselectGenre.getValues()
+        // Salvar dados da primeira página
+        gameData = {
+          Nome_jogo: nomeJogo,
+          Descricao_jogo: form.Descricao_jogo.value,
+          Preco_jogo: precoJogo,
+          Logo_jogo: form.Logo_jogo.value,
+          Capa_jogo: capaJogo,
+          Faixa_etaria: form.Faixa_etaria.value,
+          categorias: multiselectCategory.getValues(),
+          generos: multiselectGenre.getValues(),
         };
+        navigateToSecondPage();
+      });
 
-        const submitBtn = addGameForm.querySelector('.submit-btn');
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Adicionando...';
-
-        try {
-            const response = await fetch('http://localhost:3000/adicionar-jogo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(gameData),
-            });
-
-            const result = await response.text();
-
-            if (response.ok) {
-                showCustomMessage(result);
-                addGameForm.reset();
-                multiselectGenre.reset();
-                multiselectCategory.reset();
-                document.body.removeChild(modal);
-                document.body.removeChild(overlay);
-
-                document.dispatchEvent(new Event('gameUpdated'));
-
-            } else {
-                showCustomMessage('Erro ao adicionar jogo: ' + result);
-            }
-        } catch (error) {
-            console.error('Erro na requisição:', error);
-            showCustomMessage('Ocorreu um erro ao conectar com o servidor.');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Adicionar';
-        }
-    });
-
-    const clearButton = modal.querySelector('.clear-btn');
-    clearButton.addEventListener('click', () => {
-        addGameForm.reset();
+      form.querySelector(".clear-btn").addEventListener("click", () => {
+        form.reset();
         multiselectGenre.reset();
         multiselectCategory.reset();
+      });
+    }
+
+    const backBtn = modal.querySelector(".back-btn");
+    if (backBtn) {
+      backBtn.addEventListener("click", navigateToFirstPage);
+    }
+
+    const submitBtn = modal.querySelector(".submit-btn");
+    if (submitBtn) {
+      submitBtn.addEventListener("click", handleFormSubmit);
+    }
+  }
+
+  // Lógica para a seleção de arquivos e visualização
+  function setupMediaUpload() {
+    const mediaInput = document.getElementById("media-upload");
+    const previewContainer = document.getElementById("media-preview-container");
+    // Adicione uma referência ao elemento onde a contagem de arquivos será exibida
+    const fileCountDisplay = document.createElement("p"); // Ou use um elemento existente se já houver um
+    fileCountDisplay.classList.add("media-count-display");
+    previewContainer.parentNode.insertBefore(
+      fileCountDisplay,
+      previewContainer
+    ); // Insere antes do container de preview
+
+    // Função para atualizar a exibição da contagem de arquivos
+    function updateFileCountDisplay() {
+      if (selectedMediaFiles.length === 0) {
+        fileCountDisplay.textContent = "Nenhuma mídia selecionada.";
+      } else {
+        fileCountDisplay.textContent = `${selectedMediaFiles.length} arquivo(s) selecionado(s)`;
+      }
+    }
+
+    mediaInput.addEventListener("change", (e) => {
+      const newFiles = Array.from(e.target.files);
+
+      // Adiciona os novos arquivos ao array existente
+      selectedMediaFiles = [...selectedMediaFiles, ...newFiles];
+
+      // Limpa o valor do input para permitir a seleção do mesmo arquivo novamente ou adicionar mais
+      e.target.value = null;
+
+      // Limpa a visualização anterior e renderiza todos os arquivos acumulados
+      renderMediaPreviews();
+      updateFileCountDisplay(); // Atualiza a contagem após adicionar novos arquivos
     });
+
+    // Função para renderizar as pré-visualizações (extraída para organização)
+    function renderMediaPreviews() {
+      previewContainer.innerHTML = ""; // Limpa a visualização anterior
+
+      selectedMediaFiles.forEach((file) => {
+        const fileContainer = document.createElement("div");
+        fileContainer.classList.add("media-preview-item");
+
+        const fileURL = URL.createObjectURL(file);
+        if (file.type.startsWith("image/")) {
+          const img = document.createElement("img");
+          img.src = fileURL;
+          img.alt = file.name;
+          fileContainer.appendChild(img);
+        } else if (file.type.startsWith("video/")) {
+          const video = document.createElement("video");
+          video.src = fileURL;
+          video.controls = true;
+          fileContainer.appendChild(video);
+        }
+
+        const fileName = document.createElement("p");
+        fileName.textContent = file.name;
+        fileContainer.appendChild(fileName);
+
+        const removeBtn = document.createElement("button");
+        removeBtn.classList.add("remove-media-btn");
+        removeBtn.textContent = "Remover";
+        removeBtn.addEventListener("click", () => {
+          // Filtra o arquivo a ser removido
+          selectedMediaFiles = selectedMediaFiles.filter((f) => f !== file);
+          previewContainer.removeChild(fileContainer);
+          updateFileCountDisplay(); // Atualiza a contagem após remover um arquivo
+        });
+        fileContainer.appendChild(removeBtn);
+
+        previewContainer.appendChild(fileContainer);
+      });
+    }
+
+    // Inicializa a visualização e a contagem
+    updateFileCountDisplay(); // Garante que a contagem seja exibida corretamente na inicialização
+    renderMediaPreviews();
+  }
+
+  // Lida com o envio do formulário completo
+  async function handleFormSubmit() {
+    const submitBtn = modal.querySelector(".submit-btn");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Adicionando...";
+
+    try {
+      const formData = new FormData();
+      formData.append("Nome_jogo", gameData.Nome_jogo);
+      formData.append("Descricao_jogo", gameData.Descricao_jogo);
+      formData.append("Preco_jogo", gameData.Preco_jogo);
+      formData.append("Logo_jogo", gameData.Logo_jogo);
+      formData.append("Capa_jogo", gameData.Capa_jogo);
+      formData.append("Faixa_etaria", gameData.Faixa_etaria);
+      formData.append("categorias", JSON.stringify(gameData.categorias));
+      formData.append("generos", JSON.stringify(gameData.generos));
+
+      // Anexa os arquivos selecionados ao FormData
+      selectedMediaFiles.forEach((file) => {
+        formData.append("Midias_jogo", file);
+      });
+
+      // Requisição para o backend
+      const response = await fetch(
+        "http://localhost:3000/adicionar-jogo-file",
+        {
+          // URL da nova rota
+          method: "POST",
+          body: formData, // FormData não precisa de Content-Type
+        }
+      );
+
+      const result = await response.text();
+
+      if (response.ok) {
+        showCustomMessage(result);
+        // Fecha o modal e reseta o formulário
+        document.body.removeChild(modal);
+        document.body.removeChild(overlay);
+        document.dispatchEvent(new Event("gameUpdated"));
+        selectedMediaFiles = []; // Limpa o array de arquivos
+      } else {
+        showCustomMessage("Erro ao adicionar jogo: " + result);
+      }
+    } catch (error) {
+      console.error("Erro na requisição:", error);
+      showCustomMessage("Ocorreu um erro ao conectar com o servidor.");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Adicionar Jogo";
+    }
+  }
+
+  attachEventListeners();
 }
 
+// ... (Resto do código do navbar.js permanece o mesmo) ...
 
 // Lida com a submissão do formulário de busca.
 function handleSearch(event) {
-    event.preventDefault(); // Evita o recarregamento padrão do formulário
-    const searchInput = document.getElementById('search-input');
-    const query = searchInput.value;
+  event.preventDefault();
+  const searchInput = document.getElementById("search-input");
+  const query = searchInput.value;
 
-    if (query.trim() === '') {
-        // Se a busca estiver vazia, acionamos um evento para limpar os resultados
-        if (window.location.pathname.includes('navegar.html')) {
-            const customEvent = new CustomEvent('searchSubmitted', { detail: { query: '' } });
-            document.dispatchEvent(customEvent);
-        } else {
-            // Se não estiver em navegar.html, redireciona para lá
-            window.location.href = `navegar.html`;
-        }
-        return;
-    }
-
-    if (window.location.pathname.includes('navegar.html')) {
-        // Se estiver, dispara um evento personalizado com a query
-        const customEvent = new CustomEvent('searchSubmitted', { detail: { query } });
-        document.dispatchEvent(customEvent);
+  if (query.trim() === "") {
+    if (window.location.pathname.includes("navegar.html")) {
+      const customEvent = new CustomEvent("searchSubmitted", {
+        detail: { query: "" },
+      });
+      document.dispatchEvent(customEvent);
     } else {
-        // Se não estiver, redireciona para a página de navegação com a query
-        window.location.href = `navegar.html?query=${encodeURIComponent(query)}`;
+      window.location.href = `navegar.html`;
     }
+    return;
+  }
+
+  if (window.location.pathname.includes("navegar.html")) {
+    const customEvent = new CustomEvent("searchSubmitted", {
+      detail: { query },
+    });
+    document.dispatchEvent(customEvent);
+  } else {
+    window.location.href = `navegar.html?query=${encodeURIComponent(query)}`;
+  }
 }
 
 // Renderiza a barra de navegação com base no estado de login do usuário.
 function renderNavbar(user) {
-    const navbar = document.querySelector('.navbar');
-    if (!navbar) return;
+  const navbar = document.querySelector(".navbar");
+  if (!navbar) return;
 
-    const isSignedIn = !!user;
-    const userEmail = user?.primaryEmailAddress?.emailAddress;
+  const isSignedIn = !!user;
+  const userEmail = user?.primaryEmailAddress?.emailAddress;
 
-    let navbarHTML = '';
+  let navbarHTML = "";
 
-    if (isSignedIn) {
-        if (userEmail === "phantomgamestcc@gmail.com") {
-            // HTML para o usuário administrador
-            navbarHTML = `
+  if (isSignedIn) {
+    if (userEmail === "phantomgamestcc@gmail.com") {
+      navbarHTML = `
                 <div class="logadoA">
                     <ul>
                         <li><img src="../../assets/imagens/logo-png.png" alt="Logo"></li>
@@ -335,9 +535,8 @@ function renderNavbar(user) {
                     <div id="user-button"></div>
                 </div>
             `;
-        } else {
-            // HTML para um usuário logado comum.
-            navbarHTML = `
+    } else {
+      navbarHTML = `
                 <div class="logadoM">
                     <ul>
                         <li><img class="logo" src="../../assets/imagens/logo-png.png" alt="Logo"></li>
@@ -355,10 +554,9 @@ function renderNavbar(user) {
                     </div>
                 </div>
             `;
-        }
-    } else {
-        // HTML para um usuário deslogado.
-        navbarHTML = `
+    }
+  } else {
+    navbarHTML = `
             <div class="deslogado">
                 <ul>
                     <li><img class="logo" src="../../assets/imagens/logo-png.png" alt="Logo"></li>
@@ -372,76 +570,64 @@ function renderNavbar(user) {
                 <a href="login.html"><button>Entrar</button></a>
             </div>
         `;
-    }
+  }
 
-    navbar.innerHTML = navbarHTML;
+  navbar.innerHTML = navbarHTML;
 
-    // Adiciona o event listener para o formulário de busca em qualquer estado.
-    const searchForm = document.getElementById('search-form');
-    if (searchForm) {
-        searchForm.addEventListener('submit', handleSearch);
-    }
+  const searchForm = document.getElementById("search-form");
+  if (searchForm) {
+    searchForm.addEventListener("submit", handleSearch);
+  }
 
-    // Adiciona um listener para monitorar o input e o evento de "enter"
-    const searchInput = document.getElementById('search-input');
-    if (searchInput) {
-        // Evento para a tecla 'Enter'
-        searchInput.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') {
-                handleSearch(event);
-            }
-        });
+  const searchInput = document.getElementById("search-input");
+  if (searchInput) {
+    searchInput.addEventListener("keyup", (event) => {
+      if (event.key === "Enter") {
+        handleSearch(event);
+      }
+    });
 
-        // Evento para monitorar a limpeza do input (seja por digitação ou pelo 'X')
-        searchInput.addEventListener('input', () => {
-            if (searchInput.value.trim() === '') {
-                // Dispara um evento vazio para limpar a busca
-                if (window.location.pathname.includes('navegar.html')) {
-                    const customEvent = new CustomEvent('searchSubmitted', { detail: { query: '' } });
-                    document.dispatchEvent(customEvent);
-                }
-            }
-        });
-    }
-
-    if (isSignedIn) {
-        // Renderiza o UserButton se o usuário estiver logado
-        const userButtonDiv = document.getElementById('user-button');
-        if (userButtonDiv) {
-            clerk.mountUserButton(userButtonDiv);
+    searchInput.addEventListener("input", () => {
+      if (searchInput.value.trim() === "") {
+        if (window.location.pathname.includes("navegar.html")) {
+          const customEvent = new CustomEvent("searchSubmitted", {
+            detail: { query: "" },
+          });
+          document.dispatchEvent(customEvent);
         }
+      }
+    });
+  }
 
-        // Lógica para o botão de adicionar jogo do admin
-        if (userEmail === "phantomgamestcc@gmail.com") {
-            const addButton = document.getElementById('add-game-btn');
-            if (addButton) {
-                addButton.addEventListener('click', createAddGameModal);
-            }
-        }
+  if (isSignedIn) {
+    const userButtonDiv = document.getElementById("user-button");
+    if (userButtonDiv) {
+      clerk.mountUserButton(userButtonDiv);
     }
 
-    // Preenche o input de busca se houver um parâmetro na URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const query = urlParams.get('query');
-    if (searchInput && query) {
-        searchInput.value = query;
+    if (userEmail === "phantomgamestcc@gmail.com") {
+      const addButton = document.getElementById("add-game-btn");
+      if (addButton) {
+        addButton.addEventListener("click", createAddGameModal);
+      }
     }
+  }
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const query = urlParams.get("query");
+  if (searchInput && query) {
+    searchInput.value = query;
+  }
 }
 
-// Quando o documento estiver completamente carregado, inicializa o Clerk.
-document.addEventListener('DOMContentLoaded', async () => {
-    try {
-        await clerk.load();
-
-        // Adiciona um listener para atualizar a navbar sempre que o estado do usuário mudar.
-        clerk.addListener(({ user }) => {
-            renderNavbar(user);
-        });
-
-        // Renderiza a navbar com o estado inicial do usuário.
-        renderNavbar(clerk.user);
-
-    } catch (error) {
-        console.error('Erro ao inicializar Clerk:', error);
-    }
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    await clerk.load();
+    clerk.addListener(({ user }) => {
+      renderNavbar(user);
+    });
+    renderNavbar(clerk.user);
+  } catch (error) {
+    console.error("Erro ao inicializar Clerk:", error);
+  }
 });

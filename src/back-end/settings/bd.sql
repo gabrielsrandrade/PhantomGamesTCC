@@ -32,9 +32,16 @@ Preco_jogo decimal(5,2) not null,
 Logo_jogo text not null,
 Descricao_jogo text,
 Capa_jogo text not null,
-Midias_jogo text not null,
 Faixa_etaria text not null,
 Media_nota decimal(10,2) not null
+);
+
+/* tabela midia_jogos */
+create table midias_jogo(
+  ID_midia int(10) not null auto_increment primary key,
+  ID_jogo int(5) not null,
+  URL_midia varchar(255) not null,
+  foreign key (ID_jogo) references jogos(ID_jogo)
 );
 
 /* tabela categoria_jogos (relacionamento entre jogos e categorias) */
@@ -54,7 +61,6 @@ create table genero_jogos(
   foreign key (ID_genero) references genero(ID_genero),
   foreign key (ID_jogo) references jogos(ID_jogo)
 );
-
  
 /*tabela lista_desejos */
 create table lista_desejos(
