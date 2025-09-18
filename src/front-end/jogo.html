@@ -16,28 +16,16 @@
 
   <a href="homepage.html" class="seta-retorno"><img src="../../assets/imagens/chevron-left.png" alt="retorno" /></a>
 
-  <span id="nome-jogo">Minecraft</span>
+  <span id="nome-jogo"></span>
 
   <main>
     <div class="imagem-jogo">
       <div style="
-            --swiper-navigation-color: #fff;
-            --swiper-pagination-color: #fff;
+            --swiper-navigation-color: #ffffff;
+            --swiper-pagination-color: #ffffff;
           " class="swiper jogo-main-image">
         <div class="swiper-wrapper">
-          <div class="swiper-slide">
-            <img src="https://xboxwire.thesourcemediaassets.com/sites/8/2024/05/Hero-bdef2532984d6fcafc40.jpg" />
-          </div>
-          <div class="swiper-slide">
-            <img src="https://xboxwire.thesourcemediaassets.com/sites/8/2025/07/Hero-6c04e1b759a006009ce7.jpg" />
-          </div>
-          <div class="swiper-slide">
-            <img
-              src="https://assets.nintendo.com/image/upload/ar_16:9,c_lpad,w_1240/b_white/f_auto/q_auto/ncom/software/switch/70010000000964/a28a81253e919298beab2295e39a56b7a5140ef15abdb56135655e5c221b2a3a" />
-          </div>
-          <div class="swiper-slide">
-            <img src="https://jogospc.com.br/wp-content/uploads/2025/01/Minecraft.jpg" />
-          </div>
+          <!-- Slides serão populados dinamicamente pelo JS -->
         </div>
         <!-- <div class="swiper-button-next"></div>
           <div class="swiper-button-prev"></div> -->
@@ -45,45 +33,24 @@
 
       <div thumbsSlider="" class="swiper jogo-side-image">
         <div class="swiper-wrapper">
-          <div class="swiper-slide">
-            <img src="https://xboxwire.thesourcemediaassets.com/sites/8/2024/05/Hero-bdef2532984d6fcafc40.jpg" />
-          </div>
-          <div class="swiper-slide">
-            <img src="https://xboxwire.thesourcemediaassets.com/sites/8/2025/07/Hero-6c04e1b759a006009ce7.jpg" />
-          </div>
-          <div class="swiper-slide">
-            <img
-              src="https://assets.nintendo.com/image/upload/ar_16:9,c_lpad,w_1240/b_white/f_auto/q_auto/ncom/software/switch/70010000000964/a28a81253e919298beab2295e39a56b7a5140ef15abdb56135655e5c221b2a3a" />
-          </div>
-          <div class="swiper-slide">
-            <img src="https://jogospc.com.br/wp-content/uploads/2025/01/Minecraft.jpg" />
-          </div>
+          <!-- Thumbs serão populados dinamicamente pelo JS -->
         </div>
       </div>
     </div>
 
     <div class="sobre-jogo">
       <div id="logo-jogo"></div>
-      <span id="descrição">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Debitis non
-        adipisci omnis vero quos facere eos perspiciatis consequatur sed ipsa
-        deserunt impedit reprehenderit fugit similique nisi, quidem harum
-        accusamus dolor.</span>
-      <div id="faixa-etaria"></div>
+      <span id="descrição"></span>
+      <div id="faixa-etaria">
+        <img id="faixa-etaria-img" alt="Faixa Etária" />
+      </div>
 
       <div class="detalhes-jogo">
         <div class="preco-avaliacao">
-          <span id="preco">R$89,90</span>
-          <div id="avaliacao">
-            <span class="star">&#9733;</span>
-            <span class="star">&#9733;</span>
-            <span class="star">&#9733;</span>
-            <span class="star">&#9733;</span>
-            <span class="star">&#9733;</span>
-          </div>
+          <span id="preco"></span>
+          <div id="avaliacao"></div>
         </div>
-
-        <button id="editar">Editar Jogo</button>
-        <button id="remover">Remover Jogo</button>
+        <!-- Botões serão populados dinamicamente pelo JS com base no usuário -->
       </div>
 
     </div>
@@ -92,15 +59,13 @@
     <div class="generos">
       <span>Gêneros</span>
       <div id="genero">
-        <span>Ação</span>
-        <span>Aventura</span>
+        <!-- Gêneros serão populados dinamicamente pelo JS -->
       </div>
     </div>
     <div class="categorias">
       <span>Categorias</span>
       <div id="categoria">
-        <span>Multiplayer Online</span>
-
+        <!-- Categorias serão populados dinamicamente pelo JS -->
       </div>
     </div>
   </section>
@@ -110,7 +75,7 @@
     <div id="adicionar-comentario">
       <div class="image-perfil ">
         <img src="" alt="">
-        <span id="nome">Dheiko</span>
+        <span id="nome">Dheiko</span> <!-- Placeholder, integrar com Clerk user depois -->
       </div>
       <div class="nota">
         <span class="star">&#9733;</span>
@@ -128,7 +93,7 @@
     <div class="comentariosJaFeito">
       <div class="image-perfil ">
         <img src="" alt="">
-        <span id="nome">Dheiko</span>
+        <span id="nome">Dheiko</span> <!-- Placeholder -->
       </div>
       <div class="nota">
         <span class="star">&#9733;</span>
@@ -139,7 +104,7 @@
       </div>
       <div id="cometarioFeito">
         <span>Lorem ipsum dolor sit amet consectetur adipisicing elit. Possimus perferendis recusandae
-        consectetur vero at quia? Nulla et, alias pariatur sed dolorum amet, inventore rem, expedita doloribus quo quasi. Incidunt, molestias?</span>
+        consectetur vero at quia? Nulla et, alias pariatur sed dolorum amet, inventore rem, expedita doloribus quo quasi. Incidunt, molestias?</span> <!-- Placeholder -->
       </div>
     </div>
   </section>
@@ -163,8 +128,9 @@
   </footer>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script src="../Script/jogoSwiper.js"></script>
+<script type="module" src="/src/js/auth.js"></script>
 <script type="module" src="../Script/navbar.js"></script>
 <script type="module" src="../Script/userbutton.js"></script>
+<script type="module" src="../Script/jogo.js"></script> 
 
 </html>

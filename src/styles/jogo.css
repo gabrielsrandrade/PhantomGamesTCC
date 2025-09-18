@@ -73,10 +73,10 @@ main {
 
     #logo-jogo {
       height: 15rem;
-      background-image: url('https://logos-world.net/wp-content/uploads/2020/05/Minecraft-Logo.png');
+      /* background-image: url('https://logos-world.net/wp-content/uploads/2020/05/Minecraft-Logo.png');
       background-repeat: no-repeat;
       background-size: contain;
-      background-position: center;
+      background-position: center; */
       /* display: none; */
     }
 
@@ -87,10 +87,10 @@ main {
     #faixa-etaria {
       height: 3rem;
       width: 3rem;
-      background-image: url('../../assets/imagens/livre.png');
+      /* background-image: url('../../assets/imagens/livre.png');
       background-repeat: no-repeat;
       background-size: cover;
-      background-position: center;
+      background-position: center; */
     }
 
     .detalhes-jogo {

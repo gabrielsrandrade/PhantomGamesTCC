@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const preco = parseFloat(game.Preco_jogo);
             const gameCard = document.createElement('a');
             gameCard.className = 'card_jogo';
-            gameCard.href = `pagina_jogo.html?id=${game.ID_jogo}`;
+            gameCard.href = `jogo.html?id=${game.ID_jogo}`;
             
             // Lógica para definir o texto do preço
             let precoText;

@@ -27,7 +27,7 @@ Nome varchar(20) not null
 /* tabela jogos */
 create table jogos(
 ID_jogo int(5) primary key not null auto_increment,
-Nome_jogo varchar(20) not null,
+Nome_jogo varchar(100) not null,
 Preco_jogo decimal(5,2) not null,
 Logo_jogo text not null,
 Descricao_jogo text,

@@ -212,6 +212,56 @@ app.post("/adicionar-jogo-file", upload.array('Midias_jogo', 10), async (req, re
     }
 });
 
+// Nova rota para buscar um jogo específico por ID
+app.get("/jogos/:id", async (req, res) => {
+    let connection;
+    try {
+        const jogoId = req.params.id;
+        connection = await pool.getConnection();
+
+        // Busca o jogo principal
+        const [jogosRows] = await connection.execute("SELECT * FROM jogos WHERE ID_jogo = ?", [jogoId]);
+        if (jogosRows.length === 0) {
+            return res.status(404).send("Jogo não encontrado.");
+        }
+
+        // Busca categorias
+        const [categoriasRows] = await connection.execute(
+            "SELECT c.Nome FROM categoria_jogos AS cj INNER JOIN categoria AS c ON cj.ID_categoria = c.ID_categoria WHERE cj.ID_jogo = ?",
+            [jogoId]
+        );
+        const categorias = categoriasRows.map(row => row.Nome);
+
+        // Busca gêneros
+        const [generosRows] = await connection.execute(
+            "SELECT g.Nome FROM genero_jogos AS gj INNER JOIN genero AS g ON gj.ID_genero = g.ID_genero WHERE gj.ID_jogo = ?",
+            [jogoId]
+        );
+        const generos = generosRows.map(row => row.Nome);
+
+        // Busca mídias
+        const [midiasRows] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
+        const midias = midiasRows.map(row => row.URL_midia);
+
+        // Monta o objeto do jogo com detalhes
+        const jogoComDetalhes = {
+            ...jogosRows[0],
+            categorias: categorias,
+            generos: generos,
+            midias: midias,
+        };
+
+        res.status(200).json(jogoComDetalhes);
+    } catch (err) {
+        console.error("Erro ao buscar jogo por ID:", err.message);
+        res.status(500).send("Erro interno do servidor ao buscar o jogo.");
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+});
+
 // Rota para buscar jogos (mantida como estava)
 app.get("/jogos", async (req, res) => {
     let connection;
