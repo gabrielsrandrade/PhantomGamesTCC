@@ -1,23 +1,20 @@
 const express = require("express");
 const mysql = require("mysql2/promise");
-const bodyParser = require("body-parser"); // Usado para json e urlencoded
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require('path');
 const fs = require('fs');
-// const fetch = require('node-fetch'); // Removido, pois não é mais usado
-const crypto = require('crypto'); // Mantido para geração de nomes de arquivo únicos, se necessário para outras partes
-const multer = require('multer'); // Importado para o upload de arquivos
+const crypto = require('crypto');
+const multer = require('multer');
 
 const app = express();
 const port = 3000;
 
 app.use(cors());
-// Mantenha bodyParser.json() e bodyParser.urlencoded() se você ainda precisa deles para outras rotas.
-// Para a rota de upload com Multer, não precisamos de bodyParser.json().
-app.use(express.json()); // Alternativa moderna ao bodyParser.json()
-app.use(express.urlencoded({ extended: true })); // Alternativa moderna ao bodyParser.urlencoded()
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Serve a pasta de uploads estaticamente para que as imagens fiquem acessíveis
+// Serve a pasta de uploads estaticamente
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const storage = multer.diskStorage({
@@ -31,25 +28,16 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         let fileExtension = path.extname(file.originalname);
+        const contentType = file.mimetype;
 
-        // Lógica para verificar o Content-Type e ajustar a extensão se necessário
-        const contentType = file.mimetype; // Multer adiciona mimetype ao objeto do arquivo
-        if (contentType === 'image/jpeg' && fileExtension.toLowerCase() === '.jfif') {
-            fileExtension = '.jpg'; // Corrige de .jfif para .jpg se for JPEG
-        } else if (contentType && contentType.startsWith('image/')) {
-            // Tenta obter a extensão correta a partir do content type se disponível
-            const mimeMap = {
-                'image/jpeg': '.jpg',
-                'image/png': '.png',
-                'image/gif': '.gif',
-                'image/bmp': '.bmp',
-                'image/webp': '.webp',
-                'image/svg+xml': '.svg',
-            };
-            const mappedExtension = mimeMap[contentType.toLowerCase()] || fileExtension;
-            if (mappedExtension !== fileExtension) {
-                fileExtension = mappedExtension;
-            }
+        const mimeMap = {
+            'image/jpeg': '.jpg', 'image/png': '.png', 'image/gif': '.gif',
+            'image/bmp': '.bmp', 'image/webp': '.webp', 'image/svg+xml': '.svg',
+            'video/mp4': '.mp4', 'video/webm': '.webm', 'video/ogg': '.ogg',
+        };
+        const mappedExtension = mimeMap[contentType.toLowerCase()] || fileExtension;
+        if (mappedExtension !== fileExtension) {
+            fileExtension = mappedExtension;
         }
 
         cb(null, file.fieldname + '-' + uniqueSuffix + fileExtension);
@@ -58,8 +46,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-
-// Configurações do seu banco de dados
 const dbConfig = {
     host: "localhost",
     user: "root",
@@ -70,10 +56,8 @@ const dbConfig = {
     queueLimit: 0,
 };
 
-// Cria um pool de conexões
 const pool = mysql.createPool(dbConfig);
 
-// Verifica a conexão
 async function checkDatabaseConnection() {
     let connection;
     try {
@@ -89,161 +73,35 @@ async function checkDatabaseConnection() {
 }
 checkDatabaseConnection();
 
+// --- ROTAS DO BACK-END ---
 
-// --- Rota para adicionar jogo com upload de arquivos via FormData ---
-// upload.array('Midias_jogo') espera um array de arquivos com o nome 'Midias_jogo'
-app.post("/adicionar-jogo-file", upload.array('Midias_jogo', 10), async (req, res) => { // O segundo argumento (10) limita a 10 arquivos por upload
-    let connection;
-    try {
-        connection = await pool.getConnection();
-        await connection.beginTransaction();
-
-        // Os dados não relacionados aos arquivos são enviados como campos de texto no FormData
-        const {
-            Nome_jogo,
-            Descricao_jogo,
-            Preco_jogo,
-            Logo_jogo,
-            Capa_jogo,
-            Faixa_etaria,
-            categorias, // Estes virão como strings JSON do FormData
-            generos     // Estes virão como strings JSON do FormData
-        } = req.body;
-
-        // Converte as strings JSON de volta para arrays
-        const categoriasArray = JSON.parse(categorias);
-        const generosArray = JSON.parse(generos);
-
-        if (!Nome_jogo || !Preco_jogo) {
-            await connection.rollback();
-            return res.status(400).send("Todos os campos são obrigatórios.");
-        }
-
-        // --- 1. Inserir o novo jogo na tabela 'jogos' ---
-        const gameSql = `
-            INSERT INTO jogos (Nome_jogo, Preco_jogo, Logo_jogo, Descricao_jogo, Capa_jogo, Faixa_etaria, Media_nota)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        `;
-        const gameValues = [
-            Nome_jogo,
-            parseFloat(Preco_jogo), // Converte o preço para número
-            Logo_jogo, // Logo e Capa ainda são tratadas como URLs
-            Descricao_jogo,
-            Capa_jogo,
-            Faixa_etaria,
-            10.0, // Valor padrão para Media_nota
-        ];
-        const [gameResult] = await connection.execute(gameSql, gameValues);
-        const jogoId = gameResult.insertId;
-        console.log(`Jogo inserido com sucesso! ID do jogo: ${jogoId}`);
-
-        // --- 2. Inserir as mídias na tabela 'midias_jogo' ---
-        // req.files contém as informações sobre os arquivos que foram enviados e salvos pelo Multer
-        if (req.files && req.files.length > 0) {
-            const midiasValues = req.files.map(file => {
-                // file.filename contém o nome do arquivo salvo pelo Multer
-                return [jogoId, `/uploads/${file.filename}`];
-            });
-
-            await connection.query(
-                "INSERT INTO midias_jogo (ID_jogo, URL_midia) VALUES ?",
-                [midiasValues]
-            );
-            console.log(`Mídias adicionadas para o jogo ${jogoId}.`);
-        } else {
-            console.log(`Nenhuma mídia enviada para o jogo ${jogoId}.`);
-        }
-
-        // --- 3. Inserir categorias ---
-        if (categoriasArray && categoriasArray.length > 0) {
-            // Busca as IDs das categorias existentes pelo nome
-            const placeholders = categoriasArray.map(() => '?').join(',');
-            const [existingCategories] = await connection.execute(
-                `SELECT ID_categoria FROM categoria WHERE Nome IN (${placeholders})`,
-                categoriasArray
-            );
-            // Cria os pares de (ID_categoria, ID_jogo) para inserção
-            const categoriaValues = existingCategories.map(row => [row.ID_categoria, jogoId]);
-            if (categoriaValues.length > 0) {
-                await connection.query(
-                    "INSERT INTO categoria_jogos (ID_categoria, ID_jogo) VALUES ?",
-                    [categoriaValues]
-                );
-                console.log(`Vínculos de categorias criados para o jogo ${jogoId}.`);
-            }
-        }
-
-        // --- 4. Inserir gêneros ---
-        if (generosArray && generosArray.length > 0) {
-            // Busca as IDs dos gêneros existentes pelo nome
-            const placeholders = generosArray.map(() => '?').join(',');
-            const [existingGenres] = await connection.execute(
-                `SELECT ID_genero FROM genero WHERE Nome IN (${placeholders})`,
-                generosArray
-            );
-            // Cria os pares de (ID_genero, ID_jogo) para inserção
-            const generoValues = existingGenres.map(row => [row.ID_genero, jogoId]);
-            if (generoValues.length > 0) {
-                await connection.query(
-                    "INSERT INTO genero_jogos (ID_genero, ID_jogo) VALUES ?",
-                    [generoValues]
-                );
-                console.log(`Vínculos de gêneros criados para o jogo ${jogoId}.`);
-            }
-        }
-
-        await connection.commit(); // Confirma a transação
-        res.status(200).send("Jogo adicionado com sucesso!");
-
-    } catch (err) {
-        if (connection) {
-            await connection.rollback(); // Desfaz a transação em caso de erro
-            console.error("Transação desfeita devido a um erro.");
-        }
-        console.error("Erro na rota /adicionar-jogo-file:", err.message);
-        // Logar o stack trace pode ser útil para depuração
-        console.error("Stack trace:", err.stack);
-        res.status(500).send("Erro interno do servidor ao adicionar jogo.");
-    } finally {
-        if (connection) {
-            connection.release(); // Libera a conexão de volta para o pool
-            console.log("Conexão liberada.");
-        }
-    }
-});
-
-// Nova rota para buscar um jogo específico por ID
+// Rota para buscar um jogo específico por ID (GET)
 app.get("/jogos/:id", async (req, res) => {
     let connection;
     try {
         const jogoId = req.params.id;
         connection = await pool.getConnection();
 
-        // Busca o jogo principal
         const [jogosRows] = await connection.execute("SELECT * FROM jogos WHERE ID_jogo = ?", [jogoId]);
         if (jogosRows.length === 0) {
-            return res.status(404).send("Jogo não encontrado.");
+            return res.status(404).json({ message: "Jogo não encontrado." });
         }
 
-        // Busca categorias
         const [categoriasRows] = await connection.execute(
             "SELECT c.Nome FROM categoria_jogos AS cj INNER JOIN categoria AS c ON cj.ID_categoria = c.ID_categoria WHERE cj.ID_jogo = ?",
             [jogoId]
         );
         const categorias = categoriasRows.map(row => row.Nome);
 
-        // Busca gêneros
         const [generosRows] = await connection.execute(
             "SELECT g.Nome FROM genero_jogos AS gj INNER JOIN genero AS g ON gj.ID_genero = g.ID_genero WHERE gj.ID_jogo = ?",
             [jogoId]
         );
         const generos = generosRows.map(row => row.Nome);
 
-        // Busca mídias
         const [midiasRows] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
         const midias = midiasRows.map(row => row.URL_midia);
 
-        // Monta o objeto do jogo com detalhes
         const jogoComDetalhes = {
             ...jogosRows[0],
             categorias: categorias,
@@ -254,7 +112,7 @@ app.get("/jogos/:id", async (req, res) => {
         res.status(200).json(jogoComDetalhes);
     } catch (err) {
         console.error("Erro ao buscar jogo por ID:", err.message);
-        res.status(500).send("Erro interno do servidor ao buscar o jogo.");
+        res.status(500).json({ message: "Erro interno do servidor ao buscar o jogo." });
     } finally {
         if (connection) {
             connection.release();
@@ -262,7 +120,148 @@ app.get("/jogos/:id", async (req, res) => {
     }
 });
 
-// Rota para buscar jogos (mantida como estava)
+// Rota para editar jogo (PUT)
+app.put("/jogos/:id", upload.array('midias', 10), async (req, res) => {
+    let connection;
+    try {
+        const jogoId = req.params.id;
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        const {
+            Nome_jogo, Descricao_jogo, Preco_jogo, Logo_jogo, Capa_jogo, Faixa_etaria,
+            generos, categorias, existing_midias
+        } = req.body;
+        
+        console.log("ID do jogo para edição:", jogoId);
+        console.log("Dados do formulário:", req.body);
+        console.log("Novos arquivos de mídia:", req.files);
+
+        // 1. Atualizar os dados principais do jogo
+        const updateGameSql = `
+            UPDATE jogos SET
+            Nome_jogo = ?, Descricao_jogo = ?, Preco_jogo = ?, Logo_jogo = ?, Capa_jogo = ?, Faixa_etaria = ?
+            WHERE ID_jogo = ?
+        `;
+        const updateGameValues = [Nome_jogo, Descricao_jogo, Preco_jogo, Logo_jogo, Capa_jogo, Faixa_etaria, jogoId];
+        await connection.execute(updateGameSql, updateGameValues);
+
+        // 2. Lidar com gêneros: deletar antigos e inserir novos
+        await connection.execute("DELETE FROM genero_jogos WHERE ID_jogo = ?", [jogoId]);
+        if (generos && generos.length > 0) {
+            const generosArray = Array.isArray(generos) ? generos : [generos];
+            const placeholders = generosArray.map(() => '?').join(',');
+            const [existingGenres] = await connection.execute(`SELECT ID_genero FROM genero WHERE Nome IN (${placeholders})`, generosArray);
+            const generoValues = existingGenres.map(row => [row.ID_genero, jogoId]);
+            if (generoValues.length > 0) {
+                await connection.query("INSERT INTO genero_jogos (ID_genero, ID_jogo) VALUES ?", [generoValues]);
+            }
+        }
+
+        // 3. Lidar com categorias: deletar antigas e inserir novas
+        await connection.execute("DELETE FROM categoria_jogos WHERE ID_jogo = ?", [jogoId]);
+        if (categorias && categorias.length > 0) {
+            const categoriasArray = Array.isArray(categorias) ? categorias : [categorias];
+            const placeholders = categoriasArray.map(() => '?').join(',');
+            const [existingCategories] = await connection.execute(`SELECT ID_categoria FROM categoria WHERE Nome IN (${placeholders})`, categoriasArray);
+            const categoriaValues = existingCategories.map(row => [row.ID_categoria, jogoId]);
+            if (categoriaValues.length > 0) {
+                await connection.query("INSERT INTO categoria_jogos (ID_categoria, ID_jogo) VALUES ?", [categoriaValues]);
+            }
+        }
+
+        // 4. Lidar com mídias: deletar antigas não enviadas e inserir novas
+        const existingMidiasArray = Array.isArray(existing_midias) ? existing_midias : (existing_midias ? [existing_midias] : []);
+        const [oldMidiasRows] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
+        const oldMidiasPaths = oldMidiasRows.map(row => row.URL_midia);
+        
+        // Mídias a serem deletadas
+        const midiasToDelete = oldMidiasPaths.filter(path => !existingMidiasArray.includes(path));
+        if (midiasToDelete.length > 0) {
+            const placeholders = midiasToDelete.map(() => '?').join(',');
+            await connection.execute(`DELETE FROM midias_jogo WHERE ID_jogo = ? AND URL_midia IN (${placeholders})`, [jogoId, ...midiasToDelete]);
+            // Opcional: deletar os arquivos físicos
+            midiasToDelete.forEach(filePath => {
+                const fullPath = path.join(__dirname, filePath);
+                if (fs.existsSync(fullPath)) {
+                    fs.unlinkSync(fullPath);
+                }
+            });
+        }
+
+        // Novas mídias a serem inseridas
+        if (req.files && req.files.length > 0) {
+            const newMediaValues = req.files.map(file => [jogoId, `/uploads/${file.filename}`]);
+            await connection.query("INSERT INTO midias_jogo (ID_jogo, URL_midia) VALUES ?", [newMediaValues]);
+        }
+
+        await connection.commit();
+        res.status(200).json({ message: "Jogo atualizado com sucesso!" });
+
+    } catch (err) {
+        if (connection) {
+            await connection.rollback();
+        }
+        console.error("Erro na rota PUT /jogos/:id:", err);
+        res.status(500).json({ message: "Erro interno do servidor ao editar o jogo." });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+});
+
+// Rota para remover um jogo específico por ID (DELETE)
+app.delete("/jogos/:id", async (req, res) => {
+    let connection;
+    try {
+        const jogoId = req.params.id;
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        // Deletar os arquivos de mídia físicos primeiro
+        const [midiasRows] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
+        midiasRows.forEach(row => {
+            const filePath = path.join(__dirname, row.URL_midia);
+            if (fs.existsSync(filePath)) {
+                fs.unlinkSync(filePath);
+            }
+        });
+
+        // 1. Deletar mídias do banco de dados
+        await connection.execute("DELETE FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
+
+        // 2. Deletar vínculos de categorias
+        await connection.execute("DELETE FROM categoria_jogos WHERE ID_jogo = ?", [jogoId]);
+
+        // 3. Deletar vínculos de gêneros
+        await connection.execute("DELETE FROM genero_jogos WHERE ID_jogo = ?", [jogoId]);
+
+        // 4. Deletar o jogo da tabela principal
+        const [result] = await connection.execute("DELETE FROM jogos WHERE ID_jogo = ?", [jogoId]);
+
+        if (result.affectedRows === 0) {
+            await connection.rollback();
+            return res.status(404).json({ message: "Jogo não encontrado." });
+        }
+
+        await connection.commit();
+        res.status(200).json({ message: "Jogo removido com sucesso." });
+    } catch (err) {
+        if (connection) {
+            await connection.rollback();
+        }
+        console.error("Erro ao remover jogo:", err);
+        res.status(500).json({ message: "Erro interno do servidor ao remover o jogo." });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+});
+
+
+// Rota para buscar todos os jogos (GET)
 app.get("/jogos", async (req, res) => {
     let connection;
     try {
@@ -283,7 +282,7 @@ app.get("/jogos", async (req, res) => {
         res.status(200).json(jogosComDetalhes);
     } catch (err) {
         console.error("Erro ao buscar jogos:", err.message);
-        res.status(500).send("Erro interno do servidor ao buscar os jogos.");
+        res.status(500).json({ message: "Erro interno do servidor ao buscar os jogos." });
     } finally {
         if (connection) {
             connection.release();
@@ -291,12 +290,74 @@ app.get("/jogos", async (req, res) => {
     }
 });
 
-// Rota raiz (mantida)
+// Rota para adicionar jogo (POST)
+app.post("/adicionar-jogo-file", upload.array('Midias_jogo', 10), async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        const {
+            Nome_jogo, Descricao_jogo, Preco_jogo, Logo_jogo, Capa_jogo, Faixa_etaria, categorias, generos
+        } = req.body;
+
+        const categoriasArray = JSON.parse(categorias);
+        const generosArray = JSON.parse(generos);
+
+        if (!Nome_jogo || !Preco_jogo) {
+            await connection.rollback();
+            return res.status(400).json({ message: "Nome e preço do jogo são obrigatórios." });
+        }
+
+        const gameSql = `INSERT INTO jogos (Nome_jogo, Preco_jogo, Logo_jogo, Descricao_jogo, Capa_jogo, Faixa_etaria, Media_nota) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        const gameValues = [Nome_jogo, parseFloat(Preco_jogo), Logo_jogo, Descricao_jogo, Capa_jogo, Faixa_etaria, 10.0];
+        const [gameResult] = await connection.execute(gameSql, gameValues);
+        const jogoId = gameResult.insertId;
+
+        if (req.files && req.files.length > 0) {
+            const midiasValues = req.files.map(file => [jogoId, `/uploads/${file.filename}`]);
+            await connection.query("INSERT INTO midias_jogo (ID_jogo, URL_midia) VALUES ?", [midiasValues]);
+        }
+
+        if (categoriasArray && categoriasArray.length > 0) {
+            const placeholders = categoriasArray.map(() => '?').join(',');
+            const [existingCategories] = await connection.execute(`SELECT ID_categoria FROM categoria WHERE Nome IN (${placeholders})`, categoriasArray);
+            const categoriaValues = existingCategories.map(row => [row.ID_categoria, jogoId]);
+            if (categoriaValues.length > 0) {
+                await connection.query("INSERT INTO categoria_jogos (ID_categoria, ID_jogo) VALUES ?", [categoriaValues]);
+            }
+        }
+
+        if (generosArray && generosArray.length > 0) {
+            const placeholders = generosArray.map(() => '?').join(',');
+            const [existingGenres] = await connection.execute(`SELECT ID_genero FROM genero WHERE Nome IN (${placeholders})`, generosArray);
+            const generoValues = existingGenres.map(row => [row.ID_genero, jogoId]);
+            if (generoValues.length > 0) {
+                await connection.query("INSERT INTO genero_jogos (ID_genero, ID_jogo) VALUES ?", [generoValues]);
+            }
+        }
+
+        await connection.commit();
+        res.status(200).json({ message: "Jogo adicionado com sucesso!" });
+
+    } catch (err) {
+        if (connection) {
+            await connection.rollback();
+        }
+        console.error("Erro na rota /adicionar-jogo-file:", err);
+        res.status(500).json({ message: "Erro interno do servidor ao adicionar jogo." });
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+});
+
+// Rota raiz
 app.get("/", (req, res) => {
     res.status(200).send("Servidor está rodando.");
 });
 
-// Inicia o servidor (mantido)
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });

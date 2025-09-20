@@ -312,3 +312,41 @@ main {
 .swiper-button-prev {
   left: 10px;
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+    color: white;
+    display: flex;
+    justify-content: center; 
+    align-items: center;     
+}
+
+/* Ajuste o modal de confirmação */
+.confirm-modal {
+
+    
+    background-color: var(--search-bar);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    z-index: 2000;
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    transform: scale(1);
+    opacity: 1;
+
+    button{
+      margin-top: 1rem;
+      margin-right: 1rem;
+      background-color: var(--button-color);
+      color: white;
+      padding: 10px 40px;
+      border-radius: 8px;
+    }
+}

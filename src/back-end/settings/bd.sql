@@ -108,15 +108,3 @@ VALUES ('Singleplayer'), ('Multiplayer Local'), ('Multiplayer Online'), ('Co-op'
 ('2D'), ('3D'), ('2.5D'), ('Top-Down'), ('Side-Scrooling'), ('Isométrico'), ('Primeira Pessoa'), ('Terceira Pessoa'),
 ('Linear'), ('Mundo Aberto'), ('Sandbox'), ('Campanha'), ('Missões/Fases'), ('Permadeath'), ('Rouguelike');
 
-
-SELECT
-    j.Nome_jogo,
-    c.Nome AS Nome_categoria
-FROM
-    jogos AS j
-INNER JOIN
-    categoria_jogos AS cj ON j.ID_jogo = cj.ID_jogo
-INNER JOIN
-    categoria AS c ON cj.ID_categoria = c.ID_categoria
-WHERE
-    j.ID_jogo = 1;
