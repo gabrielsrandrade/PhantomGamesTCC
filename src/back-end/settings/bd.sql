@@ -1,17 +1,16 @@
 drop database PhantomGames;
 
 create database PhantomGames;
- 
+
 use PhantomGames;
- 
-/*tabela usuario */
+
+/* tabela usuario */
 create table usuario(
-ID_usuario int(6) primary key not null auto_increment, 
+ID_usuario varchar(50) primary key not null,
 Nome varchar(80) not null,
-email varchar(50) not null,
-senha varchar(20) not null,
-classe varchar(1) not null);
- 
+Imagem_perfil varchar(255)
+);
+
 /* tabela categoria */
 create table categoria(
 ID_categoria int(2) primary key not null auto_increment,
@@ -61,37 +60,37 @@ create table genero_jogos(
   foreign key (ID_genero) references genero(ID_genero),
   foreign key (ID_jogo) references jogos(ID_jogo)
 );
- 
+
 /*tabela lista_desejos */
 create table lista_desejos(
 ID_lista_desejos int(5) primary key not null auto_increment, 
-ID_usuario int(6),
+ID_usuario varchar(50),
 ID_jogo int(5),
 foreign key (ID_usuario) references usuario(ID_usuario),
 foreign key (ID_jogo) references jogos(ID_jogo));
- 
+
 /*tabela biblioteca */
 create table biblioteca(
 ID_biblioteca int(5) primary key not null auto_increment, 
-ID_usuario int(6),
+ID_usuario varchar(50),
 ID_jogo int(5),
 foreign key (ID_usuario) references usuario(ID_usuario),
 foreign key (ID_jogo) references jogos(ID_jogo));
- 
+
 /*tabela carrinho */
 create table carrinho(
 ID_carrinho int(5) primary key not null auto_increment, 
 forma_pagamento varchar(20) not null,
 data_compra date not null,
-ID_usuario int(6),
+ID_usuario varchar(50),
 ID_jogo int(5),
 foreign key (ID_usuario) references usuario(ID_usuario),
 foreign key (ID_jogo) references jogos(ID_jogo));
- 
+
 /*tabela comentário */
 create table comentario(
 ID_comentario int(12) primary key not null auto_increment, 
-ID_usuario int(6),
+ID_usuario varchar(50),
 ID_jogo int(5),
 txtcomentario varchar(255),
 data_comentario date not null,
@@ -107,4 +106,3 @@ INSERT INTO categoria (Nome)
 VALUES ('Singleplayer'), ('Multiplayer Local'), ('Multiplayer Online'), ('Co-op'), ('PvP'), ('PvE'), ('MMO'), ('Cross-Plataform'),
 ('2D'), ('3D'), ('2.5D'), ('Top-Down'), ('Side-Scrooling'), ('Isométrico'), ('Primeira Pessoa'), ('Terceira Pessoa'),
 ('Linear'), ('Mundo Aberto'), ('Sandbox'), ('Campanha'), ('Missões/Fases'), ('Permadeath'), ('Rouguelike');
-

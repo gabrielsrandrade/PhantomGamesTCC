@@ -680,3 +680,26 @@ footer {
     }
 }
 
+/* Container que irá segurar as duas camadas de estrelas */
+.estrelas-container {
+    position: relative;
+    display: flex;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    width: max-content;
+}
+
+/* Camada de estrelas de fundo (sempre cheia e cinza) */
+.estrelas-container .star-empty {
+    color: var(--non-selected-color);
+}
+
+/* Camada de estrelas preenchidas (amarelas) */
+.estrelas-container .star-filled {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--star-color);
+    overflow: hidden;
+    white-space: nowrap;
+}

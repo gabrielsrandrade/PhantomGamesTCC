@@ -1,3 +1,4 @@
+// carregar_jogo.js
 document.addEventListener('DOMContentLoaded', () => {
 
     const cardsContainer = document.querySelector('.card_jogos');
@@ -42,54 +43,57 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Função para renderizar os jogos no container.
-    const displayGames = (games, query) => {
-        cardsContainer.innerHTML = '';
-        
-        if (!games || games.length === 0) {
-            if (query) {
-                cardsContainer.innerHTML = `<p style="color: white; text-align: center;">Nenhum resultado encontrado para "${query}".</p>`;
-            } else {
-                cardsContainer.innerHTML = '<p style="color: white; text-align: center;">Nenhum jogo encontrado.</p>';
-            }
-            return;
+// Substitua a função displayGames existente por esta corrigida
+const displayGames = (games, query) => {
+    cardsContainer.innerHTML = '';
+
+    if (!games || games.length === 0) {
+        if (query) {
+            cardsContainer.innerHTML = `<p style="color: white; text-align: center;">Nenhum resultado encontrado para "${query}".</p>`;
+        } else {
+            cardsContainer.innerHTML = '<p style="color: white; text-align: center;">Nenhum jogo encontrado.</p>';
+        }
+        return;
+    }
+
+    games.forEach(game => {
+        const preco = parseFloat(game.Preco_jogo);
+        const gameCard = document.createElement('a');
+        gameCard.className = 'card_jogo';
+        gameCard.href = `jogo.html?id=${game.ID_jogo}`;
+
+        let precoText;
+        if (preco === 0) {
+            precoText = 'Grátis';
+        } else {
+            precoText = `R$${preco.toFixed(2).replace('.', ',')}`;
         }
 
-        games.forEach(game => {
-            const preco = parseFloat(game.Preco_jogo);
-            const gameCard = document.createElement('a');
-            gameCard.className = 'card_jogo';
-            gameCard.href = `jogo.html?id=${game.ID_jogo}`;
-            
-            // Lógica para definir o texto do preço
-            let precoText;
-            if (preco === 0) {
-                precoText = 'Grátis';
-            } else {
-                precoText = `R$${preco.toFixed(2).replace('.', ',')}`;
-            }
+        // --- Lógica de avaliação com preenchimento parcial ---
+        const averageRating = game.Media_nota ? parseFloat(game.Media_nota) : 0;
+        const totalStars = 5;
+        const ratingPercentage = (averageRating / 10) * 100;
 
-            // Lógica de avaliação por estrelas
-            const rating = Math.round(game.Media_nota / 2); 
-            let starHtml = '';
-            for (let i = 0; i < 5; i++) {
-                starHtml += `<span class="star" style="color: ${i < rating ? 'var(--star-color)' : 'var(--non-selected-color)'};">&#9733;</span>`;
-            }
+        const starsHtml = '&#9733;'.repeat(totalStars);
+        
+        const starsHtmlComplete = `
+            <div class="estrelas-container">
+                <div class="star-empty">${starsHtml}</div>
+                <div class="star-filled" style="width: ${ratingPercentage}%;">${starsHtml}</div>
+            </div>
+        `;
+        // --- Fim da lógica de avaliação ---
 
-            gameCard.innerHTML = `
-                <div class="capa_card" style="background-image: url('${game.Capa_jogo}')"></div>
-                <span class="nome_jogo">${game.Nome_jogo}</span>
-                <div class="estrelas">
-                    ${starHtml}
-                </div>
-                <span class="preco">${precoText}</span>
-            `;
+        gameCard.innerHTML = `
+            <div class="capa_card" style="background-image: url('${game.Capa_jogo}')"></div>
+            <span class="nome_jogo">${game.Nome_jogo}</span>
+            ${starsHtmlComplete}
+            <span class="preco">${precoText}</span>
+        `;
 
-            cardsContainer.appendChild(gameCard);
-        });
-    };
-
-    // --- Lógica de comunicação com navbar.js ---
+        cardsContainer.appendChild(gameCard);
+    });
+};
 
     document.addEventListener('gameUpdated', () => {
         fetchGames();
