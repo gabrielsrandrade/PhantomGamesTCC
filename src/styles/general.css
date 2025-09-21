@@ -708,15 +708,29 @@ footer {
     white-space: nowrap;
 }
 
+.preco-original-riscado {
+  color: var(--non-selected-color); 
+  text-decoration: line-through;       
+  font-size: .9rem;    
+}
+
 #preco .preco-original-riscado {
   color: var(--non-selected-color); 
   text-decoration: line-through;  
-  margin-right: 0.75rem;           
+  margin-right: 0.75rem;  
+  font-size: 1.5rem;         
 }
 
-#preco .preco-desconto {
+ .preco-desconto {
   font-weight: bold; 
+} 
+.desconto-tag{
+    background-color: var(--button-color);
+    padding: 2px 4px;
+    border-radius: 1rem;
+    font-size: 1rem;
 }
+
 #preco .desconto-tag{
     background-color: var(--button-color);
     padding: 2px 4px;

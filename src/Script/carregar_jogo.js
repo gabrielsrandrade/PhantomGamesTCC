@@ -1,50 +1,50 @@
 // carregar_jogo.js
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
+  const cardsContainer = document.querySelector(".card_jogos");
+  const searchInput = document.getElementById("search-input");
 
-    const cardsContainer = document.querySelector('.card_jogos');
-    const searchInput = document.getElementById('search-input');
+  // Função para atualizar a URL do navegador sem recarregar a página.
+  const updateUrl = (query) => {
+    const url = new URL(window.location.href);
+    if (query) {
+      url.searchParams.set("query", query);
+    } else {
+      url.searchParams.delete("query");
+    }
+    window.history.pushState({}, "", url);
+  };
 
-    // Função para atualizar a URL do navegador sem recarregar a página.
-    const updateUrl = (query) => {
-        const url = new URL(window.location.href);
-        if (query) {
-            url.searchParams.set('query', query);
-        } else {
-            url.searchParams.delete('query');
+  // Função para buscar os jogos com base em uma query (ou sem ela).
+  const fetchGames = async (query = "") => {
+    try {
+      let url = "http://localhost:3000/jogos";
+      if (query.trim() !== "") {
+        url = `http://localhost:3000/buscar-jogo?query=${encodeURIComponent(
+          query
+        )}`;
+      }
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        // Se a API não encontrar resultados (status 404), tratamos aqui.
+        if (response.status === 404) {
+          displayGames([], query);
+          return;
         }
-        window.history.pushState({}, '', url);
-    };
+        throw new Error("Erro ao buscar dados dos jogos");
+      }
+      const games = await response.json();
+      console.log("Jogos recebidos:", games);
 
-    // Função para buscar os jogos com base em uma query (ou sem ela).
-    const fetchGames = async (query = '') => {
-        try {
-            let url = 'http://localhost:3000/jogos';
-            if (query.trim() !== '') {
-                url = `http://localhost:3000/buscar-jogo?query=${encodeURIComponent(query)}`;
-            }
+      displayGames(games, query);
+    } catch (error) {
+      console.error("Erro:", error);
+      cardsContainer.innerHTML =
+        '<p style="color: red; text-align: center;">Não foi possível carregar os jogos. Tente novamente mais tarde.</p>';
+    }
+  };
 
-            const response = await fetch(url);
-            if (!response.ok) {
-                // Se a API não encontrar resultados (status 404), tratamos aqui.
-                if (response.status === 404) {
-                    displayGames([], query);
-                    return; 
-                }
-                throw new Error('Erro ao buscar dados dos jogos');
-            }
-            const games = await response.json();
-            console.log('Jogos recebidos:', games);
-            
-            displayGames(games, query);
-
-        } catch (error) {
-            console.error('Erro:', error);
-            cardsContainer.innerHTML = '<p style="color: red; text-align: center;">Não foi possível carregar os jogos. Tente novamente mais tarde.</p>';
-        }
-    };
-
-// Substitua a função displayGames existente por esta corrigida
-const displayGames = (games, query) => {
+  const displayGames = (games, query) => {
     cardsContainer.innerHTML = '';
 
     if (!games || games.length === 0) {
@@ -58,22 +58,29 @@ const displayGames = (games, query) => {
 
     games.forEach(game => {
         const preco = parseFloat(game.Preco_jogo);
+        const desconto = parseFloat(game.Desconto_jogo);
         const gameCard = document.createElement('a');
         gameCard.className = 'card_jogo';
         gameCard.href = `jogo.html?id=${game.ID_jogo}`;
 
-        let precoText;
+        let precoHtml;
+
         if (preco === 0) {
-            precoText = 'Grátis';
+            precoHtml = 'Grátis';
+        } else if (desconto > 0) {
+            const precoComDesconto = preco * (1 - desconto / 100);
+            precoHtml = `
+                <span class="preco-original-riscado">R$${preco.toFixed(2).replace('.', ',')}</span>
+                <span class="preco-desconto">R$${precoComDesconto.toFixed(2).replace('.', ',')}</span>
+                <span class="desconto-tag">-${desconto.toFixed(0)}%</span>
+            `;
         } else {
-            precoText = `R$${preco.toFixed(2).replace('.', ',')}`;
+            precoHtml = `R$${preco.toFixed(2).replace('.', ',')}`;
         }
 
-        // --- Lógica de avaliação com preenchimento parcial ---
         const averageRating = game.Media_nota ? parseFloat(game.Media_nota) : 0;
         const totalStars = 5;
         const ratingPercentage = (averageRating / 10) * 100;
-
         const starsHtml = '&#9733;'.repeat(totalStars);
         
         const starsHtmlComplete = `
@@ -82,37 +89,37 @@ const displayGames = (games, query) => {
                 <div class="star-filled" style="width: ${ratingPercentage}%;">${starsHtml}</div>
             </div>
         `;
-        // --- Fim da lógica de avaliação ---
 
+        // A classe 'preco' agora precisa permitir que os itens dentro dela fiquem alinhados
         gameCard.innerHTML = `
             <div class="capa_card" style="background-image: url('${game.Capa_jogo}')"></div>
             <span class="nome_jogo">${game.Nome_jogo}</span>
             ${starsHtmlComplete}
-            <span class="preco">${precoText}</span>
+            <span class="preco" style="display: flex; align-items: center;">${precoHtml}</span>
         `;
 
         cardsContainer.appendChild(gameCard);
     });
 };
 
-    document.addEventListener('gameUpdated', () => {
-        fetchGames();
-    });
+  document.addEventListener("gameUpdated", () => {
+    fetchGames();
+  });
 
-    document.addEventListener('searchSubmitted', (event) => {
-        const query = event.detail.query;
-        updateUrl(query);
-        fetchGames(query);
-    });
+  document.addEventListener("searchSubmitted", (event) => {
+    const query = event.detail.query;
+    updateUrl(query);
+    fetchGames(query);
+  });
 
-    // --- Lógica de inicialização da página ---
+  // --- Lógica de inicialização da página ---
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const initialQuery = urlParams.get('query') || '';
-    
-    if (searchInput) {
-        searchInput.value = initialQuery;
-    }
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialQuery = urlParams.get("query") || "";
 
-    fetchGames(initialQuery);
+  if (searchInput) {
+    searchInput.value = initialQuery;
+  }
+
+  fetchGames(initialQuery);
 });
