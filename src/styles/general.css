@@ -531,6 +531,10 @@ footer {
     
     max-height: 90vh;
     overflow-y: auto; 
+
+    h4{
+        margin: 1rem 0;
+    }
 }
 
 .modal-content h2 {
@@ -702,4 +706,19 @@ footer {
     color: var(--star-color);
     overflow: hidden;
     white-space: nowrap;
+}
+
+#preco .preco-original-riscado {
+  color: var(--non-selected-color); 
+  text-decoration: line-through;  
+  margin-right: 0.75rem;           
+}
+
+#preco .preco-desconto {
+  font-weight: bold; 
+}
+#preco .desconto-tag{
+    background-color: var(--button-color);
+    padding: 2px 4px;
+    border-radius: 1rem;
 }

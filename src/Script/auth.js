@@ -5,7 +5,7 @@ export const clerk = new Clerk(clerkPubKey);
 
 let authState = {
   isSignedIn: false,
-  isAdmin: false,
+  isAdmin: false, // O backend decide, o frontend só confia no que recebe
   user: null,
 };
 
@@ -19,10 +19,11 @@ async function saveUserToDatabase() {
       id: user.id,
       nome: user.username || "Usuário Anônimo",
       imagem_perfil: user.imageUrl,
-      email: user.emailAddresses[0].emailAddress,
     };
 
     try {
+      // Esta chamada não precisa de token, pois é uma ação que o próprio
+      // usuário logado faz em seu nome.
       const response = await fetch("http://localhost:3000/salvar-usuario", {
         method: "POST",
         headers: {
@@ -32,10 +33,7 @@ async function saveUserToDatabase() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Erro ao salvar usuário no backend:", errorData.message);
-      } else {
-        console.log("Informações do usuário salvas com sucesso!");
+        console.error("Erro ao salvar usuário no backend:", await response.json());
       }
     } catch (error) {
       console.error("Erro de rede ao salvar usuário:", error);
@@ -43,14 +41,12 @@ async function saveUserToDatabase() {
   }
 }
 
-// Escuta por mudanças de estado de autenticação (login/logout)
 clerk.addListener(({ user }) => {
   if (user && user.id) {
     saveUserToDatabase();
   }
 });
 
-// Inicializa a autenticação e retorna o estado atual
 export async function initializeAuth() {
   try {
     await clerk.load();
@@ -58,19 +54,19 @@ export async function initializeAuth() {
     authState.user = user;
     authState.isSignedIn = !!user;
 
-    // VERIFICAÇÃO DE ADMIN: Usa o e-mail para definir o status de administrador
-    const userEmail = user?.primaryEmailAddress?.emailAddress;
-    authState.isAdmin = userEmail === "phantomgamestcc@gmail.com";
+    // A verificação de admin agora é baseada nos metadados do Clerk.
+    // Isso ainda é apenas para a INTERFACE, a segurança REAL está no backend.
+    authState.isAdmin = user?.publicMetadata?.role === 'admin';
 
     console.log(
       "Clerk inicializado. Logado:",
       authState.isSignedIn,
-      "Admin:",
+      "Admin (UI):",
       authState.isAdmin
     );
     return authState;
   } catch (error) {
-    console.warn("Erro ao acessar Clerk:", error);
+    console.error("Erro ao inicializar Clerk:", error);
     authState.isSignedIn = false;
     authState.isAdmin = false;
     return authState;

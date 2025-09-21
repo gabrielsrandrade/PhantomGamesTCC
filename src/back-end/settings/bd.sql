@@ -1,108 +1,118 @@
-drop database PhantomGames;
+DROP DATABASE PhantomGames;
 
-create database PhantomGames;
+CREATE DATABASE PhantomGames;
 
-use PhantomGames;
+USE PhantomGames;
 
-/* tabela usuario */
-create table usuario(
-ID_usuario varchar(50) primary key not null,
-Nome varchar(80) not null,
-Imagem_perfil varchar(255)
+/* Tabela de usuários, com a adição do campo de admin */
+CREATE TABLE usuario(
+    ID_usuario VARCHAR(50) PRIMARY KEY NOT NULL,
+    Nome VARCHAR(80) NOT NULL,
+    Imagem_perfil VARCHAR(255),
+    is_admin BOOLEAN DEFAULT FALSE
 );
 
-/* tabela categoria */
-create table categoria(
-ID_categoria int(2) primary key not null auto_increment,
-Nome varchar(20) not null
+/* Tabela de categorias de jogos */
+CREATE TABLE categoria(
+    ID_categoria INT(2) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    Nome VARCHAR(30) NOT NULL
 );
 
-/* tabela genero */
-create table genero(
-ID_genero int(2) primary key not null auto_increment,
-Nome varchar(20) not null
+/* Tabela de gêneros de jogos */
+CREATE TABLE genero(
+    ID_genero INT(2) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    Nome VARCHAR(30) NOT NULL
 );
 
-/* tabela jogos */
-create table jogos(
-ID_jogo int(5) primary key not null auto_increment,
-Nome_jogo varchar(100) not null,
-Preco_jogo decimal(5,2) not null,
-Logo_jogo text not null,
-Descricao_jogo text,
-Capa_jogo text not null,
-Faixa_etaria text not null,
-Media_nota decimal(10,2) not null
+/* Tabela principal de jogos */
+CREATE TABLE jogos(
+    ID_jogo INT(5) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    Nome_jogo VARCHAR(100) NOT NULL,
+    Preco_jogo DECIMAL(8,2) NOT NULL,
+    Desconto_jogo DECIMAL(5,2) DEFAULT 0.00,
+    Logo_jogo TEXT,
+    Descricao_jogo TEXT,
+    Capa_jogo TEXT NOT NULL,
+    Faixa_etaria VARCHAR(10) NOT NULL,
+    Media_nota DECIMAL(3,1) NOT NULL DEFAULT 0.0
 );
 
-/* tabela midia_jogos */
-create table midias_jogo(
-  ID_midia int(10) not null auto_increment primary key,
-  ID_jogo int(5) not null,
-  URL_midia varchar(255) not null,
-  foreign key (ID_jogo) references jogos(ID_jogo)
+/* Tabela para armazenar as URLs de imagens e vídeos dos jogos */
+CREATE TABLE midias_jogo(
+  ID_midia INT(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  ID_jogo INT(5) NOT NULL,
+  URL_midia VARCHAR(255) NOT NULL,
+  FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE
 );
 
-/* tabela categoria_jogos (relacionamento entre jogos e categorias) */
-create table categoria_jogos(
-  ID_categoria int(2) not null,
-  ID_jogo int(5) not null,
-  primary key (ID_categoria, ID_jogo),
-  foreign key (ID_categoria) references categoria(ID_categoria),
-  foreign key (ID_jogo) references jogos(ID_jogo)
+/* Tabela de relacionamento entre jogos e categorias (muitos-para-muitos) */
+CREATE TABLE categoria_jogos(
+  ID_categoria INT(2) NOT NULL,
+  ID_jogo INT(5) NOT NULL,
+  PRIMARY KEY (ID_categoria, ID_jogo),
+  FOREIGN KEY (ID_categoria) REFERENCES categoria(ID_categoria) ON DELETE CASCADE,
+  FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE
 );
 
-/* tabela genero_jogos (relacionamento entre jogos e generos) */
-create table genero_jogos(
-  ID_genero int(2) not null,
-  ID_jogo int(5) not null,
-  primary key (ID_genero, ID_jogo),
-  foreign key (ID_genero) references genero(ID_genero),
-  foreign key (ID_jogo) references jogos(ID_jogo)
+/* Tabela de relacionamento entre jogos e gêneros (muitos-para-muitos) */
+CREATE TABLE genero_jogos(
+  ID_genero INT(2) NOT NULL,
+  ID_jogo INT(5) NOT NULL,
+  PRIMARY KEY (ID_genero, ID_jogo),
+  FOREIGN KEY (ID_genero) REFERENCES genero(ID_genero) ON DELETE CASCADE,
+  FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE
 );
 
-/*tabela lista_desejos */
-create table lista_desejos(
-ID_lista_desejos int(5) primary key not null auto_increment, 
-ID_usuario varchar(50),
-ID_jogo int(5),
-foreign key (ID_usuario) references usuario(ID_usuario),
-foreign key (ID_jogo) references jogos(ID_jogo));
+/* Tabela de lista de desejos */
+CREATE TABLE lista_desejos(
+    ID_lista_desejos INT(5) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    ID_usuario VARCHAR(50),
+    ID_jogo INT(5),
+    FOREIGN KEY (ID_usuario) REFERENCES usuario(ID_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE
+);
 
-/*tabela biblioteca */
-create table biblioteca(
-ID_biblioteca int(5) primary key not null auto_increment, 
-ID_usuario varchar(50),
-ID_jogo int(5),
-foreign key (ID_usuario) references usuario(ID_usuario),
-foreign key (ID_jogo) references jogos(ID_jogo));
+/* Tabela de biblioteca de jogos do usuário */
+CREATE TABLE biblioteca(
+    ID_biblioteca INT(5) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    ID_usuario VARCHAR(50),
+    ID_jogo INT(5),
+    FOREIGN KEY (ID_usuario) REFERENCES usuario(ID_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE
+);
 
-/*tabela carrinho */
-create table carrinho(
-ID_carrinho int(5) primary key not null auto_increment, 
-forma_pagamento varchar(20) not null,
-data_compra date not null,
-ID_usuario varchar(50),
-ID_jogo int(5),
-foreign key (ID_usuario) references usuario(ID_usuario),
-foreign key (ID_jogo) references jogos(ID_jogo));
+/* Tabela de carrinho de compras */
+CREATE TABLE carrinho(
+    ID_carrinho INT(5) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    forma_pagamento VARCHAR(20) NOT NULL,
+    data_compra DATE NOT NULL,
+    ID_usuario VARCHAR(50),
+    ID_jogo INT(5),
+    FOREIGN KEY (ID_usuario) REFERENCES usuario(ID_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE
+);
 
-/*tabela comentário */
-create table comentario(
-ID_comentario int(12) primary key not null auto_increment, 
-ID_usuario varchar(50),
-ID_jogo int(5),
-txtcomentario varchar(255),
-data_comentario date not null,
-nota int(1),
-foreign key (ID_usuario) references usuario(ID_usuario),
-foreign key (ID_jogo) references jogos(ID_jogo));
+/* Tabela de comentários e avaliações */
+CREATE TABLE comentario(
+    ID_comentario INT(12) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    ID_usuario VARCHAR(50),
+    ID_jogo INT(5),
+    txtcomentario VARCHAR(255),
+    data_comentario DATE NOT NULL,
+    nota INT(2),
+    FOREIGN KEY (ID_usuario) REFERENCES usuario(ID_usuario) ON DELETE CASCADE,
+    FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE
+);
 
-INSERT INTO genero (Nome)
-VALUES ('Ação'), ('Aventura'), ('Casual'), ('Corrida'), ('Esportes'), ('Estratégia'), ('Indie'), ('Luta'), ('Musical'), ('Narrativo'), 
+/* Inserindo os dados iniciais para Gêneros */
+INSERT INTO genero (Nome) VALUES
+('Ação'), ('Aventura'), ('Casual'), ('Corrida'), ('Esportes'), ('Estratégia'), ('Indie'), ('Luta'), ('Musical'), ('Narrativo'),
 ('Plataforma'), ('Puzzle'), ('RPG'), ('Simulação'), ('Sobrevivência'), ('Terror'), ('Tiro');
 
-INSERT INTO categoria (Nome)
-VALUES ('Singleplayer'), ('Multiplayer Local'), ('Multiplayer Online'), ('Co-op'), ('PvP'), ('PvE'), ('MMO'), ('Cross-Plataform'),
+/* Inserindo os dados iniciais para Categorias */
+INSERT INTO categoria (Nome) VALUES
+('Singleplayer'), ('Multiplayer Local'), ('Multiplayer Online'), ('Co-op'), ('PvP'), ('PvE'), ('MMO'), ('Cross-Plataform'),
 ('2D'), ('3D'), ('2.5D'), ('Top-Down'), ('Side-Scrooling'), ('Isométrico'), ('Primeira Pessoa'), ('Terceira Pessoa'),
 ('Linear'), ('Mundo Aberto'), ('Sandbox'), ('Campanha'), ('Missões/Fases'), ('Permadeath'), ('Rouguelike');
+
+UPDATE usuario SET is_admin = TRUE WHERE ID_usuario = 'user_31YoUjT0yZIMujj9D7jiveiepOt';

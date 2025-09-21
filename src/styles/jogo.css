@@ -4,11 +4,11 @@
   height: 2.5rem;
   padding: 0 4rem;
   margin-top: 1rem;
+}
 
-  img {
-    width: auto;
-    height: 100%;
-  }
+.seta-retorno img {
+  width: auto;
+  height: 100%;
 }
 
 #nome-jogo {
@@ -19,206 +19,201 @@
 }
 
 main {
-  padding: 0 6rem;
+  padding: 1rem 6rem;
   height: 100%;
   width: 100%;
   display: flex;
   justify-content: space-between;
+  gap: 2rem;
+}
 
-  .imagem-jogo {
-    display: flex;
-    flex-direction: column;
-    width: 60%;
+main .imagem-jogo {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+}
+
+main .imagem-jogo .jogo-main-image {
+  width: 100%;
+  height: 36.14rem;
+  background-color: var(--navbar-color);
+}
+
+main .imagem-jogo .jogo-main-image img,
+main .imagem-jogo .jogo-main-image video {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+main .imagem-jogo .jogo-side-image {
+  width: 100%;
+  height: 8.61rem;
+  margin-top: 1rem;
+}
+
+main .imagem-jogo .jogo-side-image img,
+main .imagem-jogo .jogo-side-image video {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+main .imagem-jogo .jogo-side-image .swiper-slide {
+  width: 8.14rem;
+  height: 100%;
+  background-color: var(--navbar-color);
+  opacity: 0.4;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+main .imagem-jogo .jogo-side-image .swiper-slide-thumb-active {
+  opacity: 1;
+}
+
+main .sobre-jogo {
+  display: flex;
+  flex-direction: column;
+  width: 35%;
+  gap: 1.5rem;
+}
+
+/* ✅ CORREÇÃO 1: LOGO */
+main .sobre-jogo #logo-jogo {
+  height: 15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+main .sobre-jogo #logo-jogo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  /* Garante que a logo mantenha a proporção */
+}
+
+main .sobre-jogo #descrição {
+  color: white;
+  line-height: 1.5;
+}
+
+main .sobre-jogo #faixa-etaria img {
+  height: 3rem;
+  width: 3rem;
+}
+
+main .sobre-jogo .detalhes-jogo {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+main .sobre-jogo .detalhes-jogo .preco-avaliacao {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+main .sobre-jogo .detalhes-jogo #preco {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+main .sobre-jogo .detalhes-jogo #avaliacao {
+  font-size: 1.5rem;
+}
+
+/* ✅ CORREÇÃO 2: BOTÕES */
+.detalhes-jogo .action-buttons {
+  display: flex;
+  flex-direction: column;
+  /* Botões um em cima do outro */
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.detalhes-jogo .action-buttons button {
+  height: 3.5rem;
+  width: 100%;
+  /* Ocupa toda a largura */
+  padding: 0px 20px;
+  border-radius: 7px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: white;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s;
+}
+
+.detalhes-jogo .action-buttons button:hover {
+  transform: scale(1.02);
+}
+
+#editar-jogo,
+#comprar {
+  background-color: var(--button-color);
+}
 
 
-    .jogo-main-image {
-      width: 100%;
-      height: 36.14rem;
-      background-color: var(--navbar-color);
+#editar-jogo:hover,
+#comprar:hover {
+  background-color: #1979c9;
+}
 
+#desejos{
+  background-color: var(--search-bar);
+}
+#desejos:hover {
+  background-color: #555555;
+}
 
-      img {
-        height: 100%;
-        width: 100%;
-      }
-    }
+#remover-jogo {
+  background-color: #e53232;
+}
 
-    .jogo-side-image {
-      width: 100%;
-      height: 8.61rem;
-      margin-top: 1rem;
-
-      img {
-        height: 100%;
-        width: 100%;
-      }
-
-      .swiper-slide {
-        width: 8.14rem;
-        height: 100%;
-        background-color: var(--navbar-color);
-        opacity: 0.4;
-      }
-
-      .swiper-slide-thumb-active {
-        opacity: 1;
-      }
-    }
-  }
-
-  .sobre-jogo {
-    display: flex;
-    flex-direction: column;
-    width: 30%;
-    gap: 3rem;
-
-    #logo-jogo {
-      height: 15rem;
-      /* background-image: url('https://logos-world.net/wp-content/uploads/2020/05/Minecraft-Logo.png');
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-position: center; */
-      /* display: none; */
-    }
-
-    #descrição {
-      color: white;
-    }
-
-    #faixa-etaria {
-      height: 3rem;
-      width: 3rem;
-      /* background-image: url('../../assets/imagens/livre.png');
-      background-repeat: no-repeat;
-      background-size: cover;
-      background-position: center; */
-    }
-
-    .detalhes-jogo {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-
-      span {
-        color: white;
-      }
-
-      .preco-avaliacao {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-
-        #preco {
-          color: white;
-          font-size: 1.5rem;
-          font-weight: bold;
-        }
-
-        #avaliacao {
-          font-size: 1.5rem;
-
-          .star {
-            color: var(--star-color);
-          }
-        }
-      }
-
-      button {
-        height: 3.5rem;
-        width: auto;
-        padding: 0px 20px;
-        border-radius: 7px;
-        font-size: 1rem;
-        cursor: pointer;
-        color: white;
-        font-weight: 600;
-      }
-
-      #editar,
-      #comprar,
-      #jogar {
-        background-color: var(--button-color);
-      }
-
-      #editar:hover,
-      #comprar:hover,
-      #jogar:hover {
-        background-color: #1979c9;
-        transition: 0.3s;
-
-      }
-
-      #carrinho,
-      #desejos {
-        background-color: var(--search-bar);
-      }
-
-      #carrinho:hover,
-      #desejos:hover {
-        background-color: #555555;
-        transition: 0.3s;
-      }
-
-      #remover {
-        background-color: #e53232;
-      }
-
-      #remover:hover {
-        background-color: #b12222;
-        transition: 0.3s;
-      }
-    }
-  }
+#remover-jogo:hover {
+  background-color: #b12222;
 }
 
 .genero-categoria {
   display: flex;
   padding: 2rem 6rem;
-  width: 100%;
+  width: 60%;
   color: white;
   margin-top: 2rem;
   font-size: 1.5rem;
+  gap: 2rem;
+}
 
-  .generos {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 30%;
+.genero-categoria .generos,
+.genero-categoria .categorias {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 50%;
+}
 
-    #genero {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
+.genero-categoria .categorias {
+  padding-left: 2rem;
+  border-left: solid 2px var(--search-bar);
+}
 
-      span {
-        background-color: var(--search-bar);
-        border-radius: 10px;
-        padding: 4px 6px;
-      }
-    }
-  }
+.genero-categoria #genero,
+.genero-categoria #categoria {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
 
-  .categorias {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    width: 30%;
-    padding-left: 1rem;
-    border-left: solid 2px var(--search-bar);
-
-
-    #categoria {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-
-      span {
-        background-color: var(--search-bar);
-        border-radius: 10px;
-        padding: 4px 6px;
-      }
-    }
-  }
+.genero-categoria #genero span,
+.genero-categoria #categoria span {
+  background-color: var(--search-bar);
+  border-radius: 10px;
+  padding: 4px 6px;
 }
 
 .avaliacao {
@@ -227,158 +222,146 @@ main {
   padding: 2rem 6rem;
   gap: 1rem;
   width: 100%;
-
-  #adicionar-comentario {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--card-color);
-    padding: 1rem;
-    border-radius: 1rem;
-    color: white;
-    gap: 6px;
-
-    .image-perfil {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-
-      img {
-        background-color: #555555;
-        height: 2rem;
-        width: 2rem;
-        border-radius: 50%;
-      }
-    }
-
-    .nota {
-      font-size: 1.5rem;
-    }
-
-    #comentario {
-      width: 100%;
-
-      .inputComentario {
-        background-color: var(--search-bar);
-        border-radius: 10px;
-        height: 2rem;
-        width: 94%;
-        font-size: 1rem;
-        padding: 6px;
-        color: white;
-      }
-
-      button {
-        height: 2rem;
-        width: 5%;
-        border-radius: 10px;
-        background-color: var(--button-color);
-        font-size: 1rem;
-        color: white;
-        font-weight: 600;
-      }
-
-      button:hover {
-        background-color: #1979c9;
-        transition: 0.3s;
-      }
-    }
-  }
-
-  .comentariosJaFeito {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--card-color);
-    padding: 1rem;
-    border-radius: 1rem;
-    color: white;
-    gap: 6px;
-    margin-top: 1rem;
-
-    .image-perfil {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-
-      img {
-        background-color: #555555;
-        height: 2rem;
-        width: 2rem;
-        border-radius: 50%;
-      }
-    }
-
-    .nota {
-      font-size: 1.5rem;
-    }
-
-    #cometarioFeito {
-      margin-top: 1rem;
-      font-size: 1rem;
-      font-weight: 600;
-    }
-  }
 }
 
-
-.swiper-button-next {
-  right: 10px;
+#adicionar-comentario {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-color);
+  padding: 1rem;
+  border-radius: 1rem;
+  color: white;
+  gap: 0.5rem;
 }
 
-.swiper-button-prev {
-  left: 10px;
+#adicionar-comentario .image-perfil {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
-.modal-overlay {
-  position: fixed;
+#adicionar-comentario .image-perfil img {
+  background-color: #555555;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+#adicionar-comentario .nota .star {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--non-selected-color);
+}
+
+#adicionar-comentario #comentario {
+  display: flex;
+  width: 100%;
+  gap: 1rem;
+}
+
+#adicionar-comentario .inputComentario {
+  background-color: var(--search-bar);
+  border-radius: 10px;
+  height: 2.5rem;
+  flex-grow: 1;
+  font-size: 1rem;
+  padding: 0.5rem;
+  color: white;
+}
+
+#adicionar-comentario button {
+  height: 2.5rem;
+  width: auto;
+  padding: 0 1.5rem;
+  border-radius: 10px;
+  background-color: var(--button-color);
+  font-size: 1rem;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#adicionar-comentario button:hover {
+  background-color: #1979c9;
+  transition: 0.3s;
+}
+
+.comentariosJaFeito {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card-color);
+  padding: 1rem;
+  border-radius: 1rem;
+  color: white;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.comentariosJaFeito .image-perfil {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.comentariosJaFeito .image-perfil img {
+  background-color: #555555;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comentariosJaFeito #cometarioFeito {
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.comentariosJaFeito .nota {
+  position: relative;
+  display: inline-block;
+  font-size: 1.2rem;
+  align-self: flex-start;
+}
+
+.comentariosJaFeito .nota .star-container {
+  position: relative;
+  color: var(--non-selected-color);
+}
+
+.comentariosJaFeito .nota .star-fill {
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 999;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  color: var(--star-color);
+  overflow: hidden;
+  white-space: nowrap;
 }
 
-.confirm-modal {
+.remove-comment-btn {
+  margin-left: auto;
+  background-color: transparent;
+  color: #ff4d4f;
+  font-size: 2rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
 
-
-  background-color: var(--search-bar);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  z-index: 2000;
-  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-  transform: scale(1);
+.remove-comment-btn:hover {
   opacity: 1;
-
-  button {
-    margin-top: 1rem;
-    margin-right: 1rem;
-    background-color: var(--button-color);
-    color: white;
-    padding: 10px 40px;
-    border-radius: 8px;
-  }
 }
 
-.avaliacao .preco-avaliacao {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
+/* Estilos para a avaliação principal */
 #avaliacao {
   position: relative;
-  font-size: 1.5rem;
   display: inline-block;
+  font-size: 1.5rem;
 }
 
 #avaliacao .star-container {
-  position: relative;
   color: var(--non-selected-color);
 }
 
@@ -389,22 +372,73 @@ main {
   color: var(--star-color);
   overflow: hidden;
   white-space: nowrap;
-
 }
 
-.remove-comment-btn {
-  margin-left: auto;
-  background-color: transparent;
-  border: none;
-  color: #ff4d4f;
-  font-size: 18px;
-  cursor: pointer;
+/* Estilos do modal de confirmação de remoção de comentário */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+}
+
+.confirm-modal {
+  background-color: var(--navbar-color);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--search-bar);
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  z-index: 10000;
+  max-width: 400px;
+}
+
+.confirm-modal p {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.confirm-modal .confirm-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.confirm-modal button {
+  padding: 10px 30px;
+  border-radius: 5px;
+  font-size: 1rem;
   font-weight: bold;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
+  cursor: pointer;
+  border: none;
+  transition: transform 0.2s ease;
 }
 
-.remove-comment-btn:hover {
-  opacity: 1;
-  color: #ff7875;
+.confirm-modal button:hover {
+    transform: scale(1.05);
+}
+
+#confirm-yes {
+  background-color: #e53232;
+  color: white;
+}
+
+#confirm-yes:hover {
+    background-color: #b12222;
+}
+
+#confirm-no {
+  background-color: var(--search-bar);
+  color: white;
+}
+
+#confirm-no:hover {
+    background-color: #555555;
 }

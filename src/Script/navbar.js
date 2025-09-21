@@ -1,13 +1,13 @@
 import { clerk, initializeAuth } from "./auth.js";
-import { setupMultiselect } from "./multiselect.js"; // Importe a função aqui
+import { setupMultiselect } from "./multiselect.js";
 
-// Variáveis globais para o modal de adicionar jogo
+// Variáveis globais para o modal, para manter o estado entre as páginas
 let selectedMediaFiles = [];
-let gameData = {};
+let gameDataFromFirstPage = {};
 let multiselectGenre;
 let multiselectCategory;
 
-// Funções do Modal de Mensagem
+// Função para exibir modais de mensagem simples
 function showCustomMessage(message) {
     const modalContainer = document.createElement("div");
     modalContainer.className = "custom-message-modal";
@@ -20,77 +20,73 @@ function showCustomMessage(message) {
     document.body.appendChild(modalContainer);
 
     const closeBtn = modalContainer.querySelector(".close-message-btn");
-    closeBtn.addEventListener("click", () => {
-        document.body.removeChild(modalContainer);
-    });
-
-    modalContainer.addEventListener("click", (e) => {
-        if (e.target === modalContainer) {
-            document.body.removeChild(modalContainer);
-        }
-    });
+    const close = () => { if (document.body.contains(modalContainer)) document.body.removeChild(modalContainer); };
+    closeBtn.addEventListener("click", close);
+    modalContainer.addEventListener("click", (e) => { if (e.target === modalContainer) close(); });
 }
 
-// Funções do Modal de Adicionar Jogo
-function createAddGameModal() {
+// Função principal que cria e gerencia o modal de adicionar jogo
+async function createAddGameModal() {
+    // 1. Buscar dados dinâmicos do backend ANTES de renderizar o modal
+    let generos = [];
+    let categorias = [];
+    try {
+        const [generosRes, categoriasRes] = await Promise.all([
+            fetch('http://localhost:3000/generos'),
+            fetch('http://localhost:3000/categorias')
+        ]);
+        if (!generosRes.ok || !categoriasRes.ok) throw new Error('Falha ao carregar dados para o formulário.');
+        
+        generos = await generosRes.json();
+        categorias = await categoriasRes.json();
+    } catch (error) {
+        console.error(error);
+        showCustomMessage("Não foi possível carregar o formulário. Verifique a conexão com o servidor.");
+        return;
+    }
+
+    // Gerar as opções de multiselect dinamicamente
+    const generosOptionsHTML = generos.map(g => `<span class="multiselect-option" data-value="${g}">${g}</span>`).join("");
+    const categoriasOptionsHTML = categorias.map(c => `<span class="multiselect-option" data-value="${c}">${c}</span>`).join("");
+
+    // 2. Criar a estrutura do Modal
     const overlay = document.createElement("div");
     overlay.classList.add("modal-overlay");
 
     const modal = document.createElement("div");
     modal.classList.add("add-game-modal");
 
+    // HTML da primeira página do formulário
     const firstPageHTML = `
         <div class="modal-content" id="first-page">
             <button class="close-modal-btn">&times;</button>
             <h2>Adicionar Novo Jogo</h2>
-            <form id="add-game-form">
-                <div class="form-group">
-                    <label for="Nome_jogo">Nome do Jogo:</label>
-                    <input type="text" id="Nome_jogo" name="Nome_jogo" required>
-                </div>
-                <div class="form-group">
-                    <label for="Descricao_jogo">Descrição:</label>
-                    <textarea id="Descricao_jogo" name="Descricao_jogo" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="Preco_jogo">Preço (R$):</label>
-                    <input type="number" id="Preco_jogo" name="Preco_jogo" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label for="Logo_jogo">Logo (URL da Imagem):</label>
-                    <input type="url" id="Logo_jogo" name="Logo_jogo">
-                </div>
-                <div class="form-group">
-                    <label for="Capa_jogo">Capa (URL da Imagem):</label>
-                    <input type="url" id="Capa_jogo" name="Capa_jogo" required>
-                </div>
+            <form id="add-game-form" novalidate>
+                <div class="form-group"><label for="Nome_jogo">Nome do Jogo:</label><input type="text" id="Nome_jogo" required></div>
+                <div class="form-group"><label for="Descricao_jogo">Descrição:</label><textarea id="Descricao_jogo" required></textarea></div>
+                <div class="form-group"><label for="Preco_jogo">Preço (R$):</label><input type="number" id="Preco_jogo" step="0.01" required min="0"></div>
+                <div class="form-group"><label for="Desconto_jogo">Desconto (%):</label><input type="number" id="Desconto_jogo" min="0" max="100"></div>
+                <div class="form-group"><label for="Logo_jogo">Logo (URL):</label><input type="url" id="Logo_jogo"></div>
+                <div class="form-group"><label for="Capa_jogo">Capa (URL):</label><input type="url" id="Capa_jogo" required></div>
                 <div class="form-group">
                     <label for="Faixa_etaria">Faixa Etária:</label>
-                    <select id="Faixa_etaria" name="Faixa_etaria" required>
-                        <option value="L">L - Livre</option>
-                        <option value="10">10+</option>
-                        <option value="12">12+</option>
-                        <option value="14">14+</option>
-                        <option value="16">16+</option>
-                        <option value="18">18+</option>
+                    <select id="Faixa_etaria" required>
+                        <option value="L">L - Livre</option><option value="10">10+</option><option value="12">12+</option>
+                        <option value="14">14+</option><option value="16">16+</option><option value="18">18+</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>Gêneros:</label>
                     <div class="multiselect-container" id="multiselect-genre">
-                        <div class="multiselect-tags" id="genre-tags"></div>
-                        <div class="multiselect-dropdown hidden" id="genre-dropdown">
-                            ${["Ação", "Aventura", "Casual", "Corrida", "Esportes", "Estratégia", "Indie", "Luta", "Musical", "Narrativo", "Plataforma", "Puzzle", "RPG", "Simulação", "Sobrevivência", "Terror", "Tiro"].map(g => `<span class="multiselect-option" data-value="${g}">${g}</span>`).join("")}
-                        </div>
+                        <div class="multiselect-tags"></div>
+                        <div class="multiselect-dropdown hidden">${generosOptionsHTML}</div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Categorias:</label>
                     <div class="multiselect-container" id="multiselect-category">
-                        <div class="multiselect-tags" id="category-tags"></div>
-                        <div class="multiselect-dropdown hidden" id="category-dropdown">
-                            ${["Singleplayer", "Multiplayer Local", "Multiplayer Online", "Co-op", "PvP", "PvE", "MMO", "Cross-Plataform", "2D", "3D", "2.5D", "Top-Down", "Side-Scrooling", "Isométrico", "Primeira Pessoa", "Terceira Pessoa", "Linear", "Mundo Aberto", "Sandbox", "Campanha", "Missões/Fases", "Permadeath", "Rouguelike"].map(c => `<span class="multiselect-option" data-value="${c}">${c}</span>`).join("")}
-                        </div>
+                        <div class="multiselect-tags"></div>
+                        <div class="multiselect-dropdown hidden">${categoriasOptionsHTML}</div>
                     </div>
                 </div>
                 <div class="form-buttons">
@@ -101,206 +97,149 @@ function createAddGameModal() {
         </div>
     `;
 
+    // HTML da segunda página do formulário
     const secondPageHTML = `
-        <div class="modal-content" id="second-page">
+        <div class="modal-content" id="second-page" style="display: none;">
             <button class="close-modal-btn">&times;</button>
             <h2>Adicionar Mídias</h2>
-            <div class="form-group">
-                <label for="media-upload">Selecionar Imagens/Vídeos:</label>
-                <input type="file" id="media-upload" name="media-upload" multiple accept="image/*,video/*">
-            </div>
+            <div class="form-group"><label for="media-upload">Selecionar Imagens/Vídeos:</label><input type="file" id="media-upload" multiple accept="image/*,video/*"></div>
+            <p>Total de mídias: <span id="media-count">0</span></p>
             <div id="media-preview-container" class="media-preview-container"></div>
             <div class="form-buttons">
                 <button type="button" class="back-btn">Voltar</button>
-                <button type="submit" class="submit-btn">Adicionar Jogo</button>
+                <button type="button" class="submit-btn">Adicionar Jogo</button>
             </div>
         </div>
     `;
 
-    modal.innerHTML = firstPageHTML;
+    modal.innerHTML = firstPageHTML + secondPageHTML;
     document.body.appendChild(overlay);
     document.body.appendChild(modal);
 
-    const firstPage = modal.querySelector('#first-page');
-    if (firstPage) {
-        multiselectGenre = setupMultiselect("multiselect-genre");
-        multiselectCategory = setupMultiselect("multiselect-category");
-    }
+    // 3. Adicionar Lógica e Event Listeners
+    const firstPage = modal.querySelector("#first-page");
+    const secondPage = modal.querySelector("#second-page");
 
-    function navigateToSecondPage() {
-        modal.innerHTML = secondPageHTML;
-        setupMediaUpload();
-        attachEventListeners();
-    }
+    // Inicializa os componentes multiselect
+    multiselectGenre = setupMultiselect("multiselect-genre");
+    multiselectCategory = setupMultiselect("multiselect-category");
 
-    function navigateToFirstPage() {
-        modal.innerHTML = firstPageHTML;
-        modal.querySelector("#Nome_jogo").value = gameData.Nome_jogo || "";
-        modal.querySelector("#Descricao_jogo").value = gameData.Descricao_jogo || "";
-        modal.querySelector("#Preco_jogo").value = gameData.Preco_jogo || "";
-        modal.querySelector("#Logo_jogo").value = gameData.Logo_jogo || "";
-        modal.querySelector("#Capa_jogo").value = gameData.Capa_jogo || "";
-        modal.querySelector("#Faixa_etaria").value = gameData.Faixa_etaria || "L";
+    const closeModal = () => {
+        document.body.removeChild(modal);
+        document.body.removeChild(overlay);
+        // Limpa as variáveis globais para a próxima abertura do modal
+        selectedMediaFiles = [];
+        gameDataFromFirstPage = {};
+    };
 
-        const newMultiselectGenre = setupMultiselect("multiselect-genre");
-        const newMultiselectCategory = setupMultiselect("multiselect-category");
-        newMultiselectGenre.setValues(gameData.generos || []);
-        newMultiselectCategory.setValues(gameData.categorias || []);
-
-        attachEventListeners();
-    }
-
-    function attachEventListeners() {
-        const closeModalBtn = modal.querySelector(".close-modal-btn");
-        closeModalBtn.addEventListener("click", () => {
-            document.body.removeChild(modal);
-            document.body.removeChild(overlay);
-        });
-
-        const form = modal.querySelector("#add-game-form");
-        if (form) {
-            form.querySelector(".next-btn").addEventListener("click", (e) => {
-                e.preventDefault();
-                const nomeJogo = form.Nome_jogo.value.trim();
-                const precoJogo = parseFloat(form.Preco_jogo.value);
-                const capaJogo = form.Capa_jogo.value.trim();
-
-                if (!nomeJogo || isNaN(precoJogo) || !capaJogo) {
-                    showCustomMessage("Por favor, preencha os campos obrigatórios.");
-                    return;
-                }
-
-                gameData = {
-                    Nome_jogo: nomeJogo,
-                    Descricao_jogo: form.Descricao_jogo.value,
-                    Preco_jogo: precoJogo,
-                    Logo_jogo: form.Logo_jogo.value,
-                    Capa_jogo: capaJogo,
-                    Faixa_etaria: form.Faixa_etaria.value,
-                    categorias: multiselectCategory.getValues(),
-                    generos: multiselectGenre.getValues(),
-                };
-                navigateToSecondPage();
-            });
-
-            form.querySelector(".clear-btn").addEventListener("click", () => {
-                form.reset();
-                multiselectGenre.reset();
-                multiselectCategory.reset();
-            });
+    modal.querySelectorAll('.close-modal-btn').forEach(btn => btn.addEventListener('click', closeModal));
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+    
+    // Navegação entre páginas do modal
+    firstPage.querySelector('.next-btn').addEventListener('click', () => {
+        const form = firstPage.querySelector('form');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
         }
+        // Salva os dados da primeira página
+        gameDataFromFirstPage = {
+            Nome_jogo: document.getElementById('Nome_jogo').value,
+            Descricao_jogo: document.getElementById('Descricao_jogo').value,
+            Preco_jogo: document.getElementById('Preco_jogo').value,
+            Desconto_jogo: document.getElementById('Desconto_jogo').value,
+            Logo_jogo: document.getElementById('Logo_jogo').value,
+            Capa_jogo: document.getElementById('Capa_jogo').value,
+            Faixa_etaria: document.getElementById('Faixa_etaria').value,
+            generos: multiselectGenre.getValues(),
+            categorias: multiselectCategory.getValues(),
+        };
+        firstPage.style.display = 'none';
+        secondPage.style.display = 'block';
+    });
 
-        const backBtn = modal.querySelector(".back-btn");
-        if (backBtn) {
-            backBtn.addEventListener("click", navigateToFirstPage);
-        }
+    secondPage.querySelector('.back-btn').addEventListener('click', () => {
+        secondPage.style.display = 'none';
+        firstPage.style.display = 'block';
+    });
 
-        const submitBtn = modal.querySelector(".submit-btn");
-        if (submitBtn) {
-            submitBtn.addEventListener("click", handleFormSubmit);
-        }
-    }
+    // Lógica de upload e preview de mídia
+    const mediaInput = secondPage.querySelector("#media-upload");
+    const previewContainer = secondPage.querySelector("#media-preview-container");
+    const mediaCountSpan = secondPage.querySelector("#media-count");
 
-    function setupMediaUpload() {
-        const mediaInput = document.getElementById("media-upload");
-        const previewContainer = document.getElementById("media-preview-container");
-        const fileCountDisplay = document.createElement("p");
-        fileCountDisplay.classList.add("media-count-display");
-        previewContainer.parentNode.insertBefore(fileCountDisplay, previewContainer);
-
-        function updateFileCountDisplay() {
-            if (selectedMediaFiles.length === 0) {
-                fileCountDisplay.textContent = "Nenhuma mídia selecionada.";
-            } else {
-                fileCountDisplay.textContent = `${selectedMediaFiles.length} arquivo(s) selecionado(s)`;
-            }
-        }
-
-        mediaInput.addEventListener("change", (e) => {
-            const newFiles = Array.from(e.target.files);
-            selectedMediaFiles = [...selectedMediaFiles, ...newFiles];
-            e.target.value = null;
-            renderMediaPreviews();
-            updateFileCountDisplay();
-        });
-
-        function renderMediaPreviews() {
-            previewContainer.innerHTML = "";
-            selectedMediaFiles.forEach((file) => {
-                const fileContainer = document.createElement("div");
-                fileContainer.classList.add("media-preview-item");
-                const fileURL = URL.createObjectURL(file);
-                if (file.type.startsWith("image/")) {
-                    const img = document.createElement("img");
-                    img.src = fileURL;
-                    img.alt = file.name;
-                    fileContainer.appendChild(img);
-                } else if (file.type.startsWith("video/")) {
-                    const video = document.createElement("video");
-                    video.src = fileURL;
-                    video.controls = true;
-                    fileContainer.appendChild(video);
-                }
-                const fileName = document.createElement("p");
-                fileName.textContent = file.name;
-                fileContainer.appendChild(fileName);
-                const removeBtn = document.createElement("button");
-                removeBtn.classList.add("remove-media-btn");
-                removeBtn.textContent = "Remover";
-                removeBtn.addEventListener("click", () => {
-                    selectedMediaFiles = selectedMediaFiles.filter((f) => f !== file);
-                    previewContainer.removeChild(fileContainer);
-                    updateFileCountDisplay();
-                });
-                fileContainer.appendChild(removeBtn);
-                previewContainer.appendChild(fileContainer);
-            });
-        }
-        updateFileCountDisplay();
+    mediaInput.addEventListener("change", (e) => {
+        selectedMediaFiles.push(...Array.from(e.target.files));
+        mediaInput.value = ""; // Limpa o input para permitir selecionar o mesmo arquivo novamente
         renderMediaPreviews();
+    });
+
+    function renderMediaPreviews() {
+        previewContainer.innerHTML = "";
+        mediaCountSpan.textContent = selectedMediaFiles.length;
+        selectedMediaFiles.forEach((file, index) => {
+            const item = document.createElement("div");
+            item.className = "media-preview-item";
+            const fileURL = URL.createObjectURL(file);
+            item.innerHTML = `
+                ${file.type.startsWith("image/") ? `<img src="${fileURL}" alt="${file.name}">` : `<video src="${fileURL}"></video>`}
+                <span>${file.name}</span>
+                <button class="remove-media-btn" data-index="${index}">&times;</button>
+            `;
+            previewContainer.appendChild(item);
+        });
     }
 
-    async function handleFormSubmit() {
-        const submitBtn = modal.querySelector(".submit-btn");
+    previewContainer.addEventListener('click', (e) => {
+        if (e.target.classList.contains('remove-media-btn')) {
+            const indexToRemove = parseInt(e.target.dataset.index, 10);
+            selectedMediaFiles = selectedMediaFiles.filter((_, index) => index !== indexToRemove);
+            renderMediaPreviews();
+        }
+    });
+
+    // Submissão final do formulário
+    secondPage.querySelector('.submit-btn').addEventListener('click', async (e) => {
+        const submitBtn = e.target;
         submitBtn.disabled = true;
         submitBtn.textContent = "Adicionando...";
+
+        const formData = new FormData();
+        formData.append("Nome_jogo", gameDataFromFirstPage.Nome_jogo);
+        formData.append("Descricao_jogo", gameDataFromFirstPage.Descricao_jogo);
+        formData.append("Preco_jogo", gameDataFromFirstPage.Preco_jogo);
+        formData.append("Desconto_jogo", parseFloat(gameDataFromFirstPage.Desconto_jogo) || 0); // Trata desconto vazio
+        formData.append("Logo_jogo", gameDataFromFirstPage.Logo_jogo);
+        formData.append("Capa_jogo", gameDataFromFirstPage.Capa_jogo);
+        formData.append("Faixa_etaria", gameDataFromFirstPage.Faixa_etaria);
+        formData.append("generos", JSON.stringify(gameDataFromFirstPage.generos));
+        formData.append("categorias", JSON.stringify(gameDataFromFirstPage.categorias));
+        
+        selectedMediaFiles.forEach(file => formData.append("Midias_jogo", file));
+
         try {
-            const formData = new FormData();
-            formData.append("Nome_jogo", gameData.Nome_jogo);
-            formData.append("Descricao_jogo", gameData.Descricao_jogo);
-            formData.append("Preco_jogo", gameData.Preco_jogo);
-            formData.append("Logo_jogo", gameData.Logo_jogo);
-            formData.append("Capa_jogo", gameData.Capa_jogo);
-            formData.append("Faixa_etaria", gameData.Faixa_etaria);
-            formData.append("categorias", JSON.stringify(gameData.categorias));
-            formData.append("generos", JSON.stringify(gameData.generos));
-            selectedMediaFiles.forEach((file) => {
-                formData.append("Midias_jogo", file);
-            });
+            const token = await clerk.session.getToken();
             const response = await fetch("http://localhost:3000/adicionar-jogo-file", {
                 method: "POST",
+                headers: { 'Authorization': `Bearer ${token}` },
                 body: formData,
             });
-            const result = await response.text();
-            if (response.ok) {
-                showCustomMessage(result);
-                document.body.removeChild(modal);
-                document.body.removeChild(overlay);
-                document.dispatchEvent(new Event("gameUpdated"));
-                selectedMediaFiles = [];
-            } else {
-                showCustomMessage("Erro ao adicionar jogo: " + result);
-            }
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || "Erro desconhecido.");
+
+            showCustomMessage("Jogo adicionado com sucesso!");
+            document.dispatchEvent(new Event("gameUpdated")); // Dispara evento para atualizar a lista de jogos
+            closeModal();
+
         } catch (error) {
-            console.error("Erro na requisição:", error);
-            showCustomMessage("Ocorreu um erro ao conectar com o servidor.");
+            console.error("Erro ao adicionar jogo:", error);
+            showCustomMessage(`Erro: ${error.message}`);
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = "Adicionar Jogo";
         }
-    }
-
-    attachEventListeners();
+    });
 }
 
 // Lógica da Barra de Navegação e da Busca
@@ -309,17 +248,10 @@ function handleSearch(event) {
     const searchInput = document.getElementById("search-input");
     const query = searchInput.value;
 
-    if (query.trim() === "") {
-        if (window.location.pathname.includes("navegar.html")) {
-            const customEvent = new CustomEvent("searchSubmitted", { detail: { query: "" } });
-            document.dispatchEvent(customEvent);
-        } else {
-            window.location.href = `navegar.html`;
-        }
-        return;
-    }
+    const isNavegarPage = window.location.pathname.includes("navegar.html");
 
-    if (window.location.pathname.includes("navegar.html")) {
+    if (isNavegarPage) {
+        // Se já estiver na página, apenas dispara um evento para não recarregar
         const customEvent = new CustomEvent("searchSubmitted", { detail: { query } });
         document.dispatchEvent(customEvent);
     } else {
@@ -327,125 +259,86 @@ function handleSearch(event) {
     }
 }
 
-function renderNavbar(user) {
+function renderNavbar({ isSignedIn, isAdmin }) {
     const navbar = document.querySelector(".navbar");
     if (!navbar) return;
-
-    const isSignedIn = !!user;
-    const userEmail = user?.primaryEmailAddress?.emailAddress;
-    const isAdmin = userEmail === "phantomgamestcc@gmail.com";
 
     let navbarHTML = "";
 
     if (isSignedIn) {
-        if (isAdmin) {
+        if (isAdmin) { // Admin Logado
             navbarHTML = `
                 <div class="logadoA">
                     <ul>
-                        <li><img src="../../assets/imagens/logo-png.png" alt="Logo"></li>
+                        <li><a href="homepage.html"><img src="../../assets/imagens/logo-png.png" alt="Logo"></a></li>
                         <li><a href="homepage.html">Descobrir</a></li>
                         <li><a href="navegar.html">Navegar</a></li>
                     </ul>
-                    <form class="search-bar" id="search-form">
-                        <input type="search" placeholder="Pesquisar..." id="search-input">
-                    </form>
-                    <a><button id="add-game-btn">Adicionar Jogo</button></a>
+                    <form class="search-bar" id="search-form"><input type="search" placeholder="Pesquisar..." id="search-input"></form>
+                    <button id="add-game-btn">Adicionar Jogo</button>
                     <div id="user-button"></div>
-                </div>
-            `;
-        } else {
+                </div>`;
+        } else { // Membro Logado
             navbarHTML = `
                 <div class="logadoM">
                     <ul>
-                        <li><img class="logo" src="../../assets/imagens/logo-png.png" alt="Logo"></li>
+                        <li><a href="homepage.html"><img class="logo" src="../../assets/imagens/logo-png.png" alt="Logo"></a></li>
                         <li><a href="homepage.html">Descobrir</a></li>
                         <li><a href="navegar.html">Navegar</a></li>
                         <li><a href="suporte.html">Suporte</a></li>
                         <li><a href="biblioteca.html">Biblioteca</a></li>
                     </ul>
-                    <form class="search-bar" id="search-form">
-                        <input type="search" placeholder="Pesquisar..." id="search-input">
-                    </form>
+                    <form class="search-bar" id="search-form"><input type="search" placeholder="Pesquisar..." id="search-input"></form>
                     <div class="left">
-                        <li><img class="carrinho" src="../../assets/imagens/carrinho.png" alt="Logo"></li>
+                        <a href="#"><img class="carrinho" src="../../assets/imagens/carrinho.png" alt="Carrinho"></a>
                         <div id="user-button"></div>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
-    } else {
+    } else { // Deslogado
         navbarHTML = `
             <div class="deslogado">
                 <ul>
-                    <li><img class="logo" src="../../assets/imagens/logo-png.png" alt="Logo"></li>
+                    <li><a href="homepage.html"><img class="logo" src="../../assets/imagens/logo-png.png" alt="Logo"></a></li>
                     <li><a href="homepage.html">Descobrir</a></li>
                     <li><a href="navegar.html">Navegar</a></li>
                     <li><a href="suporte.html">Suporte</a></li>
                 </ul>
-                <form class="search-bar" id="search-form">
-                    <input type="search" placeholder="Pesquisar..." id="search-input">
-                </form>
+                <form class="search-bar" id="search-form"><input type="search" placeholder="Pesquisar..." id="search-input"></form>
                 <a href="login.html"><button>Entrar</button></a>
-            </div>
-        `;
+            </div>`;
     }
 
     navbar.innerHTML = navbarHTML;
 
     // Adiciona event listeners após a renderização
     const searchForm = document.getElementById("search-form");
-    if (searchForm) {
-        searchForm.addEventListener("submit", handleSearch);
-    }
+    if (searchForm) searchForm.addEventListener("submit", handleSearch);
 
-    const searchInput = document.getElementById("search-input");
-    if (searchInput) {
-        searchInput.addEventListener("keyup", (event) => {
-            if (event.key === "Enter") {
-                handleSearch(event);
-            }
-        });
-
-        searchInput.addEventListener("input", () => {
-            if (searchInput.value.trim() === "" && window.location.pathname.includes("navegar.html")) {
-                const customEvent = new CustomEvent("searchSubmitted", { detail: { query: "" } });
-                document.dispatchEvent(customEvent);
-            }
-        });
-    }
-
-    // Monta o botão do usuário do Clerk, se estiver logado
-    if (isSignedIn) {
-        const userButtonDiv = document.getElementById("user-button");
-        if (userButtonDiv) {
-            try {
-                clerk.mountUserButton(userButtonDiv);
-            } catch (mountError) {
-                console.warn('Erro ao montar user button:', mountError);
-            }
-        }
-
-        // Adiciona o listener para o botão de adicionar jogo (apenas para o admin)
-        if (isAdmin) {
-            const addButton = document.getElementById("add-game-btn");
-            if (addButton) {
-                addButton.addEventListener("click", createAddGameModal);
-            }
-        }
-    }
-
-    // Preenche o campo de busca se houver uma query na URL
     const urlParams = new URLSearchParams(window.location.search);
     const query = urlParams.get("query");
-    if (searchInput && query) {
-        searchInput.value = query;
+    const searchInput = document.getElementById("search-input");
+    if (searchInput && query) searchInput.value = query;
+
+    if (isSignedIn) {
+        const userButtonDiv = document.getElementById("user-button");
+        if (userButtonDiv) clerk.mountUserButton(userButtonDiv);
+
+        if (isAdmin) {
+            const addButton = document.getElementById("add-game-btn");
+            if (addButton) addButton.addEventListener("click", createAddGameModal);
+        }
     }
 }
 
-// Lógica para inicializar a página e gerenciar a sessão do Clerk
+// Ponto de entrada principal do script
 document.addEventListener("DOMContentLoaded", async () => {
-    // Usando initializeAuth para garantir que o Clerk esteja pronto
-    const { user } = await initializeAuth();
-    // Renderiza a navbar apenas depois que o estado de autenticação for conhecido
-    renderNavbar(user);
+    try {
+        const authData = await initializeAuth();
+        renderNavbar(authData);
+    } catch (error) {
+        console.error("Falha na inicialização:", error);
+        // Renderiza a navbar de deslogado como fallback
+        renderNavbar({ isSignedIn: false, isAdmin: false });
+    }
 });
