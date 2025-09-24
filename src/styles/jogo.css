@@ -80,7 +80,6 @@ main .sobre-jogo {
   gap: 1.5rem;
 }
 
-/* ✅ CORREÇÃO 1: LOGO */
 main .sobre-jogo #logo-jogo {
   height: 15rem;
   display: flex;
@@ -92,7 +91,6 @@ main .sobre-jogo #logo-jogo img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  /* Garante que a logo mantenha a proporção */
 }
 
 main .sobre-jogo #descrição {
@@ -127,11 +125,10 @@ main .sobre-jogo .detalhes-jogo #avaliacao {
   font-size: 1.5rem;
 }
 
-/* ✅ CORREÇÃO 2: BOTÕES */
 .detalhes-jogo .action-buttons {
   display: flex;
   flex-direction: column;
-  /* Botões um em cima do outro */
+
   gap: 0.5rem;
   margin-top: 1rem;
 }
@@ -139,7 +136,6 @@ main .sobre-jogo .detalhes-jogo #avaliacao {
 .detalhes-jogo .action-buttons button {
   height: 3.5rem;
   width: 100%;
-  /* Ocupa toda a largura */
   padding: 0px 20px;
   border-radius: 7px;
   font-size: 1rem;
