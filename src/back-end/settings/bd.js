@@ -144,6 +144,97 @@ app.get("/buscar-jogo", async (req, res) => {
     finally { if (connection) connection.release(); }
 });
 
+app.get("/filtrar-jogos", async (req, res) => {
+    const { genero, categoria, preco, avaliacao } = req.query;
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        
+        let sql = `
+            SELECT DISTINCT j.* 
+            FROM jogos j
+        `;
+        let params = [];
+        let joins = [];
+        let wheres = [];
+
+        // Filtro por Gênero
+        if (genero) {
+            joins.push(`
+                INNER JOIN genero_jogos gj ON j.ID_jogo = gj.ID_jogo
+                INNER JOIN genero g ON gj.ID_genero = g.ID_genero
+            `);
+            wheres.push("g.Nome = ?");
+            params.push(genero);
+        }
+
+        // Filtro por Categoria
+        if (categoria) {
+            joins.push(`
+                INNER JOIN categoria_jogos cj ON j.ID_jogo = cj.ID_jogo
+                INNER JOIN categoria c ON cj.ID_categoria = c.ID_categoria
+            `);
+            wheres.push("c.Nome = ?");
+            params.push(categoria);
+        }
+
+        // Filtro por Preço
+        if (preco) {
+            if (preco === "Grátis") {
+                wheres.push("j.Preco_jogo = 0");
+            } else if (preco === "Até R$20") {
+                wheres.push("j.Preco_jogo > 0 AND j.Preco_jogo <= 20");
+            } else if (preco === "R$20 - R$50") {
+                wheres.push("j.Preco_jogo > 20 AND j.Preco_jogo <= 50");
+            } else if (preco === "R$50 - R$100") {
+                wheres.push("j.Preco_jogo > 50 AND j.Preco_jogo <= 100");
+            } else if (preco === "Acima de R$100") {
+                wheres.push("j.Preco_jogo > 100");
+            }
+        }
+
+        // Filtro por Avaliação (faixa exata baseada no arredondamento para N estrelas)
+        if (avaliacao) {
+            const estrelas = parseInt(avaliacao.split(" ")[0]); // Ex: "4 Estrelas" -> 4
+            if (!isNaN(estrelas) && estrelas >= 1 && estrelas <= 5) {
+                if (estrelas === 5) {
+                    wheres.push("j.Media_nota >= 9.0");
+                } else if (estrelas === 1) {
+                    wheres.push("j.Media_nota > 0 AND j.Media_nota < 3.0");
+                } else {
+                    const minNota = estrelas * 2 - 1;
+                    const maxNota = estrelas * 2 + 1;
+                    wheres.push("j.Media_nota >= ? AND j.Media_nota < ?");
+                    params.push(minNota, maxNota);
+                }
+            }
+        }
+
+        // Monta a query final
+        if (joins.length > 0) {
+            sql += joins.join(" ");
+        }
+        if (wheres.length > 0) {
+            sql += " WHERE " + wheres.join(" AND ");
+        }
+        sql += " ORDER BY j.Nome_jogo ASC";
+
+        console.log("SQL Executada:", sql);
+        console.log("Parâmetros:", params);
+
+        const [rows] = await connection.execute(sql, params);
+        if (rows.length === 0) {
+            return res.status(404).json([]);
+        }
+        res.status(200).json(rows);
+    } catch (err) {
+        console.error("Erro ao filtrar jogos:", err);
+        res.status(500).json({ message: "Erro ao filtrar jogos." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
 app.get("/generos", async (req, res) => {
     let connection;
     try {
