@@ -250,8 +250,16 @@ function handleSearch(event) {
 
     const isNavegarPage = window.location.pathname.includes("navegar.html");
 
+     searchInput.addEventListener('input', () => {
+            if (searchInput.value.trim() === '') {
+                if (window.location.pathname.includes('navegar.html')) {
+                    const customEvent = new CustomEvent('searchSubmitted', { detail: { query: '' } });
+                    document.dispatchEvent(customEvent);
+                }
+            }
+        });
+
     if (isNavegarPage) {
-        // Se já estiver na página, apenas dispara um evento para não recarregar
         const customEvent = new CustomEvent("searchSubmitted", { detail: { query } });
         document.dispatchEvent(customEvent);
     } else {
