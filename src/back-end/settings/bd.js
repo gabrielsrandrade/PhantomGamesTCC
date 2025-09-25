@@ -15,7 +15,7 @@ const port = 3000;
 // --- 2. CONFIGURAÇÃO DE SEGURANÇA (CLERK) ---
 const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
 if (!CLERK_SECRET_KEY || !CLERK_SECRET_KEY.startsWith("sk_")) {
-  throw new Error("A chave secreta do Clerk (CLERK_SECRET_KEY) parece estar ausente ou inválida.");
+    throw new Error("A chave secreta do Clerk (CLERK_SECRET_KEY) parece estar ausente ou inválida.");
 }
 
 // --- 3. MIDDLEWARES ---
@@ -27,57 +27,58 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const clerkAuthMiddleware = ClerkExpressWithAuth({ secretKey: CLERK_SECRET_KEY });
 
 const isAdminMiddleware = async (req, res, next) => {
-  if (!req.auth || !req.auth.userId) {
-    return res.status(401).json({ message: "Usuário não autenticado." });
-  }
-  let connection;
-  try {
-    connection = await pool.getConnection();
-    const [rows] = await connection.execute("SELECT is_admin FROM usuario WHERE ID_usuario = ?", [req.auth.userId]);
-    if (rows.length === 0 || !rows[0].is_admin) {
-      return res.status(403).json({ message: "Acesso negado. Requer permissão de administrador." });
+    if (!req.auth || !req.auth.userId) {
+        return res.status(401).json({ message: "Usuário não autenticado." });
     }
-    next();
-  } catch (error) {
-    return res.status(500).json({ message: "Erro ao verificar permissões." });
-  } finally {
-    if (connection) connection.release();
-  }
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        const [rows] = await connection.execute("SELECT is_admin FROM usuario WHERE ID_usuario = ?", [req.auth.userId]);
+        if (rows.length === 0 || !rows[0].is_admin) {
+            return res.status(403).json({ message: "Acesso negado. Requer permissão de administrador." });
+        }
+        next();
+    } catch (error) {
+        return res.status(500).json({ message: "Erro ao verificar permissões." });
+    } finally {
+        if (connection) connection.release();
+    }
 };
 
 // --- 4. CONFIGURAÇÃO DE UPLOAD (MULTER) ---
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadsDir = path.join(__dirname, "uploads");
-    if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
-  },
+    destination: (req, file, cb) => {
+        const uploadsDir = path.join(__dirname, "uploads");
+        if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir);
+        cb(null, "uploads/");
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+    },
 });
 const upload = multer({ storage: storage });
 
 // --- 5. CONFIGURAÇÃO DO BANCO DE DADOS ---
-const dbConfig = { 
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "PhantomGames", 
-  waitForConnections: true, 
-  connectionLimit: 10, 
-  queueLimit: 0 };
+const dbConfig = {
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "PhantomGames",
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+};
 const pool = mysql.createPool(dbConfig);
 (async () => {
-  try {
-    const connection = await pool.getConnection();
-    console.log("Pool de conexões com o banco de dados criado com sucesso!");
-    connection.release();
-  } catch (err) {
-    console.error("ERRO FATAL: Não foi possível conectar ao banco de dados:", err.message);
-    process.exit(1);
-  }
+    try {
+        const connection = await pool.getConnection();
+        console.log("Pool de conexões com o banco de dados criado com sucesso!");
+        connection.release();
+    } catch (err) {
+        console.error("ERRO FATAL: Não foi possível conectar ao banco de dados:", err.message);
+        process.exit(1);
+    }
 })();
 
 // --- 6. ROTAS DA API ---
@@ -100,7 +101,7 @@ app.post("/salvar-usuario", async (req, res) => {
             await connection.execute("INSERT INTO usuario (ID_usuario, Nome, Imagem_perfil) VALUES (?, ?, ?)", [id, nome, imagem_perfil]);
             res.status(201).json({ message: "Usuário salvo." });
         }
-    } catch (err) { res.status(500).json({ message: "Erro interno do servidor." }); } 
+    } catch (err) { res.status(500).json({ message: "Erro interno do servidor." }); }
     finally { if (connection) connection.release(); }
 });
 
@@ -111,7 +112,7 @@ app.get("/jogos", async (req, res) => {
         connection = await pool.getConnection();
         const [jogos] = await connection.execute("SELECT * FROM jogos ORDER BY Nome_jogo ASC");
         res.status(200).json(jogos);
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar jogos." }); } 
+    } catch (err) { res.status(500).json({ message: "Erro ao buscar jogos." }); }
     finally { if (connection) connection.release(); }
 });
 
@@ -128,7 +129,7 @@ app.get("/jogos/:id", async (req, res) => {
 
         const jogoCompleto = { ...jogosRows[0], categorias: categoriasRows.map(r => r.Nome), generos: generosRows.map(r => r.Nome), midias: midiasRows.map(r => r.URL_midia) };
         res.status(200).json(jogoCompleto);
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar detalhes do jogo." }); } 
+    } catch (err) { res.status(500).json({ message: "Erro ao buscar detalhes do jogo." }); }
     finally { if (connection) connection.release(); }
 });
 
@@ -140,7 +141,7 @@ app.get("/buscar-jogo", async (req, res) => {
         connection = await pool.getConnection();
         const [jogos] = await connection.execute("SELECT * FROM jogos WHERE Nome_jogo LIKE ?", [`%${query}%`]);
         res.status(200).json(jogos);
-    } catch (err) { res.status(500).json({ message: "Erro no servidor ao buscar jogos." }); } 
+    } catch (err) { res.status(500).json({ message: "Erro no servidor ao buscar jogos." }); }
     finally { if (connection) connection.release(); }
 });
 
@@ -149,7 +150,7 @@ app.get("/filtrar-jogos", async (req, res) => {
     let connection;
     try {
         connection = await pool.getConnection();
-        
+
         let sql = `
             SELECT DISTINCT j.* 
             FROM jogos j
@@ -178,18 +179,19 @@ app.get("/filtrar-jogos", async (req, res) => {
             params.push(categoria);
         }
 
-        // Filtro por Preço
+        // Filtro por Preço (considerando desconto como porcentagem)
         if (preco) {
+            const precoComDesconto = `(j.Preco_jogo * (1 - COALESCE(j.Desconto_jogo, 0) / 100))`;
             if (preco === "Grátis") {
-                wheres.push("j.Preco_jogo = 0");
+                wheres.push(`${precoComDesconto} = 0`);
             } else if (preco === "Até R$20") {
-                wheres.push("j.Preco_jogo > 0 AND j.Preco_jogo <= 20");
+                wheres.push(`${precoComDesconto} > 0 AND ${precoComDesconto} <= 20`);
             } else if (preco === "R$20 - R$50") {
-                wheres.push("j.Preco_jogo > 20 AND j.Preco_jogo <= 50");
+                wheres.push(`${precoComDesconto} > 20 AND ${precoComDesconto} <= 50`);
             } else if (preco === "R$50 - R$100") {
-                wheres.push("j.Preco_jogo > 50 AND j.Preco_jogo <= 100");
+                wheres.push(`${precoComDesconto} > 50 AND ${precoComDesconto} <= 100`);
             } else if (preco === "Acima de R$100") {
-                wheres.push("j.Preco_jogo > 100");
+                wheres.push(`${precoComDesconto} > 100`);
             }
         }
 
@@ -241,7 +243,7 @@ app.get("/generos", async (req, res) => {
         connection = await pool.getConnection();
         const [generos] = await connection.execute("SELECT Nome FROM genero ORDER BY Nome ASC");
         res.status(200).json(generos.map(g => g.Nome));
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar gêneros." }); } 
+    } catch (err) { res.status(500).json({ message: "Erro ao buscar gêneros." }); }
     finally { if (connection) connection.release(); }
 });
 
@@ -251,7 +253,7 @@ app.get("/categorias", async (req, res) => {
         connection = await pool.getConnection();
         const [categorias] = await connection.execute("SELECT Nome FROM categoria ORDER BY Nome ASC");
         res.status(200).json(categorias.map(c => c.Nome));
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar categorias." }); } 
+    } catch (err) { res.status(500).json({ message: "Erro ao buscar categorias." }); }
     finally { if (connection) connection.release(); }
 });
 
@@ -266,11 +268,11 @@ app.get("/comentarios/:id", async (req, res) => {
             [req.params.id]
         );
         const [mediaNota] = await connection.execute("SELECT Media_nota FROM jogos WHERE ID_jogo = ?", [req.params.id]);
-        res.status(200).json({ 
-            comentarios, 
+        res.status(200).json({
+            comentarios,
             media: mediaNota.length > 0 ? parseFloat(mediaNota[0].Media_nota).toFixed(1) : "0.0"
         });
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar comentários." }); } 
+    } catch (err) { res.status(500).json({ message: "Erro ao buscar comentários." }); }
     finally { if (connection) connection.release(); }
 });
 
@@ -312,11 +314,11 @@ app.delete("/remover-comentario/:id", clerkAuthMiddleware, async (req, res) => {
 
         const [userRows] = await connection.execute("SELECT is_admin FROM usuario WHERE ID_usuario = ?", [userId]);
         const isUserAdmin = userRows.length > 0 && userRows[0].is_admin;
-        
+
         if (!isUserAdmin && userId !== commentRows[0].ID_usuario) {
             return res.status(403).json({ message: "Você não tem permissão para remover este comentário." });
         }
-        
+
         await connection.beginTransaction();
         await connection.execute("DELETE FROM comentario WHERE ID_comentario = ?", [comentarioId]);
         const jogoId = commentRows[0].ID_jogo;
@@ -343,7 +345,7 @@ app.post("/adicionar-jogo-file", clerkAuthMiddleware, isAdminMiddleware, upload.
         // "Ensinamos" o backend a ler a string JSON enviada pelo frontend
         let categoriasArray = [];
         if (categorias) try { categoriasArray = JSON.parse(categorias); } catch (e) { console.error("Erro ao parsear categorias"); }
-        
+
         let generosArray = [];
         if (generos) try { generosArray = JSON.parse(generos); } catch (e) { console.error("Erro ao parsear generos"); }
         // --- FIM DA CORREÇÃO ---
@@ -421,15 +423,15 @@ app.put("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, upload.array("midi
         // 3. Gerencia as mídias com a consulta SQL correta
         const [midiasAntigas] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
         const midiasParaDeletar = midiasAntigas.filter(midia => !midiasExistentes.includes(midia.URL_midia));
-        
+
         if (midiasParaDeletar.length > 0) {
             const urlsParaDeletar = midiasParaDeletar.map(m => m.URL_midia);
-            
+
             // Cria os placeholders (?) para a cláusula IN
             const placeholders = urlsParaDeletar.map(() => '?').join(',');
             // Executa a deleção com os placeholders corretos
             await connection.execute(`DELETE FROM midias_jogo WHERE ID_jogo = ? AND URL_midia IN (${placeholders})`, [jogoId, ...urlsParaDeletar]);
-            
+
             // Deleta os arquivos físicos do servidor
             urlsParaDeletar.forEach(url => {
                 const fullPath = path.join(__dirname, url);
@@ -443,7 +445,7 @@ app.put("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, upload.array("midi
             const midiasValues = req.files.map(file => [jogoId, `/uploads/${file.filename}`]);
             await connection.query("INSERT INTO midias_jogo (ID_jogo, URL_midia) VALUES ?", [midiasValues]);
         }
-        
+
         await connection.commit();
         res.status(200).json({ message: "Jogo atualizado com sucesso!" });
 
@@ -462,22 +464,22 @@ app.delete("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, async (req, res
     try {
         connection = await pool.getConnection();
         await connection.beginTransaction();
-        
+
         // Deletar arquivos de mídia do servidor
         const [midias] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
         midias.forEach(midia => {
             const fullPath = path.join(__dirname, midia.URL_midia);
             if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
         });
-        
+
         // Deletar o jogo da tabela principal (o ON DELETE CASCADE cuidará do resto)
         const [result] = await connection.execute("DELETE FROM jogos WHERE ID_jogo = ?", [jogoId]);
-        
+
         if (result.affectedRows === 0) {
             await connection.rollback();
             return res.status(404).json({ message: "Jogo não encontrado." });
         }
-        
+
         await connection.commit();
         res.status(200).json({ message: "Jogo removido com sucesso." });
     } catch (err) {
@@ -491,5 +493,5 @@ app.delete("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, async (req, res
 
 // --- 7. INICIALIZAÇÃO DO SERVIDOR ---
 app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
+    console.log(`Servidor rodando em http://localhost:${port}`);
 });

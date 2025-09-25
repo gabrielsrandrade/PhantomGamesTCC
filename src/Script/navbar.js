@@ -184,7 +184,7 @@ async function createAddGameModal() {
             item.innerHTML = `
                 ${file.type.startsWith("image/") ? `<img src="${fileURL}" alt="${file.name}">` : `<video src="${fileURL}"></video>`}
                 <span>${file.name}</span>
-                <button class="remove-media-btn" data-index="${index}">&times;</button>
+                <button class="remove-media-btn" data-index="${index}">Remover</button>
             `;
             previewContainer.appendChild(item);
         });
