@@ -3,19 +3,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const cardsContainer = document.querySelector(".card_jogos");
   const searchInput = document.getElementById("search-input");
 
-  // Objeto para armazenar os filtros ativos
   const filters = {};
 
-  // Função para atualizar a URL do navegador com todos os parâmetros
-  const updateUrl = (params) => {
-    const url = new URL(window.location.href);
-    url.searchParams.forEach((value, key) => url.searchParams.delete(key));
-    for (const key in params) {
-      if (params[key]) {
-        url.searchParams.set(key, params[key]);
+  // Função para limpar os parâmetros da URL sem recarregar a página
+  const limparUrl = () => {
+      const url = new URL(window.location.href);
+      if (url.search) { // Apenas executa se houver parâmetros na URL
+        // history.replaceState(null, '', window.location.pathname);
+        url.search = '';
+        window.history.pushState({}, '', url);
       }
-    }
-    window.history.pushState({}, "", url);
   };
 
   const fetchAndDisplayGames = async (params = {}) => {
@@ -28,7 +25,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (Object.keys(filterParams).length > 0) {
             const urlParams = new URLSearchParams(filterParams).toString();
             url = `http://localhost:3000/filtrar-jogos?${urlParams}`;
-            console.log("URL de Filtro:", url); // Adicione para depuração
         } else {
             url = "http://localhost:3000/jogos";
         }
@@ -49,9 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
         cardsContainer.innerHTML =
             '<p style="color: red; text-align: center;">Não foi possível carregar os jogos. Verifique a conexão com o servidor.</p>';
     }
-};
+  };
 
-  // Função para renderizar os cards dos jogos
   const displayGames = (games, query) => {
     cardsContainer.innerHTML = '';
     if (!games || games.length === 0) {
@@ -86,11 +81,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const averageRating = game.Media_nota ? parseFloat(game.Media_nota) : 0;
       const totalStars = 5;
-      const ratingPercentage = (averageRating / 10) * 100;
+      const ratingForDisplay = averageRating / 2;
+      const ratingPercentage = (ratingForDisplay / totalStars) * 100;
       const starsHtml = '&#9733;'.repeat(totalStars);
 
       const starsHtmlComplete = `
-              <div class="estrelas-container">
+              <div class="estrelas-container" data-avaliacao="${averageRating.toFixed(1)}">
                   <div class="star-empty">${starsHtml}</div>
                   <div class="star-filled" style="width: ${ratingPercentage}%;">${starsHtml}</div>
               </div>
@@ -107,14 +103,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // --- Lógica de eventos para filtros e busca ---
+  // --- Lógica de eventos ---
   document.addEventListener("gameUpdated", () => {
     fetchAndDisplayGames();
   });
 
   document.addEventListener("searchSubmitted", (event) => {
     const query = event.detail.query;
-    updateUrl({ query });
+    limparUrl(); // Limpa a URL antes de fazer uma nova busca
     fetchAndDisplayGames({ query });
   });
 
@@ -126,31 +122,21 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
         delete filters[filterName];
     }
-
-    console.log("Filtros Ativos:", filters); // Depuração
-    updateUrl(filters);
+    
+    limparUrl(); // Limpa a URL ao aplicar/limpar um filtro
     fetchAndDisplayGames(filters);
-});
+  });
 
   // --- Lógica de inicialização da página ---
   const urlParams = new URLSearchParams(window.location.search);
-  const initialQuery = urlParams.get("query") || "";
-
-  urlParams.forEach((value, key) => {
-    if (key !== 'query') {
-      filters[key] = value;
-    }
-  });
-
-  if (searchInput) {
-    searchInput.value = initialQuery;
-  }
+  const initialQuery = urlParams.get("query");
 
   if (initialQuery) {
-    fetchAndDisplayGames({ query: initialQuery });
-  } else if (Object.keys(filters).length > 0) {
-    fetchAndDisplayGames(filters);
+      if (searchInput) {
+        searchInput.value = initialQuery;
+      }
+      fetchAndDisplayGames({ query: initialQuery });
   } else {
-    fetchAndDisplayGames();
+      fetchAndDisplayGames(); // Carrega todos os jogos se não houver query
   }
 });

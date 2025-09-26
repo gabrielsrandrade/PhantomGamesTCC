@@ -120,14 +120,12 @@ async function createAddGameModal() {
     const firstPage = modal.querySelector("#first-page");
     const secondPage = modal.querySelector("#second-page");
 
-    // Inicializa os componentes multiselect
     multiselectGenre = setupMultiselect("multiselect-genre");
     multiselectCategory = setupMultiselect("multiselect-category");
 
     const closeModal = () => {
         document.body.removeChild(modal);
         document.body.removeChild(overlay);
-        // Limpa as variáveis globais para a próxima abertura do modal
         selectedMediaFiles = [];
         gameDataFromFirstPage = {};
     };
@@ -135,14 +133,12 @@ async function createAddGameModal() {
     modal.querySelectorAll('.close-modal-btn').forEach(btn => btn.addEventListener('click', closeModal));
     overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
     
-    // Navegação entre páginas do modal
     firstPage.querySelector('.next-btn').addEventListener('click', () => {
         const form = firstPage.querySelector('form');
         if (!form.checkValidity()) {
             form.reportValidity();
             return;
         }
-        // Salva os dados da primeira página
         gameDataFromFirstPage = {
             Nome_jogo: document.getElementById('Nome_jogo').value,
             Descricao_jogo: document.getElementById('Descricao_jogo').value,
@@ -163,14 +159,13 @@ async function createAddGameModal() {
         firstPage.style.display = 'block';
     });
 
-    // Lógica de upload e preview de mídia
     const mediaInput = secondPage.querySelector("#media-upload");
     const previewContainer = secondPage.querySelector("#media-preview-container");
     const mediaCountSpan = secondPage.querySelector("#media-count");
 
     mediaInput.addEventListener("change", (e) => {
         selectedMediaFiles.push(...Array.from(e.target.files));
-        mediaInput.value = ""; // Limpa o input para permitir selecionar o mesmo arquivo novamente
+        mediaInput.value = "";
         renderMediaPreviews();
     });
 
@@ -198,7 +193,6 @@ async function createAddGameModal() {
         }
     });
 
-    // Submissão final do formulário
     secondPage.querySelector('.submit-btn').addEventListener('click', async (e) => {
         const submitBtn = e.target;
         submitBtn.disabled = true;
@@ -208,7 +202,7 @@ async function createAddGameModal() {
         formData.append("Nome_jogo", gameDataFromFirstPage.Nome_jogo);
         formData.append("Descricao_jogo", gameDataFromFirstPage.Descricao_jogo);
         formData.append("Preco_jogo", gameDataFromFirstPage.Preco_jogo);
-        formData.append("Desconto_jogo", parseFloat(gameDataFromFirstPage.Desconto_jogo) || 0); // Trata desconto vazio
+        formData.append("Desconto_jogo", parseFloat(gameDataFromFirstPage.Desconto_jogo) || 0);
         formData.append("Logo_jogo", gameDataFromFirstPage.Logo_jogo);
         formData.append("Capa_jogo", gameDataFromFirstPage.Capa_jogo);
         formData.append("Faixa_etaria", gameDataFromFirstPage.Faixa_etaria);
@@ -229,7 +223,7 @@ async function createAddGameModal() {
             if (!response.ok) throw new Error(result.message || "Erro desconhecido.");
 
             showCustomMessage("Jogo adicionado com sucesso!");
-            document.dispatchEvent(new Event("gameUpdated")); // Dispara evento para atualizar a lista de jogos
+            document.dispatchEvent(new Event("gameUpdated"));
             closeModal();
 
         } catch (error) {
@@ -243,29 +237,30 @@ async function createAddGameModal() {
 }
 
 // Lógica da Barra de Navegação e da Busca
+// ##### INÍCIO DA CORREÇÃO #####
 function handleSearch(event) {
     event.preventDefault();
     const searchInput = document.getElementById("search-input");
-    const query = searchInput.value;
+    const query = searchInput.value.trim(); // Usa trim() para ignorar espaços em branco
 
+    if (!query) { // Se a busca for vazia, não faz nada
+        return;
+    }
+
+    // Verifica se a página atual é a 'navegar.html'
     const isNavegarPage = window.location.pathname.includes("navegar.html");
 
-     searchInput.addEventListener('input', () => {
-            if (searchInput.value.trim() === '') {
-                if (window.location.pathname.includes('navegar.html')) {
-                    const customEvent = new CustomEvent('searchSubmitted', { detail: { query: '' } });
-                    document.dispatchEvent(customEvent);
-                }
-            }
-        });
-
     if (isNavegarPage) {
+        // Se já está na página, apenas dispara um evento para ela mesma lidar com a busca
         const customEvent = new CustomEvent("searchSubmitted", { detail: { query } });
         document.dispatchEvent(customEvent);
     } else {
+        // Se está em outra página, redireciona para 'navegar.html' com a query na URL
         window.location.href = `navegar.html?query=${encodeURIComponent(query)}`;
     }
 }
+// ##### FIM DA CORREÇÃO #####
+
 
 function renderNavbar({ isSignedIn, isAdmin }) {
     const navbar = document.querySelector(".navbar");
@@ -298,6 +293,7 @@ function renderNavbar({ isSignedIn, isAdmin }) {
                     </ul>
                     <form class="search-bar" id="search-form"><input type="search" placeholder="Pesquisar..." id="search-input"></form>
                     <div class="left">
+                        <a href="#"><img class="carrinho" src="../../assets/imagens/lista-desejos.png" alt="Carrinho"></a>
                         <a href="#"><img class="carrinho" src="../../assets/imagens/carrinho.png" alt="Carrinho"></a>
                         <div id="user-button"></div>
                     </div>
@@ -322,10 +318,21 @@ function renderNavbar({ isSignedIn, isAdmin }) {
     // Adiciona event listeners após a renderização
     const searchForm = document.getElementById("search-form");
     if (searchForm) searchForm.addEventListener("submit", handleSearch);
+    
+    // Adiciona listener para limpar a busca se o campo ficar vazio
+    const searchInput = document.getElementById("search-input");
+    if (searchInput && window.location.pathname.includes('navegar.html')) {
+        searchInput.addEventListener('input', () => {
+            if (searchInput.value.trim() === '') {
+                const customEvent = new CustomEvent('searchSubmitted', { detail: { query: '' } });
+                document.dispatchEvent(customEvent);
+            }
+        });
+    }
+
 
     const urlParams = new URLSearchParams(window.location.search);
     const query = urlParams.get("query");
-    const searchInput = document.getElementById("search-input");
     if (searchInput && query) searchInput.value = query;
 
     if (isSignedIn) {
@@ -346,7 +353,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         renderNavbar(authData);
     } catch (error) {
         console.error("Falha na inicialização:", error);
-        // Renderiza a navbar de deslogado como fallback
         renderNavbar({ isSignedIn: false, isAdmin: false });
     }
 });

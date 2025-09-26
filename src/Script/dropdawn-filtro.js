@@ -24,8 +24,7 @@ selectTriggers.forEach(trigger => {
             this.classList.remove('is-selected');
 
             filtroContent.classList.remove('show');
-            
-            // Dispara o evento de filtro aplicado, com o valor do filtro removido
+
             document.dispatchEvent(new CustomEvent('filterApplied', {
                 detail: { filterName, filterValue: null }
             }));
@@ -62,7 +61,6 @@ document.querySelectorAll('.filtro-content li').forEach(item => {
         selectDisplay.classList.add('is-selected');
         filtroContent.classList.remove('show');
 
-        // Dispara o evento com o nome e valor do filtro
         document.dispatchEvent(new CustomEvent('filterApplied', {
             detail: { filterName, filterValue }
         }));

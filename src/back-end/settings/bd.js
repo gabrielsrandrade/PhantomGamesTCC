@@ -147,13 +147,10 @@ app.get("/buscar-jogo", async (req, res) => {
 
 app.get("/filtrar-jogos", async (req, res) => {
     const { genero, categoria, preco, avaliacao } = req.query;
-    let connection;
+    
     try {
-        connection = await pool.getConnection();
-
         let sql = `
-            SELECT DISTINCT j.* 
-            FROM jogos j
+            SELECT DISTINCT j.* FROM jogos j
         `;
         let params = [];
         let joins = [];
@@ -179,7 +176,7 @@ app.get("/filtrar-jogos", async (req, res) => {
             params.push(categoria);
         }
 
-        // Filtro por Preço (considerando desconto como porcentagem)
+        // Filtro por Preço
         if (preco) {
             const precoComDesconto = `(j.Preco_jogo * (1 - COALESCE(j.Desconto_jogo, 0) / 100))`;
             if (preco === "Grátis") {
@@ -195,26 +192,38 @@ app.get("/filtrar-jogos", async (req, res) => {
             }
         }
 
-        // Filtro por Avaliação (faixa exata baseada no arredondamento para N estrelas)
+        // ##### LÓGICA DE AVALIAÇÃO COM A OPÇÃO "SEM ESTRELAS" #####
         if (avaliacao) {
-            const estrelas = parseInt(avaliacao.split(" ")[0]); // Ex: "4 Estrelas" -> 4
-            if (!isNaN(estrelas) && estrelas >= 1 && estrelas <= 5) {
-                if (estrelas === 5) {
-                    wheres.push("j.Media_nota >= 9.0");
-                } else if (estrelas === 1) {
-                    wheres.push("j.Media_nota > 0 AND j.Media_nota < 3.0");
-                } else {
-                    const minNota = estrelas * 2 - 1;
-                    const maxNota = estrelas * 2 + 1;
-                    wheres.push("j.Media_nota >= ? AND j.Media_nota < ?");
-                    params.push(minNota, maxNota);
-                }
+            if (avaliacao === '0') {
+                // "Sem Estrelas": Apenas jogos com nota 0
+                wheres.push("j.Media_nota = ?");
+                params.push(0.0);
+            } else if (avaliacao === '5') {
+                // 5 estrelas: Apenas nota 10
+                wheres.push("j.Media_nota = ?");
+                params.push(10.0);
+            } else if (avaliacao === '4-5') {
+                // 4-5 estrelas: Nota de 8.0 até 9.9
+                wheres.push("j.Media_nota >= ? AND j.Media_nota < ?");
+                params.push(8.0, 10.0);
+            } else if (avaliacao === '3-4') {
+                // 3-4 estrelas: Nota de 6.0 até 7.9
+                wheres.push("j.Media_nota >= ? AND j.Media_nota < ?");
+                params.push(6.0, 8.0);
+            } else if (avaliacao === '2-3') {
+                // 2-3 estrelas: Nota de 4.0 até 5.9
+                wheres.push("j.Media_nota >= ? AND j.Media_nota < ?");
+                params.push(4.0, 6.0);
+            } else if (avaliacao === '1-2') {
+                // 1-2 estrelas: Nota de 2.0 até 3.9
+                wheres.push("j.Media_nota >= ? AND j.Media_nota < ?");
+                params.push(2.0, 4.0);
             }
         }
 
         // Monta a query final
         if (joins.length > 0) {
-            sql += joins.join(" ");
+            sql += [...new Set(joins)].join(" ");
         }
         if (wheres.length > 0) {
             sql += " WHERE " + wheres.join(" AND ");
@@ -224,27 +233,14 @@ app.get("/filtrar-jogos", async (req, res) => {
         console.log("SQL Executada:", sql);
         console.log("Parâmetros:", params);
 
-        const [rows] = await connection.execute(sql, params);
-        if (rows.length === 0) {
-            return res.status(404).json([]);
-        }
+        const [rows] = await pool.execute(sql, params);
+        
         res.status(200).json(rows);
+
     } catch (err) {
         console.error("Erro ao filtrar jogos:", err);
-        res.status(500).json({ message: "Erro ao filtrar jogos." });
-    } finally {
-        if (connection) connection.release();
+        res.status(500).json({ message: "Erro interno do servidor ao filtrar jogos." });
     }
-});
-
-app.get("/generos", async (req, res) => {
-    let connection;
-    try {
-        connection = await pool.getConnection();
-        const [generos] = await connection.execute("SELECT Nome FROM genero ORDER BY Nome ASC");
-        res.status(200).json(generos.map(g => g.Nome));
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar gêneros." }); }
-    finally { if (connection) connection.release(); }
 });
 
 app.get("/categorias", async (req, res) => {
