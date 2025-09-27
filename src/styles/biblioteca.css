@@ -1,0 +1,60 @@
+@import "general.css";
+
+.titulo-biblioteca {
+    color: white;
+    margin: 2rem 1.5rem;
+}
+
+
+/*cards*/
+.cards_principais {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    max-width: 89rem;
+    margin: 5rem auto;
+    gap: 1rem;
+
+
+    .card_jogos {
+        display: flex;
+        flex-wrap: wrap;
+        overflow-x: unset;
+        min-width: 89rem;
+        gap: 2.5625rem;
+
+
+        .card_jogo_biblioteca {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            max-width: 15.75rem;
+            min-width: 15.75rem;
+            height: fit-content;
+
+            background-color: var(--card-color);
+            color: white;
+            font-weight: bold;
+
+            border-radius: 20px;
+            padding: 8px;
+
+            cursor: pointer;
+
+            .capa_card_biblioteca {
+                width: auto;
+                height: 20rem;
+                background-size: cover;
+                background-position: center;
+                border-radius: 20px;
+
+            }
+        }
+    }
+}
+
+
+footer {
+    margin-top: auto;
+}

@@ -65,29 +65,28 @@ CREATE TABLE genero_jogos(
 
 /* Tabela de lista de desejos */
 CREATE TABLE lista_desejos(
-    ID_lista_desejos INT(5) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    ID_usuario VARCHAR(50),
-    ID_jogo INT(5),
+    ID_usuario VARCHAR(50) NOT NULL,
+    ID_jogo INT(5) NOT NULL,
+    PRIMARY KEY (ID_usuario, ID_jogo),
     FOREIGN KEY (ID_usuario) REFERENCES usuario(ID_usuario) ON DELETE CASCADE,
     FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE
 );
 
 /* Tabela de biblioteca de jogos do usuário */
 CREATE TABLE biblioteca(
-    ID_biblioteca INT(5) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    ID_usuario VARCHAR(50),
-    ID_jogo INT(5),
+    ID_usuario VARCHAR(50) NOT NULL,
+    ID_jogo INT(5) NOT NULL,
+    PRIMARY KEY (ID_usuario, ID_jogo),
     FOREIGN KEY (ID_usuario) REFERENCES usuario(ID_usuario) ON DELETE CASCADE,
     FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE
 );
 
 /* Tabela de carrinho de compras */
-CREATE TABLE carrinho(
-    ID_carrinho INT(5) PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    forma_pagamento VARCHAR(20) NOT NULL,
-    data_compra DATE NOT NULL,
-    ID_usuario VARCHAR(50),
-    ID_jogo INT(5),
+CREATE TABLE carrinho_itens (
+    ID_usuario VARCHAR(50) NOT NULL,
+    ID_jogo INT(5) NOT NULL,
+    data_adicao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ID_usuario, ID_jogo),
     FOREIGN KEY (ID_usuario) REFERENCES usuario(ID_usuario) ON DELETE CASCADE,
     FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE
 );
@@ -116,3 +115,4 @@ INSERT INTO categoria (Nome) VALUES
 ('Linear'), ('Mundo Aberto'), ('Sandbox'), ('Campanha'), ('Missões/Fases'), ('Permadeath'), ('Rouguelike');
 
 UPDATE usuario SET is_admin = TRUE WHERE ID_usuario = 'user_31YoUjT0yZIMujj9D7jiveiepOt';
+

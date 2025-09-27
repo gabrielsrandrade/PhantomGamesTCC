@@ -12,20 +12,26 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 const app = express();
 const port = 3000;
 
-// --- 2. CONFIGURAÇÃO DE SEGURANÇA (CLERK) ---
+// --- 2. CONFIGURAÇÃO DE SEGURANÇA (CLERK E STRIPE) ---
 const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 if (!CLERK_SECRET_KEY || !CLERK_SECRET_KEY.startsWith("sk_")) {
     throw new Error("A chave secreta do Clerk (CLERK_SECRET_KEY) parece estar ausente ou inválida.");
 }
 
 // --- 3. MIDDLEWARES ---
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173', // Permite requisições do seu front-end
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const clerkAuthMiddleware = ClerkExpressWithAuth({ secretKey: CLERK_SECRET_KEY });
 
+// Middleware de verificação do Clerk
+const clerkAuthMiddleware = ClerkExpressWithAuth({ secretKey: CLERK_SECRET_KEY });
+// Middleware para verificar se o usuário é admin
 const isAdminMiddleware = async (req, res, next) => {
     if (!req.auth || !req.auth.userId) {
         return res.status(401).json({ message: "Usuário não autenticado." });
@@ -81,12 +87,8 @@ const pool = mysql.createPool(dbConfig);
     }
 })();
 
-// --- 6. ROTAS DA API ---
-
-// ROTA PRINCIPAL
 app.get("/", (req, res) => res.status(200).send("Servidor PhantomGames está no ar."));
 
-// ROTA PARA SALVAR/ATUALIZAR USUÁRIO
 app.post("/salvar-usuario", async (req, res) => {
     const { id, nome, imagem_perfil } = req.body;
     if (!id || !nome) return res.status(400).json({ message: "ID e nome são obrigatórios." });
@@ -116,21 +118,51 @@ app.get("/jogos", async (req, res) => {
     finally { if (connection) connection.release(); }
 });
 
-app.get("/jogos/:id", async (req, res) => {
+app.get("/jogos/:id",ClerkExpressWithAuth(), async (req, res) => {
+    const jogoId = req.params.id;
+    const userId = req.auth?.userId; 
     let connection;
+
     try {
         connection = await pool.getConnection();
-        const [jogosRows] = await connection.execute("SELECT * FROM jogos WHERE ID_jogo = ?", [req.params.id]);
+        const [jogosRows] = await connection.execute("SELECT * FROM jogos WHERE ID_jogo = ?", [jogoId]);
         if (jogosRows.length === 0) return res.status(404).json({ message: "Jogo não encontrado." });
 
-        const [categoriasRows] = await connection.execute("SELECT c.Nome FROM categoria_jogos cj JOIN categoria c ON cj.ID_categoria = c.ID_categoria WHERE cj.ID_jogo = ?", [req.params.id]);
-        const [generosRows] = await connection.execute("SELECT g.Nome FROM genero_jogos gj JOIN genero g ON gj.ID_genero = g.ID_genero WHERE gj.ID_jogo = ?", [req.params.id]);
-        const [midiasRows] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [req.params.id]);
+        const [categoriasRows] = await connection.execute("SELECT c.Nome FROM categoria_jogos cj JOIN categoria c ON cj.ID_categoria = c.ID_categoria WHERE cj.ID_jogo = ?", [jogoId]);
+        const [generosRows] = await connection.execute("SELECT g.Nome FROM genero_jogos gj JOIN genero g ON gj.ID_genero = g.ID_genero WHERE gj.ID_jogo = ?", [jogoId]);
+        const [midiasRows] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
 
-        const jogoCompleto = { ...jogosRows[0], categorias: categoriasRows.map(r => r.Nome), generos: generosRows.map(r => r.Nome), midias: midiasRows.map(r => r.URL_midia) };
+        const jogoCompleto = { 
+            ...jogosRows[0], 
+            categorias: categoriasRows.map(r => r.Nome), 
+            generos: generosRows.map(r => r.Nome), 
+            midias: midiasRows.map(r => r.URL_midia),
+            isInCart: false,
+            isInWishlist: false,
+            isOwned: false // Adicionamos este campo
+        };
+
+        if (userId) {
+            const [cartRows] = await connection.execute("SELECT 1 FROM carrinho_itens WHERE ID_usuario = ? AND ID_jogo = ?", [userId, jogoId]);
+            jogoCompleto.isInCart = cartRows.length > 0;
+
+            const [wishlistRows] = await connection.execute("SELECT 1 FROM lista_desejos WHERE ID_usuario = ? AND ID_jogo = ?", [userId, jogoId]);
+            jogoCompleto.isInWishlist = wishlistRows.length > 0;
+            
+            // **VERIFICAÇÃO DA BIBLIOTECA**
+            const [libraryRows] = await connection.execute("SELECT 1 FROM biblioteca WHERE ID_usuario = ? AND ID_jogo = ?", [userId, jogoId]);
+            jogoCompleto.isOwned = libraryRows.length > 0;
+        }
+
         res.status(200).json(jogoCompleto);
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar detalhes do jogo." }); }
-    finally { if (connection) connection.release(); }
+
+    } catch (err) { 
+        console.error("Erro em /jogos/:id:", err);
+        res.status(500).json({ message: "Erro ao buscar detalhes do jogo." }); 
+    }
+    finally { 
+        if (connection) connection.release(); 
+    }
 });
 
 app.get("/buscar-jogo", async (req, res) => {
@@ -253,6 +285,16 @@ app.get("/categorias", async (req, res) => {
     finally { if (connection) connection.release(); }
 });
 
+app.get("/generos", async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        const [generos] = await connection.execute("SELECT Nome FROM genero ORDER BY Nome ASC");
+        res.status(200).json(generos.map(g => g.Nome));
+    } catch (err) { res.status(500).json({ message: "Erro ao buscar gêneros." }); } 
+    finally { if (connection) connection.release(); }
+});
+
 app.get("/comentarios/:id", async (req, res) => {
     let connection;
     try {
@@ -272,7 +314,6 @@ app.get("/comentarios/:id", async (req, res) => {
     finally { if (connection) connection.release(); }
 });
 
-// ROTAS AUTENTICADAS (REQUEREM LOGIN)
 app.post("/comentarios", clerkAuthMiddleware, async (req, res) => {
     const { ID_jogo, txtcomentario, nota } = req.body;
     const ID_usuario = req.auth.userId;
@@ -337,14 +378,12 @@ app.post("/adicionar-jogo-file", clerkAuthMiddleware, isAdminMiddleware, upload.
         connection = await pool.getConnection();
         const { Nome_jogo, Descricao_jogo, Preco_jogo, Desconto_jogo, Logo_jogo, Capa_jogo, Faixa_etaria, categorias, generos } = req.body;
 
-        // --- ✅ AQUI ESTÁ A CORREÇÃO ---
-        // "Ensinamos" o backend a ler a string JSON enviada pelo frontend
+
         let categoriasArray = [];
         if (categorias) try { categoriasArray = JSON.parse(categorias); } catch (e) { console.error("Erro ao parsear categorias"); }
 
         let generosArray = [];
         if (generos) try { generosArray = JSON.parse(generos); } catch (e) { console.error("Erro ao parsear generos"); }
-        // --- FIM DA CORREÇÃO ---
 
         await connection.beginTransaction();
         const [gameResult] = await connection.execute(
@@ -394,13 +433,11 @@ app.put("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, upload.array("midi
         const categoriasArray = Array.isArray(categorias) ? categorias : (categorias ? [categorias] : []);
         const midiasExistentes = Array.isArray(existing_midias) ? existing_midias : (existing_midias ? [existing_midias] : []);
 
-        // 1. Atualiza os dados principais na tabela 'jogos' (sem alterações aqui)
         await connection.execute(
             `UPDATE jogos SET Nome_jogo = ?, Descricao_jogo = ?, Preco_jogo = ?, Desconto_jogo = ?, Logo_jogo = ?, Capa_jogo = ?, Faixa_etaria = ? WHERE ID_jogo = ?`,
             [Nome_jogo, Descricao_jogo, Preco_jogo, parseFloat(Desconto_jogo) || 0, Logo_jogo, Capa_jogo, Faixa_etaria, jogoId]
         );
 
-        // 2. Atualiza gêneros e categorias (sem alterações aqui)
         await connection.execute("DELETE FROM genero_jogos WHERE ID_jogo = ?", [jogoId]);
         if (generosArray.length > 0) {
             const placeholders = generosArray.map(() => '?').join(',');
@@ -415,17 +452,14 @@ app.put("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, upload.array("midi
             if (rows.length > 0) await connection.query("INSERT INTO categoria_jogos (ID_categoria, ID_jogo) VALUES ?", [rows.map(row => [row.ID_categoria, jogoId])]);
         }
 
-        // --- ✅ AQUI ESTÁ A CORREÇÃO ---
-        // 3. Gerencia as mídias com a consulta SQL correta
         const [midiasAntigas] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
         const midiasParaDeletar = midiasAntigas.filter(midia => !midiasExistentes.includes(midia.URL_midia));
 
         if (midiasParaDeletar.length > 0) {
             const urlsParaDeletar = midiasParaDeletar.map(m => m.URL_midia);
 
-            // Cria os placeholders (?) para a cláusula IN
             const placeholders = urlsParaDeletar.map(() => '?').join(',');
-            // Executa a deleção com os placeholders corretos
+
             await connection.execute(`DELETE FROM midias_jogo WHERE ID_jogo = ? AND URL_midia IN (${placeholders})`, [jogoId, ...urlsParaDeletar]);
 
             // Deleta os arquivos físicos do servidor
@@ -434,9 +468,7 @@ app.put("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, upload.array("midi
                 if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
             });
         }
-        // --- FIM DA CORREÇÃO ---
 
-        // 4. Adiciona as novas mídias que foram enviadas (sem alterações aqui)
         if (req.files && req.files.length > 0) {
             const midiasValues = req.files.map(file => [jogoId, `/uploads/${file.filename}`]);
             await connection.query("INSERT INTO midias_jogo (ID_jogo, URL_midia) VALUES ?", [midiasValues]);
@@ -468,7 +500,6 @@ app.delete("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, async (req, res
             if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
         });
 
-        // Deletar o jogo da tabela principal (o ON DELETE CASCADE cuidará do resto)
         const [result] = await connection.execute("DELETE FROM jogos WHERE ID_jogo = ?", [jogoId]);
 
         if (result.affectedRows === 0) {
@@ -487,7 +518,272 @@ app.delete("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, async (req, res
     }
 });
 
-// --- 7. INICIALIZAÇÃO DO SERVIDOR ---
+// Rota para ADICIONAR um jogo ao carrinho do usuário logado
+app.post("/carrinho/adicionar", clerkAuthMiddleware, async (req, res) => {
+    const { ID_jogo } = req.body;
+    const ID_usuario = req.auth.userId;
+
+    if (!ID_jogo) {
+        return res.status(400).json({ message: "ID do jogo é obrigatório." });
+    }
+
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        // INSERT IGNORE não insere se a chave primária (ID_usuario, ID_jogo) já existir.
+        await connection.execute(
+            "INSERT IGNORE INTO carrinho_itens (ID_usuario, ID_jogo) VALUES (?, ?)",
+            [ID_usuario, ID_jogo]
+        );
+        res.status(200).json({ message: "Jogo adicionado ao carrinho!" });
+    } catch (err) {
+        console.error("Erro ao adicionar ao carrinho:", err);
+        res.status(500).json({ message: "Erro interno ao adicionar jogo ao carrinho." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Rota para BUSCAR todos os jogos no carrinho do usuário logado
+app.get("/carrinho", clerkAuthMiddleware, async (req, res) => {
+    const ID_usuario = req.auth.userId;
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        const [itens] = await connection.execute(
+            `SELECT j.* FROM jogos j 
+             JOIN carrinho_itens ci ON j.ID_jogo = ci.ID_jogo 
+             WHERE ci.ID_usuario = ?`,
+            [ID_usuario]
+        );
+        res.status(200).json(itens);
+    } catch (err) {
+        console.error("Erro ao buscar carrinho:", err);
+        res.status(500).json({ message: "Erro interno ao buscar o carrinho." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Rota para REMOVER um jogo do carrinho (vamos precisar dela na página do carrinho)
+app.delete("/carrinho/remover/:jogoId", clerkAuthMiddleware, async (req, res) => {
+    const { jogoId } = req.params;
+    const ID_usuario = req.auth.userId;
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.execute(
+            "DELETE FROM carrinho_itens WHERE ID_usuario = ? AND ID_jogo = ?",
+            [ID_usuario, jogoId]
+        );
+        res.status(200).json({ message: "Jogo removido do carrinho." });
+    } catch (err) {
+        console.error("Erro ao remover do carrinho:", err);
+        res.status(500).json({ message: "Erro interno ao remover o jogo." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Rota para ADICIONAR um jogo à lista de desejos
+app.post("/desejos/adicionar", clerkAuthMiddleware, async (req, res) => {
+    const { ID_jogo } = req.body;
+    const ID_usuario = req.auth.userId;
+
+    if (!ID_jogo) {
+        return res.status(400).json({ message: "ID do jogo é obrigatório." });
+    }
+
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        // Usamos INSERT IGNORE para não dar erro se o jogo já estiver na lista
+        await connection.execute(
+            "INSERT IGNORE INTO lista_desejos (ID_usuario, ID_jogo) VALUES (?, ?)",
+            [ID_usuario, ID_jogo]
+        );
+        res.status(200).json({ message: "Jogo adicionado à Lista de Desejos!" });
+    } catch (err) {
+        console.error("Erro ao adicionar à lista de desejos:", err);
+        res.status(500).json({ message: "Erro interno do servidor." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Rota para BUSCAR todos os jogos na lista de desejos do usuário
+app.get("/desejos", clerkAuthMiddleware, async (req, res) => {
+    const ID_usuario = req.auth.userId;
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        const [jogos] = await connection.execute(
+            `SELECT j.* FROM jogos j 
+             JOIN lista_desejos ld ON j.ID_jogo = ld.ID_jogo 
+             WHERE ld.ID_usuario = ?`,
+            [ID_usuario]
+        );
+        res.status(200).json(jogos);
+    } catch (err) {
+        console.error("Erro ao buscar a lista de desejos:", err);
+        res.status(500).json({ message: "Erro interno ao buscar a lista." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Rota para REMOVER um jogo da lista de desejos
+app.delete("/desejos/remover/:jogoId", clerkAuthMiddleware, async (req, res) => {
+    const { jogoId } = req.params;
+    const ID_usuario = req.auth.userId;
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        await connection.execute(
+            "DELETE FROM lista_desejos WHERE ID_usuario = ? AND ID_jogo = ?",
+            [ID_usuario, jogoId]
+        );
+        res.status(200).json({ message: "Jogo removido da Lista de Desejos." });
+    } catch (err) {
+        console.error("Erro ao remover da lista de desejos:", err);
+        res.status(500).json({ message: "Erro interno do servidor." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+app.post('/criar-sessao-de-pagamento', clerkAuthMiddleware, async (req, res) => {
+    const userId = req.auth.userId;
+    let connection;
+
+    try {
+        connection = await pool.getConnection();
+
+        // 1. Busca os jogos do carrinho para calcular o total
+        const [jogosNoCarrinho] = await connection.execute(
+            `SELECT j.Nome_jogo, j.Preco_jogo, j.Desconto_jogo FROM jogos j
+             JOIN carrinho_itens ci ON j.ID_jogo = ci.ID_jogo
+             WHERE ci.ID_usuario = ?`,
+            [userId]
+        );
+
+        if (jogosNoCarrinho.length === 0) {
+            return res.status(400).json({ error: { message: "Seu carrinho está vazio." } });
+        }
+
+        // 2. Cria os 'line_items' para a API do Stripe
+        const line_items = jogosNoCarrinho.map(jogo => {
+            const preco = parseFloat(jogo.Preco_jogo);
+            const desconto = parseFloat(jogo.Desconto_jogo);
+            const precoFinal = desconto > 0 ? preco * (1 - desconto / 100) : preco;
+            const precoEmCentavos = Math.round(precoFinal * 100); 
+
+            return {
+                price_data: {
+                    currency: 'brl',
+                    product_data: {
+                        name: jogo.Nome_jogo,
+                    },
+                    unit_amount: precoEmCentavos,
+                },
+                quantity: 1,
+            };
+        });
+
+        // 3. Cria a sessão de checkout no Stripe
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: line_items,
+            mode: 'payment',
+            metadata: {
+                userId: userId 
+            },
+            success_url: `http://localhost:5173/src/front-end/sucesso.html?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `http://localhost:5173/src/front-end/carrinho.html`,
+        });
+
+        // 4. Envia o ID da sessão de volta para o front-end
+        res.json({ id: session.id });
+
+    } catch (error) {
+        console.error("Erro ao criar sessão de pagamento:", error);
+        res.status(500).json({ error: { message: "Não foi possível iniciar o pagamento." } });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+app.post('/verificar-pagamento', clerkAuthMiddleware, async (req, res) => {
+    const { sessionId } = req.body;
+    const userId = req.auth.userId;
+    let connection;
+
+    try {
+        // 1. Pergunta ao Stripe sobre a sessão
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+        // 2. Verifica se o status do pagamento é "pago"
+        if (session.payment_status === 'paid' && session.metadata.userId === userId) {
+            // Se o pagamento foi bem-sucedido, executa a mesma lógica do webhook
+            connection = await pool.getConnection();
+            await connection.beginTransaction();
+
+            const [jogosNoCarrinho] = await connection.execute('SELECT ID_jogo FROM carrinho_itens WHERE ID_usuario = ?', [userId]);
+            if (jogosNoCarrinho.length > 0) {
+                const jogosParaBiblioteca = jogosNoCarrinho.map(item => [userId, item.ID_jogo]);
+                await connection.query('INSERT IGNORE INTO biblioteca (ID_usuario, ID_jogo) VALUES ?', [jogosParaBiblioteca]);
+                await connection.execute('DELETE FROM carrinho_itens WHERE ID_usuario = ?', [userId]);
+            }
+            
+            await connection.commit();
+            console.log(`📚 Jogos liberados via verificação manual para o usuário: ${userId}`);
+            return res.status(200).json({ status: 'success', message: 'Pagamento verificado e jogos liberados!' });
+        } else {
+            // Se o pagamento não foi bem-sucedido ou o ID do usuário não bate
+            return res.status(400).json({ status: 'failed', message: 'Verificação de pagamento falhou.' });
+        }
+
+    } catch (error) {
+        console.error("Erro ao verificar pagamento:", error);
+        if (connection) await connection.rollback();
+        return res.status(500).json({ error: error.message });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+app.get('/biblioteca', clerkAuthMiddleware, async (req, res) => {
+    const userId = req.auth.userId;
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        const [jogos] = await connection.execute(
+            `SELECT j.ID_jogo, j.Nome_jogo, j.Capa_jogo FROM jogos j
+             JOIN biblioteca b ON j.ID_jogo = b.ID_jogo
+             WHERE b.ID_usuario = ?
+             ORDER BY j.Nome_jogo ASC`,
+            [userId]
+        );
+        res.status(200).json(jogos);
+    } catch (error) {
+        console.error("Erro ao buscar biblioteca:", error);
+        res.status(500).json({ message: "Erro ao buscar a biblioteca do usuário." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// --- INICIALIZAÇÃO DO SERVIDOR ---
 app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
+    (async () => {
+        try {
+            const connection = await pool.getConnection();
+            console.log("Pool de conexões com o banco de dados criado com sucesso!");
+            connection.release();
+            console.log(`Servidor rodando em http://localhost:${port}`);
+        } catch (err) {
+            console.error("ERRO FATAL: Não foi possível conectar ao banco de dados:", err.message);
+            process.exit(1);
+        }
+    })();
 });

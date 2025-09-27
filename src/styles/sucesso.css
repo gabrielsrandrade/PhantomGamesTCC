@@ -1,0 +1,13 @@
+@import "general.css";
+
+#status-pagamento{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--search-bar);
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+}

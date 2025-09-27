@@ -293,8 +293,8 @@ function renderNavbar({ isSignedIn, isAdmin }) {
                     </ul>
                     <form class="search-bar" id="search-form"><input type="search" placeholder="Pesquisar..." id="search-input"></form>
                     <div class="left">
-                        <a href="#"><img class="carrinho" src="../../assets/imagens/lista-desejos.png" alt="Carrinho"></a>
-                        <a href="#"><img class="carrinho" src="../../assets/imagens/carrinho.png" alt="Carrinho"></a>
+                        <a href="lista-desejos.html"><img class="carrinho" src="../../assets/imagens/lista-desejos.png" alt="Carrinho"></a>
+                        <a href="carrinho.html"><img class="carrinho" src="../../assets/imagens/carrinho.png" alt="Carrinho"></a>
                         <div id="user-button"></div>
                     </div>
                 </div>`;

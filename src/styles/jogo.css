@@ -150,13 +150,14 @@ main .sobre-jogo .detalhes-jogo #avaliacao {
 }
 
 #editar-jogo,
-#comprar {
+#comprar,#jogar
+ {
   background-color: var(--button-color);
 }
 
 
 #editar-jogo:hover,
-#comprar:hover {
+#comprar:hover,#jogar:hover {
   background-color: #1979c9;
 }
 
