@@ -33,9 +33,7 @@ selectTriggers.forEach(trigger => {
         }
 
         document.querySelectorAll('.filtro-content.show').forEach(openFiltro => {
-            if (openFiltro !== filtroContent) {
-                openFiltro.classList.remove('show');
-            }
+            openFiltro.classList.remove('show');
         });
 
         filtroContent.classList.toggle('show');

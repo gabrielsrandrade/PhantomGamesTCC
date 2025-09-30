@@ -76,6 +76,7 @@ CREATE TABLE lista_desejos(
 CREATE TABLE biblioteca(
     ID_usuario VARCHAR(50) NOT NULL,
     ID_jogo INT(5) NOT NULL,
+    data_adicao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (ID_usuario, ID_jogo),
     FOREIGN KEY (ID_usuario) REFERENCES usuario(ID_usuario) ON DELETE CASCADE,
     FOREIGN KEY (ID_jogo) REFERENCES jogos(ID_jogo) ON DELETE CASCADE

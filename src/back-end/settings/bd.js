@@ -758,7 +758,8 @@ app.get('/biblioteca', clerkAuthMiddleware, async (req, res) => {
     try {
         connection = await pool.getConnection();
         const [jogos] = await connection.execute(
-            `SELECT j.ID_jogo, j.Nome_jogo, j.Capa_jogo FROM jogos j
+            `SELECT j.ID_jogo, j.Nome_jogo, j.Capa_jogo, b.data_adicao 
+             FROM jogos j
              JOIN biblioteca b ON j.ID_jogo = b.ID_jogo
              WHERE b.ID_usuario = ?
              ORDER BY j.Nome_jogo ASC`,
