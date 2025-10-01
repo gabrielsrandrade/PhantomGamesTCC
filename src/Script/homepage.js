@@ -2,6 +2,8 @@
 
 // --- FUNÇÕES DE UTILIDADE (Mantidas aqui para garantir o escopo) ---
 
+// --- FUNÇÕES DE UTILIDADE (Mantidas aqui para garantir o escopo) ---
+
 function createRatingStars(mediaNota) {
     const numStars = 5;
     const rating = parseFloat(mediaNota) || 0;
@@ -22,15 +24,16 @@ function createRatingStars(mediaNota) {
 function createPriceHtml(preco, desconto) {
     const precoFloat = parseFloat(preco);
     const descontoFloat = parseFloat(desconto);
-    
-    if (descontoFloat > 0) {
-        const precoComDesconto = precoFloat - (precoFloat * descontoFloat / 100);
+
+    if (precoFloat === 0) {
+        return `<span class="preco-gratis" style="color: var(--selected-text-color);">Grátis</span>`;
+    } else if (descontoFloat > 0) {
+        const precoComDesconto = precoFloat * (1 - descontoFloat / 100);
         return `
             <span class="preco-original-riscado">R$ ${precoFloat.toFixed(2).replace('.', ',')}</span>
             <span class="preco-desconto" style="color: var(--button-color);">R$ ${precoComDesconto.toFixed(2).replace('.', ',')}</span>
+            <span class="desconto-tag">-${descontoFloat.toFixed(0)}%</span>
         `;
-    } else if (precoFloat === 0) {
-        return `<span class="preco-gratis" style="color: var(--selected-text-color);">Grátis</span>`;
     } else {
         return `<span class="preco-cheio">R$ ${precoFloat.toFixed(2).replace('.', ',')}</span>`;
     }
@@ -59,8 +62,8 @@ async function fetchAndDisplayHighlights() {
 
         destaques.forEach(game => {
             const gameCard = document.createElement("a");
-            gameCard.href = `jogo.html?id=${game.ID_jogo}`; 
-            gameCard.className = "swiper-slide destaques-card"; 
+            gameCard.href = `jogo.html?id=${game.ID_jogo}`;
+            gameCard.className = "swiper-slide destaques-card";
 
             const starsHtml = createRatingStars(game.Media_nota);
             const precoHtml = createPriceHtml(game.Preco_jogo, game.Desconto_jogo);
@@ -70,7 +73,7 @@ async function fetchAndDisplayHighlights() {
                 <div class="card-info">
                     <span class="nome_jogo_destaque">${game.Nome_jogo}</span>
                     ${starsHtml}
-                    <span class="preco_destaque">${precoHtml}</span>
+                    <span class="preco_destaque" style="display: flex; align-items: center;">${precoHtml}</span>
                 </div>
             `;
             cardsContainer.appendChild(gameCard);
@@ -78,17 +81,21 @@ async function fetchAndDisplayHighlights() {
 
         // INICIALIZA O SWIPER DIRETAMENTE AQUI, APÓS INJETAR OS ELEMENTOS
         new Swiper('.destaques-swiper', {
-            slidesPerView: 1,
-            spaceBetween: 10,
+            slidesPerView: 5,
+            spaceBetween: 41,
             loop: false,
+            centerSlide: true,
+            fade: true,
+            grabCursor: true,
             breakpoints: {
-                768: {
-                    slidesPerView: 3,
-                    spaceBetween: 30,
+                0: {
+                    slidesPerView: 2,
                 },
-                1200: {
-                    slidesPerView: 4, 
-                    spaceBetween: 30,
+                520: {
+                    slidesPerView: 3,
+                },
+                950: {
+                    slidesPerView: 5,
                 },
             },
             navigation: {
@@ -96,7 +103,7 @@ async function fetchAndDisplayHighlights() {
                 prevEl: '.swiper-button-prev',
             },
         });
-        
+
     } catch (error) {
         console.error("Falha ao carregar os destaques:", error);
         cardsContainer.innerHTML = '<p class="error-message">Erro ao carregar os destaques da semana.</p>';

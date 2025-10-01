@@ -294,4 +294,85 @@ h1 {
     }
 }
 
-@media (max-width: 1480px) {}
+/* estilo cards adicionados */
+
+.destaques_da_semana {
+    display: flex;
+    flex-direction: column;
+    max-width: 91rem;
+    width: 100%;
+    margin: 5rem auto;
+    gap: 1rem;
+    
+    .alinhar {
+        padding-left: 16px;
+    }
+}
+
+.destaques-swiper {
+    max-width: 91rem;
+    padding: 0 16px;
+    white-space: nowrap;
+    min-height: 25rem;
+}
+
+.destaques-card {
+    max-width: 15.75rem;
+    min-width: 15.75rem;
+    height: 28rem;
+    display: inline-flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    
+    /* gap: 0.5rem; */
+    /* Estilo Visual */
+    background-color: var(--card-color);
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    text-decoration: none;
+}
+
+.destaques-card:hover {
+    transform: translateY(-5px);
+}
+
+.capa_card_destaque {
+    width: auto;
+    height: 20rem;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 20px;
+    padding-bottom: 0 !important;
+}
+
+.card-info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.nome_jogo_destaque {
+    color: var(--selected-text-color);
+    font-size: 1.1rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.preco_destaque {
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Adicionado gap para espaçamento entre os preços */
+}
+
+.destaques-swiper .swiper-wrapper {
+    width: 100%; 
+}
