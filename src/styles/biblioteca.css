@@ -5,6 +5,7 @@
     margin: 2rem 1.5rem;
 }
 
+/*filtro*/
 .filtros {
     display: flex;
     flex-direction: column;
@@ -12,98 +13,126 @@
     max-width: 89rem;
     margin: 5rem auto;
     gap: 1rem;
+    border-radius: 0.75rem;
+}
 
-    .all-filters {
-        display: flex;
-        justify-content: flex-start;
-        gap: 1rem;
+.all-filters {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1.5rem;
+}
+
+.filtro {
+    position: relative;
+}
+
+.select {
+    max-width: 22rem;
+    min-width: 22rem;
+    height: 3.5rem;
+    color: #8A8D91;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1001;
+}
+
+.select .select-text {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.filtro-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    max-width: 22rem;
+    min-width: 22rem;
+    border-radius: 0.5rem;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    overflow-y: auto;
+    max-height: 20rem;
+    margin-top: 2px;
+    top: 0; /* Alinha ao topo do .select */
+    left: 100%; /* Posiciona à direita do .select */
+}
+
+.filtro-content[data-filtro-name="order-by"] ul {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    list-style: none;
+    padding: 0.5rem 0;
+    margin: 0;
+}
+
+.filtro-content[data-filtro-name="order-by"] a.dropdown-item {
+    color: #ffffff;
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    text-decoration: none;
+    display: block;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+.filtro-content[data-filtro-name="order-by"] a.dropdown-item:hover {
+    color: #ffffff;
+}
+
+.filtro-content.show {
+    display: block;
+    opacity: 1;
+}
+
+::-webkit-scrollbar {
+    background-color: transparent;
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #3a4050;
+    border-radius: 8px;
+}
+
+@media (max-width: 600px) {
+    .filtros {
+        min-width: 100%;
+        margin: 2rem auto;
+        padding: 1rem;
+    }
+
+    .filtros h1 {
+        font-size: 1.2rem;
     }
 
     .select {
-        max-width: 20.938rem;
-        min-width: 20.938rem;
-        height: 3.875rem;
-        background: none;
-        color: var(--non-selected-color);
-        border: 2px solid var(--navbar-color);
-        border-radius: 1rem;
-        cursor: pointer;
-        outline: none;
-        transition: background-color 0.3s ease, box-shadow 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 1rem;
-    }
-
-    .select:hover {
-        border: 2px solid var(--non-selected-color);
-        transition: 0.3s;
+        padding: 10px 20px;
+        font-size: 0.9em;
+        min-width: 160px;
+        max-width: 160px;
     }
 
     .filtro-content {
-        display: none;
-        max-width: 20.938rem;
-        height: auto;
-        background: none;
-        border: 2px solid var(--navbar-color);
-        z-index: 1;
-        border-radius: 1rem;
-        overflow: hidden;
-        margin-top: 2px;
-        left: 0;
-        opacity: 0;
-        overflow-y: auto;
+        min-width: 160px;
+        max-width: 160px;
+        left: 100%; /* Mantém o posicionamento à direita */
+        margin-left: 0.5rem; /* Ajuste de espaçamento em telas menores */
     }
 
-    ::-webkit-scrollbar {
-        background-color: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background-color: var(--navbar-color);
-        border-radius: 8px;
-    }
-
-    .filtro-content ul {
-        display: flex;
-        flex-direction: column;
-        align-items: start;
-    }
-
-    .filtro-content li {
-        color: var(--non-selected-color);
-        padding: 8px;
-        display: block;
-        cursor: pointer;
-        background: none;
-    }
-
-    .filtro-content li:hover {
-        color: #ffffff;
-    }
-
-    .filtro-content.show {
-        display: block;
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    @media (max-width: 600px) {
-        .select {
-            padding: 10px 20px;
-            font-size: 0.9em;
-            min-width: 160px;
-        }
-
-        .filtro-content {
-            min-width: 160px;
-        }
-
-        .filtro-content li {
-            padding: 10px 14px;
-            font-size: 0.9em;
-        }
+    .filtro-content a.dropdown-item {
+        padding: 10px 14px;
+        font-size: 0.9em;
     }
 }
 

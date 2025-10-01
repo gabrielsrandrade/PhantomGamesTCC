@@ -21,7 +21,6 @@
   <h1 class="titulo-biblioteca">Minha Biblioteca</h1>
 
   <form class="filtros">
-    <h1>Filtros</h1>
     <div class="all-filters">
       <div class="filtro">
         <div class="select">
@@ -30,13 +29,14 @@
         </div>
         <div class="filtro-content" data-filtro-name="order-by">
           <ul>
-            <li data-value="a-z">A-Z</li>
-            <li data-value="z-a">Z-A</li>
-            <li data-value="most-recent">Mais recentes</li>
-            <li data-value="most-old">Mais antigos</li>
+            <a class="dropdown-item" data-filter="order-by" data-value="a-z">A-Z</a>
+            <a class="dropdown-item" data-filter="order-by" data-value="z-a">Z-A</a>
+            <a class="dropdown-item" data-filter="order-by" data-value="recent-old">Mais recentes</a>
+            <a class="dropdown-item" data-filter="order-by" data-value="old-recent">Mais antigos</a>
           </ul>
         </div>
       </div>
+    </div>
   </form>
 
   <section class="cards_principais">
