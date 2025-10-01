@@ -765,6 +765,7 @@ app.get('/biblioteca', clerkAuthMiddleware, async (req, res) => {
              ORDER BY j.Nome_jogo ASC`,
             [userId]
         );
+        console.log("Dados retornados pela biblioteca:", jogos); // Adicione este log
         res.status(200).json(jogos);
     } catch (error) {
         console.error("Erro ao buscar biblioteca:", error);
