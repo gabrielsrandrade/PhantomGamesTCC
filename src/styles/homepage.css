@@ -151,6 +151,7 @@ h1 {
                 border-radius: 20px;
             }
         }
+
     }
 
     .card_jogo:hover {
@@ -294,7 +295,3 @@ h1 {
 }
 
 @media (max-width: 1480px) {}
-    
-
-
-

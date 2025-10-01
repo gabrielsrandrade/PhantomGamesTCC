@@ -38,121 +38,22 @@
     </div>
 
     <!-- cards destaques da semana -->
-    <section class="cards_principais">
-      <h1 class="alinhar">Destaques da Semana</h1>
-
-      <div class="swiper card_jogos">
-        <div class="swiper-wrapper">
-          <div class="card_jogo swiper-slide">
-            <div class="capa_card"></div>
-            <span>god of war: ragnarok</span>
-            <div class="estrelas">
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-            </div>
-            <span>R$200</span>
-          </div>
-
-          <div class="card_jogo swiper-slide">
-            <div class="capa_card"></div>
-            <span>god of war: ragnarok</span>
-            <div class="estrelas">
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-            </div>
-            <span>R$200</span>
-          </div>
-
-          <div class="card_jogo swiper-slide">
-            <div class="capa_card"></div>
-            <span>god of war: ragnarok</span>
-            <div class="estrelas">
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-            </div>
-            <span>R$200</span>
-          </div>
-
-          <div class="card_jogo swiper-slide">
-            <div class="capa_card"></div>
-            <span>god of war: ragnarok</span>
-            <div class="estrelas">
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-            </div>
-            <span>R$200</span>
-          </div>
-
-          <div class="card_jogo swiper-slide">
-            <div class="capa_card"></div>
-            <span>god of war: ragnarok</span>
-            <div class="estrelas">
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-            </div>
-            <span>R$200</span>
-          </div>
-
-          <div class="card_jogo swiper-slide">
-            <div class="capa_card"></div>
-            <span>god of war: ragnarok</span>
-            <div class="estrelas">
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-            </div>
-            <span>R$200</span>
-          </div>
-
-          <div class="card_jogo swiper-slide">
-            <div class="capa_card"></div>
-            <span>god of war: ragnarok</span>
-            <div class="estrelas">
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-            </div>
-            <span>R$200</span>
-          </div>
-
-          <div class="card_jogo swiper-slide">
-            <div class="capa_card"></div>
-            <span>god of war: ragnarok</span>
-            <div class="estrelas">
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-              <span class="star">&#9733;</span>
-            </div>
-            <span>R$200</span>
-          </div>
-        </div>
-
-        <div class="swiper-button-next swiper-navBtn"></div>
-        <div class="swiper-button-prev swiper-navBtn"></div>
-        <!--<div class="swiper-pagination"></div> -->
+    <section class="destaques_da_semana">
+      <h1>Destaques da Semana</h1>
+      <div
+          style="
+          --swiper-navigation-color: #ffffff;
+          --swiper-pagination-color: #ffffff;
+          "
+          class="swiper card_jogos destaques-swiper"
+      >
+          <div class="swiper-wrapper" id="destaques-cards-container">
+              </div>
+  
+          <div class="swiper-button-next swiper-navBtn"></div>
+          <div class="swiper-button-prev swiper-navBtn"></div>
       </div>
-    </section>
+  </section>
 
     <!--cards jogos grátis-->
     <section class="gratis">
@@ -378,9 +279,10 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="../Script/slider.js"></script>
+    <script src="../Script/slider.js"></script> 
     <script type="module" src="../Script/auth.js"></script>
     <script type="module" src="../Script/navbar.js"></script>
     <script type="module" src="../Script/userbutton.js" defer></script>
+    <script type="module" src="../Script/homepage.js"></script>
   </body>
 </html>

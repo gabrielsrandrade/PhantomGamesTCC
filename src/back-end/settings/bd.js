@@ -774,6 +774,41 @@ app.get('/biblioteca', clerkAuthMiddleware, async (req, res) => {
     }
 });
 
+app.get('/jogos-destaques', async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+
+        // 1. Calcular um peso de popularidade: 
+        // Aqui, combinamos a Média da Nota (já presente na tabela 'jogos') com a 
+        // Contagem de Comentários para dar um peso maior aos jogos mais comentados e bem avaliados.
+        // LIMIT 7 garante no máximo 7 jogos para o Swiper.
+        const [destaques] = await connection.execute(
+            `SELECT 
+                j.ID_jogo, 
+                j.Nome_jogo, 
+                j.Capa_jogo, 
+                j.Preco_jogo,
+                j.Desconto_jogo,
+                j.Media_nota,
+                COUNT(c.ID_comentario) as total_comentarios
+             FROM jogos j
+             LEFT JOIN comentario c ON j.ID_jogo = c.ID_jogo
+             GROUP BY j.ID_jogo, j.Nome_jogo, j.Capa_jogo, j.Preco_jogo, j.Desconto_jogo, j.Media_nota
+             ORDER BY j.Media_nota DESC, total_comentarios DESC
+             LIMIT 7`
+        );
+        
+        res.status(200).json(destaques);
+
+    } catch (error) {
+        console.error("Erro ao buscar jogos em destaque:", error);
+        res.status(500).json({ message: "Erro ao buscar os jogos em destaque." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
 // --- INICIALIZAÇÃO DO SERVIDOR ---
 app.listen(port, () => {
     (async () => {
