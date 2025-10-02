@@ -195,3 +195,16 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchAndDisplayFreeGames();
     fetchAndDisplayPromotions();
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetchAndDisplayHighlights();
+    fetchAndDisplayFreeGames();
+    fetchAndDisplayPromotions();
+});
+
+// Adicione isso aqui para atualizar automaticamente após adição de jogo
+document.addEventListener("gameUpdated", () => {
+    fetchAndDisplayHighlights();
+    fetchAndDisplayFreeGames();
+    fetchAndDisplayPromotions();
+});

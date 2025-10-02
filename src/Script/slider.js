@@ -59,6 +59,14 @@ async function initializeCarousel() {
       }
     });
 
+    async function initializeCarousel() {
+      images = await fetchDataFromAPI();
+      
+      if (images && images.length > 0) {
+        updateCarousel(0);
+        startAutoSlide();
+      }};
+
   } else {
     if (carrosselContainer) {
       carrosselContainer.innerHTML = '<p style="color:white; text-align:center; width:100%; height: 36rem; display: flex; align-items: center; justify-content: center;">Não foi possível carregar os jogos do carrossel.</p>';
@@ -100,3 +108,7 @@ function updateCarousel(index) {
 }
 
 initializeCarousel();
+
+document.addEventListener("gameUpdated", () => {
+  initializeCarousel();  // Recarrega o carrossel com dados frescos
+});

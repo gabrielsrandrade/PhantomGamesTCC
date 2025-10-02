@@ -124,6 +124,8 @@ h1 {
 
             cursor: pointer;
 
+            
+
             .preco {
                 display: flex;
                 gap: 16px;
@@ -167,7 +169,7 @@ h1 {
 
     }
 
-    .destaques-card:hover {
+    .card_jogo:hover{
         transform: translateY(-5px);
     }
 }

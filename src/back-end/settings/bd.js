@@ -880,6 +880,7 @@ app.get('/jogos-carrossel', async (req, res) => {
             SELECT 
                 j.ID_jogo, 
                 j.Preco_jogo,
+                j.Desconto_jogo,
                 (SELECT m.URL_midia 
                  FROM midias_jogo m 
                  WHERE m.ID_jogo = j.ID_jogo 
