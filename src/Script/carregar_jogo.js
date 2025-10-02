@@ -5,11 +5,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const filters = {};
 
-  // Função para limpar os parâmetros da URL sem recarregar a página
+
   const limparUrl = () => {
       const url = new URL(window.location.href);
-      if (url.search) { // Apenas executa se houver parâmetros na URL
-        // history.replaceState(null, '', window.location.pathname);
+      if (url.search) {
         url.search = '';
         window.history.pushState({}, '', url);
       }
@@ -103,14 +102,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   };
 
-  // --- Lógica de eventos ---
   document.addEventListener("gameUpdated", () => {
     fetchAndDisplayGames();
   });
 
   document.addEventListener("searchSubmitted", (event) => {
     const query = event.detail.query;
-    limparUrl(); // Limpa a URL antes de fazer uma nova busca
+    limparUrl(); 
     fetchAndDisplayGames({ query });
   });
 
@@ -123,11 +121,11 @@ document.addEventListener("DOMContentLoaded", () => {
         delete filters[filterName];
     }
     
-    limparUrl(); // Limpa a URL ao aplicar/limpar um filtro
+    limparUrl();
     fetchAndDisplayGames(filters);
   });
 
-  // --- Lógica de inicialização da página ---
+
   const urlParams = new URLSearchParams(window.location.search);
   const initialQuery = urlParams.get("query");
 
@@ -137,6 +135,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       fetchAndDisplayGames({ query: initialQuery });
   } else {
-      fetchAndDisplayGames(); // Carrega todos os jogos se não houver query
+      fetchAndDisplayGames(); 
   }
 });

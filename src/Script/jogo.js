@@ -1,7 +1,7 @@
 import { initializeAuth, clerk } from "./auth.js";
 import { setupMultiselect } from "./multiselect.js";
 
-// --- FUNÇÕES DE UTILIDADE (MODAIS) ---
+//FUNÇÕES DE UTILIDADE (MODAIS)
 function showMessage(message, type = "success") {
     const modal = document.createElement("div");
     modal.className = `custom-message-modal ${type}`;
@@ -148,14 +148,12 @@ async function createEditModal(gameData) {
   const mediaCountSpan = modal.querySelector("#media-count-edit");
 
   const renderMediaPreviews = () => {
-    // 1. Limpa COMPLETAMENTE o container. Esta é a correção principal.
     mediaPreviewContainer.innerHTML = "";
 
-    // 2. Atualiza o contador de mídias
     mediaCountSpan.textContent =
       existingMidiasToKeep.length + newMediaFiles.length;
 
-    // 3. Renderiza as mídias existentes (se houver)
+    // Renderiza as mídias existentes (se houver)
     mediaPreviewContainer.innerHTML += "<h4>Mídias Atuais</h4>";
     if (existingMidiasToKeep.length === 0) {
       mediaPreviewContainer.innerHTML += "<p>Nenhuma mídia existente.</p>";
@@ -173,12 +171,12 @@ async function createEditModal(gameData) {
 
         item.querySelector(".remove-media-btn").onclick = () => {
           existingMidiasToKeep = existingMidiasToKeep.filter((u) => u !== url);
-          renderMediaPreviews(); // Chama a si mesma para redesenhar a lista atualizada
+          renderMediaPreviews();
         };
         mediaPreviewContainer.appendChild(item);
       });
     }
-    // 4. Renderiza as novas mídias (se houver)
+    //Renderiza as novas mídias (se houver)
     if (newMediaFiles.length > 0) {
       mediaPreviewContainer.innerHTML += "<h4>Novas Mídias</h4>";
       newMediaFiles.forEach((file, index) => {
@@ -488,7 +486,7 @@ function renderActionButtons(isSignedIn, isAdmin, gameData) {
             }
         });
         
-    // --- Lógica para Usuário Deslogado ---
+    //Lógica para Usuário Deslogado
     } else {
         buttonWrapper.innerHTML = `
             <button id="comprar">Comprar</button>
@@ -688,15 +686,13 @@ async function main() {
 
     try {
         const authData = await initializeAuth();
-        const headers = {}; // Cria um objeto de headers
+        const headers = {};
         
-        // Se o usuário estiver logado, adiciona o token de autorização
         if (authData.isSignedIn) {
             const token = await clerk.session.getToken();
             headers['Authorization'] = `Bearer ${token}`;
         }
 
-        // A chamada fetch agora inclui os headers
         const gameRes = await fetch(`http://localhost:3000/jogos/${jogoId}`, { headers });
         
         if (!gameRes.ok) throw new Error(`Jogo não encontrado (ID: ${jogoId})`);

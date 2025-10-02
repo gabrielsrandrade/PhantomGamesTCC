@@ -27,7 +27,6 @@ function showCustomMessage(message) {
 
 // Função principal que cria e gerencia o modal de adicionar jogo
 async function createAddGameModal() {
-    // 1. Buscar dados dinâmicos do backend ANTES de renderizar o modal
     let generos = [];
     let categorias = [];
     try {
@@ -237,29 +236,24 @@ async function createAddGameModal() {
 }
 
 // Lógica da Barra de Navegação e da Busca
-// ##### INÍCIO DA CORREÇÃO #####
 function handleSearch(event) {
     event.preventDefault();
     const searchInput = document.getElementById("search-input");
-    const query = searchInput.value.trim(); // Usa trim() para ignorar espaços em branco
+    const query = searchInput.value.trim();
 
-    if (!query) { // Se a busca for vazia, não faz nada
+    if (!query) { 
         return;
     }
 
-    // Verifica se a página atual é a 'navegar.html'
     const isNavegarPage = window.location.pathname.includes("navegar.html");
 
     if (isNavegarPage) {
-        // Se já está na página, apenas dispara um evento para ela mesma lidar com a busca
         const customEvent = new CustomEvent("searchSubmitted", { detail: { query } });
         document.dispatchEvent(customEvent);
     } else {
-        // Se está em outra página, redireciona para 'navegar.html' com a query na URL
         window.location.href = `navegar.html?query=${encodeURIComponent(query)}`;
     }
 }
-// ##### FIM DA CORREÇÃO #####
 
 
 function renderNavbar({ isSignedIn, isAdmin }) {
@@ -315,11 +309,9 @@ function renderNavbar({ isSignedIn, isAdmin }) {
 
     navbar.innerHTML = navbarHTML;
 
-    // Adiciona event listeners após a renderização
     const searchForm = document.getElementById("search-form");
     if (searchForm) searchForm.addEventListener("submit", handleSearch);
     
-    // Adiciona listener para limpar a busca se o campo ficar vazio
     const searchInput = document.getElementById("search-input");
     if (searchInput && window.location.pathname.includes('navegar.html')) {
         searchInput.addEventListener('input', () => {

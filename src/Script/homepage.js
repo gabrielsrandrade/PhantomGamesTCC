@@ -1,46 +1,40 @@
-// homepage.js (Conteúdo Corrigido)
-
-// --- FUNÇÕES DE UTILIDADE (Mantidas aqui para garantir o escopo) ---
-
-// --- FUNÇÕES DE UTILIDADE (Mantidas aqui para garantir o escopo) ---
-
-function createRatingStars(mediaNota) {
-    const numStars = 5;
-    const rating = parseFloat(mediaNota) || 0;
-    const percentage = (rating / 5) * 100;
-
-    return `
-        <div class="estrelas-container">
-            <div class="star-empty">
-                ${'&#9733;'.repeat(numStars)}
-            </div>
-            <div class="star-filled" style="width: ${percentage}%;">
-                ${'&#9733;'.repeat(numStars)}
-            </div>
-        </div>
-    `;
-}
-
 function createPriceHtml(preco, desconto) {
     const precoFloat = parseFloat(preco);
     const descontoFloat = parseFloat(desconto);
 
     if (precoFloat === 0) {
-        return `<span class="preco-gratis" style="color: var(--selected-text-color);">Grátis</span>`;
-    } else if (descontoFloat > 0) {
-        const precoComDesconto = precoFloat * (1 - descontoFloat / 100);
-        return `
-            <span class="preco-original-riscado">R$ ${precoFloat.toFixed(2).replace('.', ',')}</span>
-            <span class="preco-desconto" style="color: var(--button-color);">R$ ${precoComDesconto.toFixed(2).replace('.', ',')}</span>
-            <span class="desconto-tag">-${descontoFloat.toFixed(0)}%</span>
-        `;
-    } else {
-        return `<span class="preco-cheio">R$ ${precoFloat.toFixed(2).replace('.', ',')}</span>`;
+        return `<span class="preco-gratis">Grátis</span>`;
     }
+    
+    if (descontoFloat > 0) {
+        const precoComDesconto = precoFloat * (1 - descontoFloat / 100);
+        // ADICIONAMOS A TAG DE DESCONTO AQUI
+        return `
+        <span class="promocao">R$ ${precoFloat.toFixed(2).replace('.', ',')}</span>
+        <span>R$ ${precoComDesconto.toFixed(2).replace('.', ',')}</span>
+        <span class="desconto-tag">-${descontoFloat.toFixed(0)}%</span>
+        `;
+    }
+    
+    return `<span>R$ ${precoFloat.toFixed(2).replace('.', ',')}</span>`;
 }
 
+function createRatingStars(mediaNota) {
+    const averageRating = mediaNota ? parseFloat(mediaNota) : 0;
+    const totalStars = 5;
+    const ratingForDisplay = averageRating / 2;
+    const ratingPercentage = (ratingForDisplay / totalStars) * 100;
+    const starsHtml = '&#9733;'.repeat(totalStars);
 
-// --- LÓGICA PRINCIPAL DE CARREGAMENTO DOS DESTAQUES ---
+    const starsHtmlComplete = `
+        <div class="estrelas-container" data-avaliacao="${averageRating.toFixed(1)}">
+            <div class="star-empty">${starsHtml}</div>
+            <div class="star-filled" style="width: ${ratingPercentage}%;">${starsHtml}</div>
+        </div>
+    `;
+
+    return starsHtmlComplete;
+}
 
 async function fetchAndDisplayHighlights() {
     const cardsContainer = document.getElementById("destaques-cards-container");
@@ -48,67 +42,156 @@ async function fetchAndDisplayHighlights() {
 
     try {
         const response = await fetch("http://localhost:3000/jogos-destaques");
-        if (!response.ok) {
-            throw new Error(`Erro HTTP ao buscar destaques: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
         const destaques = await response.json();
 
-        if (destaques.length === 0) {
-            cardsContainer.innerHTML = '<p class="error-message">Nenhum destaque encontrado esta semana.</p>';
+        if (!destaques || destaques.length === 0) {
+            cardsContainer.innerHTML = '<p class="error-message">Nenhum destaque encontrado.</p>';
             return;
         }
 
-        cardsContainer.innerHTML = ''; // Limpa o container
+        cardsContainer.innerHTML = '';
+        const backendUrl = 'http://localhost:3000';
 
         destaques.forEach(game => {
             const gameCard = document.createElement("a");
             gameCard.href = `jogo.html?id=${game.ID_jogo}`;
-            gameCard.className = "swiper-slide destaques-card";
+            gameCard.className = "card_jogo swiper-slide"; 
 
-            const starsHtml = createRatingStars(game.Media_nota);
+            let imageUrl = game.Capa_jogo;
+            if (imageUrl && imageUrl.startsWith('/')) imageUrl = `${backendUrl}${imageUrl}`;
+
+            const estrelasHtml = createRatingStars(game.Media_nota);
             const precoHtml = createPriceHtml(game.Preco_jogo, game.Desconto_jogo);
 
             gameCard.innerHTML = `
-                <div class="capa_card_destaque" style="background-image: url('${game.Capa_jogo}')"></div>
-                <div class="card-info">
-                    <span class="nome_jogo_destaque">${game.Nome_jogo}</span>
-                    ${starsHtml}
-                    <span class="preco_destaque" style="display: flex; align-items: center;">${precoHtml}</span>
+                <div class="capa_card" style="background-image: url('${imageUrl}')"></div>
+                <span>${game.Nome_jogo}</span>
+                ${estrelasHtml}
+                <div class="preco">${precoHtml}</div>
+            `;
+            cardsContainer.appendChild(gameCard);
+        });
+
+        new Swiper('.destaques-swiper', {
+            slidesPerView: 5, spaceBetween: 41, loop: destaques.length > 5, grabCursor: true,
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+            breakpoints: { 0: { slidesPerView: 2 }, 520: { slidesPerView: 3 }, 950: { slidesPerView: 5 } },
+        });
+
+    } catch (error) {
+        console.error("Falha ao carregar os destaques:", error);
+        cardsContainer.innerHTML = '<p class="error-message">Erro ao carregar os destaques.</p>';
+    }
+}
+
+async function fetchAndDisplayFreeGames() {
+    const cardsContainer = document.getElementById("free-games-container");
+    if (!cardsContainer) return;
+
+    try {
+        const response = await fetch("http://localhost:3000/jogos-gratis");
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+        const freeGames = await response.json();
+
+        if (!freeGames || freeGames.length === 0) {
+            cardsContainer.innerHTML = '<p class="error-message">Nenhum jogo grátis encontrado.</p>';
+            return;
+        }
+
+        cardsContainer.innerHTML = '';
+        const backendUrl = 'http://localhost:3000';
+
+        freeGames.forEach(game => {
+            const descriptionSnippet = game.Descricao_jogo ? game.Descricao_jogo.substring(0, 500)  : 'Descrição não disponível.';
+            const gameCard = document.createElement("div");
+            gameCard.className = "card_jogo swiper-slide";
+
+            const rawImageUrl = game.Primeira_Midia || game.Capa_jogo;
+            let imageUrl = rawImageUrl;
+            if (imageUrl && imageUrl.startsWith('/')) imageUrl = `${backendUrl}${rawImageUrl}`;
+
+            gameCard.innerHTML = `
+                <div class="capa-container">
+                    <img class="capa_card" src="${imageUrl}" alt="">
+                </div>
+                <div class="info_card_gratis">
+                    <span class="titulo_jogo">${game.Nome_jogo}</span>
+                    <span class="info_jogo">${descriptionSnippet}</span>
+                    <div class="bottom_side">
+                        <a href="jogo.html?id=${game.ID_jogo}" style="text-decoration: none;">
+                            <button>Jogue Agora</button>
+                        </a>
+                    </div>
                 </div>
             `;
             cardsContainer.appendChild(gameCard);
         });
 
-        // INICIALIZA O SWIPER DIRETAMENTE AQUI, APÓS INJETAR OS ELEMENTOS
-        new Swiper('.destaques-swiper', {
-            slidesPerView: 5,
-            spaceBetween: 41,
-            loop: false,
-            centerSlide: true,
-            fade: true,
-            grabCursor: true,
-            breakpoints: {
-                0: {
-                    slidesPerView: 2,
-                },
-                520: {
-                    slidesPerView: 3,
-                },
-                950: {
-                    slidesPerView: 5,
-                },
-            },
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
+        new Swiper('.card_jogos2', {
+            slidesPerView: 2, spaceBetween: 16, slidesPerGroup: 2, loop: freeGames.length > 2, grabCursor: true,
+            pagination: { el: ".swiper-pagination", clickable: true, dynamicBullets: true },
+            navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+            breakpoints: { 0: { slidesPerView: 1, slidesPerGroup: 1 }, 520: { slidesPerView: 2, slidesPerGroup: 2 }, 950: { slidesPerView: 2, slidesPerGroup: 2 } },
         });
 
     } catch (error) {
-        console.error("Falha ao carregar os destaques:", error);
-        cardsContainer.innerHTML = '<p class="error-message">Erro ao carregar os destaques da semana.</p>';
+        console.error("Falha ao carregar jogos grátis:", error);
+        cardsContainer.innerHTML = '<p class="error-message">Erro ao carregar jogos grátis.</p>';
     }
 }
 
-// Ponto de entrada: Garante que a função só roda depois que o HTML estiver carregado
-document.addEventListener("DOMContentLoaded", fetchAndDisplayHighlights);
+async function fetchAndDisplayPromotions() {
+    const cardsContainer = document.getElementById("promocoes-cards-container");
+    if (!cardsContainer) return;
+
+    try {
+        const response = await fetch("http://localhost:3000/jogos-promocoes");
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+        const promotions = await response.json();
+
+        if (!promotions || promotions.length === 0) {
+            cardsContainer.innerHTML = '<p class="error-message">Nenhuma promoção encontrada.</p>';
+            return;
+        }
+
+        cardsContainer.innerHTML = '';
+        const backendUrl = 'http://localhost:3000';
+
+        promotions.forEach(game => {
+            const gameCard = document.createElement("a");
+            gameCard.href = `jogo.html?id=${game.ID_jogo}`;
+            gameCard.className = "card_jogo swiper-slide";
+
+            let imageUrl = game.Capa_jogo;
+            if (imageUrl && imageUrl.startsWith('/')) imageUrl = `${backendUrl}${imageUrl}`;
+
+            const estrelasHtml = createRatingStars(game.Media_nota);
+            const precoHtml = createPriceHtml(game.Preco_jogo, game.Desconto_jogo);
+
+            gameCard.innerHTML = `
+                <div class="capa_card" style="background-image: url('${imageUrl}')"></div>
+                <span>${game.Nome_jogo}</span>
+                ${estrelasHtml}
+                <div class="preco">${precoHtml}</div>
+            `;
+            cardsContainer.appendChild(gameCard);
+        });
+
+        new Swiper('.card_jogos3', {
+            slidesPerView: 5, spaceBetween: 41, loop: promotions.length > 5, grabCursor: true,
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+            breakpoints: { 0: { slidesPerView: 2 }, 520: { slidesPerView: 3 }, 950: { slidesPerView: 5 } },
+        });
+
+    } catch (error) {
+        console.error("Falha ao carregar promoções:", error);
+        cardsContainer.innerHTML = '<p class="error-message">Erro ao carregar promoções.</p>';
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    fetchAndDisplayHighlights();
+    fetchAndDisplayFreeGames();
+    fetchAndDisplayPromotions();
+});

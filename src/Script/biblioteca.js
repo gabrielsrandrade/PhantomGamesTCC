@@ -23,7 +23,22 @@ async function carregarBiblioteca() {
     // Adicionamos a busca pelos elementos de UI aqui, pois vamos usá-los no listener
     const select = document.querySelector('.select');
     const dropdown = document.querySelector('.filtro-content');
-    const selectText = document.querySelector('.select-text'); // ELEMENTO DO TEXTO
+    const selectValue = document.querySelector('.select-value');
+
+     if (select && dropdown) {
+        select.addEventListener('click', (event) => {
+            // Impede que o clique no select feche o menu imediatamente
+            event.stopPropagation(); 
+            dropdown.classList.toggle('show');
+        });
+    }
+
+    // Adiciona um listener para fechar o dropdown se o usuário clicar fora dele
+    document.addEventListener('click', () => {
+        if (dropdown && dropdown.classList.contains('show')) {
+            dropdown.classList.remove('show');
+        }
+    });
 
     try {
         if (!clerk.session) {
@@ -61,9 +76,10 @@ async function carregarBiblioteca() {
             const filterName = item.dataset.filter;
             const filterValue = item.dataset.value;
 
-            if (selectText) {
-                 selectText.textContent = `Classificado por: ${item.textContent}`;
+            if (selectValue) {
+                selectValue.textContent = item.textContent;
             }
+            
 
             if (dropdown) dropdown.classList.remove('show');
             if (select) select.classList.remove('active');

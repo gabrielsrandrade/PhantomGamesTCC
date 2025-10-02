@@ -1,6 +1,6 @@
 import { clerk, waitForAuthReady } from "./auth.js";
 
-// --- FUNÇÕES DE UTILIDADE (MODAIS) ---
+//FUNÇÕES DE UTILIDADE (MODAIS)
 function showMessage(message, type = "success") {
     const modal = document.createElement("div");
     modal.className = `custom-message-modal ${type}`;
@@ -31,7 +31,6 @@ function createConfirmModal(message) {
 }
 
 
-// --- LÓGICA DA PÁGINA ---
 document.addEventListener("DOMContentLoaded", async () => {
     const authData = await waitForAuthReady(); // ESPERA O SINAL VERDE
 
@@ -55,12 +54,10 @@ async function carregarCarrinho() {
     const containerValorTotal = document.querySelector('.total .valor p');
 
     try {
-        // TRAVA DE SEGURANÇA: Garante que a sessão está ativa ANTES de pegar o token.
         if (!clerk.session) {
              throw new Error("A sessão do usuário não está ativa. Tente recarregar a página.");
         }
         const token = await clerk.session.getToken();
-        // FIM DA TRAVA DE SEGURANÇA
 
         const response = await fetch('http://localhost:3000/carrinho', {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -180,7 +177,6 @@ async function moverParaDesejos(event) {
     }
 }
 
-// **NOVA FUNÇÃO PARA O PAGAMENTO COM STRIPE**
 async function finalizarCompra() {
     const stripe = Stripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
     
@@ -202,7 +198,6 @@ async function finalizarCompra() {
         const session = await response.json();
         if (!response.ok) throw new Error(session.error.message);
 
-        // Redireciona para a página de checkout segura do Stripe
         const result = await stripe.redirectToCheckout({
             sessionId: session.id
         });

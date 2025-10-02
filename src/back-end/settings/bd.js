@@ -810,6 +810,99 @@ app.get('/jogos-destaques', async (req, res) => {
     }
 });
 
+app.get('/jogos-gratis', async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        
+        const query = `
+            SELECT 
+                j.ID_jogo, 
+                j.Nome_jogo, 
+                j.Descricao_jogo, 
+                j.Capa_jogo,
+                (SELECT m.URL_midia 
+                 FROM midias_jogo m 
+                 WHERE m.ID_jogo = j.ID_jogo 
+                 ORDER BY m.ID_midia ASC 
+                 LIMIT 1) AS Primeira_Midia
+            FROM jogos j
+            WHERE j.Preco_jogo = 0 
+            ORDER BY j.Nome_jogo ASC 
+            LIMIT 7
+        `;
+        
+        const [jogosGratis] = await connection.execute(query);
+        
+        res.status(200).json(jogosGratis);
+
+    } catch (error) {
+        console.error("Erro ao buscar jogos grátis:", error);
+        res.status(500).json({ message: "Erro ao buscar os jogos grátis." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+app.get('/jogos-promocoes', async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        
+        // Busca jogos onde o desconto é maior que zero,
+        // ordena pela maior média de nota e limita a 7 resultados.
+        const [jogosEmPromocao] = await connection.execute(
+            `SELECT 
+                ID_jogo, Nome_jogo, Capa_jogo, Preco_jogo, Desconto_jogo, Media_nota
+             FROM jogos 
+             WHERE Desconto_jogo > 0 
+             ORDER BY Media_nota DESC 
+             LIMIT 7`
+        );
+        
+        res.status(200).json(jogosEmPromocao);
+
+    } catch (error) {
+        console.error("Erro ao buscar jogos em promoção:", error);
+        res.status(500).json({ message: "Erro ao buscar os jogos em promoção." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+// Rota para buscar os 4 jogos do carrossel principal
+app.get('/jogos-carrossel', async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        
+        const query = `
+            SELECT 
+                j.ID_jogo, 
+                j.Preco_jogo,
+                (SELECT m.URL_midia 
+                 FROM midias_jogo m 
+                 WHERE m.ID_jogo = j.ID_jogo 
+                 ORDER BY m.ID_midia ASC 
+                 LIMIT 1) AS Primeira_Midia
+            FROM jogos j
+            WHERE (SELECT COUNT(*) FROM midias_jogo WHERE ID_jogo = j.ID_jogo) > 0
+            ORDER BY j.Media_nota DESC, j.Preco_jogo DESC
+            LIMIT 4
+        `;
+        
+        const [jogosCarrossel] = await connection.execute(query);
+        
+        res.status(200).json(jogosCarrossel);
+
+    } catch (error) {
+        console.error("Erro ao buscar jogos para o carrossel:", error);
+        res.status(500).json({ message: "Erro ao buscar os jogos para o carrossel." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
 // --- INICIALIZAÇÃO DO SERVIDOR ---
 app.listen(port, () => {
     (async () => {

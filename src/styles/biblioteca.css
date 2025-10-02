@@ -50,8 +50,6 @@
 .filtro-content {
     display: none;
     position: absolute;
-    top: 100%;
-    left: 0;
     max-width: 22rem;
     min-width: 22rem;
     border-radius: 0.5rem;
@@ -60,9 +58,13 @@
     transition: opacity 0.3s ease;
     overflow-y: auto;
     max-height: 20rem;
-    margin-top: 2px;
-    top: 0; /* Alinha ao topo do .select */
-    left: 100%; /* Posiciona à direita do .select */
+    
+
+    background-color: var(--background-color);
+    border: 1px solid var(--search-bar);
+    top: 100%; 
+    left: 0; 
+    margin-top: 0.5rem; 
 }
 
 .filtro-content[data-filtro-name="order-by"] ul {
@@ -103,6 +105,24 @@
 ::-webkit-scrollbar-thumb {
     background-color: #3a4050;
     border-radius: 8px;
+}
+
+.select .select-text-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Espaço entre o rótulo e o valor */
+}
+
+.select .select-label {
+    color: #8A8D91; /* Cor cinza original */
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.select .select-value {
+    color: #ffffff; /* Cor branca para o valor selecionado */
+    font-size: 1rem;
+    font-weight: 700; /* Deixa em negrito como na imagem */
 }
 
 @media (max-width: 600px) {

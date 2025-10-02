@@ -28,8 +28,8 @@ CREATE TABLE genero(
 CREATE TABLE jogos(
     ID_jogo INT(5) PRIMARY KEY NOT NULL AUTO_INCREMENT,
     Nome_jogo VARCHAR(100) NOT NULL,
-    Preco_jogo DECIMAL(8,2) NOT NULL,
-    Desconto_jogo DECIMAL(5,2) DEFAULT 0.00,
+    Preco_jogo DECIMAL(5,2) NOT NULL,
+    Desconto_jogo DECIMAL(3) DEFAULT 0,
     Logo_jogo TEXT,
     Descricao_jogo TEXT,
     Capa_jogo TEXT NOT NULL,

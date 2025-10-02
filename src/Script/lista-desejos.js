@@ -1,6 +1,6 @@
 import { clerk, waitForAuthReady } from "./auth.js";
 
-// --- FUNÇÕES DE UTILIDADE (MODAIS) ---
+//FUNÇÕES DE UTILIDADE (MODAIS)
 function showMessage(message, type = "success") {
     const modal = document.createElement("div");
     modal.className = `custom-message-modal ${type}`;
@@ -31,9 +31,8 @@ function createConfirmModal(message) {
 }
 
 
-// --- LÓGICA DA PÁGINA ---
 document.addEventListener("DOMContentLoaded", async () => {
-    const authData = await waitForAuthReady(); // CORREÇÃO APLICADA AQUI
+    const authData = await waitForAuthReady(); 
 
     if (!authData.isSignedIn) {
         document.querySelector('.cards_carrinho').innerHTML = '<h2>Sua lista está vazia</h2><p>Você precisa estar logado para ver sua lista de desejos. <a href="login.html">Faça Login</a></p>';
@@ -46,19 +45,16 @@ async function carregarListaDeDesejos() {
     const container = document.querySelector('.cards_carrinho');
     
     try {
-        // TRAVA DE SEGURANÇA: Garante que a sessão está ativa ANTES de pegar o token.
         if (!clerk.session) {
              throw new Error("A sessão do usuário não está ativa. Tente recarregar a página.");
         }
         const token = await clerk.session.getToken();
-        // FIM DA TRAVA DE SEGURANÇA
 
         const response = await fetch('http://localhost:3000/desejos', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 
         if (!response.ok) {
-            // Se a resposta for 401, a mensagem de erro será mais clara
             if(response.status === 401) throw new Error("Sessão inválida ou expirada. Faça login novamente.");
             throw new Error('Não foi possível carregar a lista de desejos.');
         }
@@ -71,7 +67,6 @@ async function carregarListaDeDesejos() {
             return;
         }
 
-        // O resto do código para renderizar os jogos continua igual...
         jogos.forEach(jogo => {
             const preco = parseFloat(jogo.Preco_jogo);
             const desconto = parseFloat(jogo.Desconto_jogo);
