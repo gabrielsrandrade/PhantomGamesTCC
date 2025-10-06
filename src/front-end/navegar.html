@@ -1,217 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Página Principal</title>
-    
-    <link rel="stylesheet" href="../styles/navegar.css" />
-    <link rel="shortcut icon" href="../../assets/imagens/logo-ico.ico" type="image/x-icon"/>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-    />
 
-    <link rel="stylesheet" href="../styles/general.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Página Principal</title>
 
-  <body>
-    <nav class="navbar">
-      
-    </nav>
+  <link rel="stylesheet" href="../styles/navegar.css" />
+  <link rel="shortcut icon" href="../../assets/imagens/logo-ico.ico" type="image/x-icon" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
-    <section class="filtroGeneros">
-      <h1>Descubra por gênero</h1>
-      <div class="swiper generos">
+  <link rel="stylesheet" href="../styles/general.css" />
+</head>
 
-        <div class="swiper-wrapper">
+<body>
+  <nav class="navbar">
 
-        <div class="g1 swiper-slide">
-          <span>AÇÃO</span>
-          <img src="../../assets/imagens/god of war kratos.png" alt="kratos" />
+  </nav>
+
+
+  </section>
+
+  <form class="filtros">
+    <h1>Filtros</h1>
+    <div class="all-filters">
+      <div class="filtro">
+        <div class="select">
+          <span class="select-text">Gênero</span>
+          <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
         </div>
-
-        <div class="g2 swiper-slide">
-          <span>AVENTURA</span>
-          <img
-            src="../../assets/imagens/tomb raider lara croft.png"
-            alt="lara croft"
-          />
-        </div>
-
-        <div class="g3 swiper-slide">
-          <span>FPS</span>
-          <img
-            src="../../assets/imagens/battlefield 2042 personagem.png"
-            alt="personagem battlefield 2042"
-          />
-        </div>
-
-        <div class="g4 swiper-slide">
-          <span>RPG</span>
-          <img
-            src="../../assets/imagens/the witcher personagem.png"
-            alt="gerald de rivia"
-          />
-        </div>
-
-        <div class="g4 swiper-slide">
-          <span>RPG</span>
-          <img
-            src="../../assets/imagens/the witcher personagem.png"
-            alt="gerald de rivia"
-          />
-        </div>
-
-        </div>
-
-        <div class="swiper-button-next swiper-navBtn"></div>
-        <div class="swiper-button-prev swiper-navBtn"></div>
-
-      </div>
-    </section>
-
-
-    <form class="filtros">
-      <h1>Filtros</h1>
-      <div class="all-filters">
-        <div class="filtro">
-          <div class="select">
-            <span class="select-text">Gênero</span>
-            <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
-          </div>
-          <div class="filtro-content" data-filtro-name="genero">
-            <ul>
-              <li data-value="Ação">Ação</li>
-              <li data-value="Aventura">Aventura</li>
-              <li data-value="Casual">Casual</li>
-              <li data-value="Corrida">Corrida</li>
-              <li data-value="Esportes">Esportes</li>
-              <li data-value="Estratégia">Estratégia</li>
-              <li data-value="Indie">Indie</li>
-              <li data-value="Luta">Luta</li>
-              <li data-value="Musical">Musical</li>
-              <li data-value="Narrativo">Narrativo</li>
-              <li data-value="Plataforma">Plataforma</li>
-              <li data-value="Puzzle">Puzzle</li>
-              <li data-value="RPG">RPG</li>
-              <li data-value="Simulação">Simulação</li>
-              <li data-value="Sobrevivência">Sobrevivência</li>
-              <li data-value="Terror">Terror</li>
-              <li data-value="Tiro">Tiro</li>
-            </ul>
-          </div>
-        </div>
-    
-        <div class="filtro">
-          <div class="select">
-            <span class="select-text">Categoria</span>
-            <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
-          </div>
-          <div class="filtro-content" data-filtro-name="categoria">
-            <ul>
-              <li data-value="Singleplayer">Singleplayer</li>
-              <li data-value="Multiplayer Local">Multiplayer Local</li>
-              <li data-value="Multiplayer Online">Multiplayer Online</li>
-              <li data-value="Co-op">Co-op</li>
-              <li data-value="PvP">PvP</li>
-              <li data-value="PvE">PvE</li>
-              <li data-value="MMO">MMO</li>
-              <li data-value="Cross-Plataform">Cross-Plataform</li>
-              <li data-value="2D">2D</li>
-              <li data-value="3D">3D</li>
-              <li data-value="2.5D">2.5D</li>
-              <li data-value="Top-Down">Top-Down</li>
-              <li data-value="Side-Scrooling">Side-Scrooling</li>
-              <li data-value="Isométrico">Isométrico</li>
-              <li data-value="Primeira Pessoa">Primeira Pessoa</li>
-              <li data-value="Terceira Pessoa">Terceira Pessoa</li>
-              <li data-value="Linear">Linear</li>
-              <li data-value="Mundo Aberto">Mundo Aberto</li>
-              <li data-value="Sandbox">Sandbox</li>
-              <li data-value="Campanha">Campanha</li>
-              <li data-value="Missões/Fases">Missões/Fases</li>
-              <li data-value="Permadeath">Permadeath</li>
-              <li data-value="Rouguelike">Rouguelike</li>
-            </ul>
-          </div>
-        </div>
-    
-        <div class="filtro">
-          <div class="select">
-            <span class="select-text">Preço</span>
-            <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
-          </div>
-          <div class="filtro-content" data-filtro-name="preco">
-            <ul>
-              <li data-value="Grátis">Grátis</li>
-              <li data-value="Até R$20">Até R$20</li>
-              <li data-value="R$20 - R$50">R$20 - R$50</li>
-              <li data-value="R$50 - R$100">R$50 - R$100</li>
-              <li data-value="Acima de R$100">Acima de R$100</li>
-            </ul>
-          </div>
-        </div>
-    
-        <div class="filtro">
-          <div class="select">
-            <span class="select-text">Avaliação</span>
-            <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
-          </div>
-          <div class="filtro-content" data-filtro-name="avaliacao">
-            <ul>
-              <li data-value="0">Sem Estrelas</li>
-              <li data-value="1-2">1 - 2 Estrelas</li>
-              <li data-value="2-3">2 - 3 Estrelas</li>
-              <li data-value="3-4">3 - 4 Estrelas</li>
-              <li data-value="4-5">4 - 5 Estrelas</li>
-              <li data-value="5">5 Estrelas</li>
-            </ul>
-          </div>
+        <div class="filtro-content" data-filtro-name="genero">
+          <ul>
+            <li data-value="Ação">Ação</li>
+            <li data-value="Aventura">Aventura</li>
+            <li data-value="Casual">Casual</li>
+            <li data-value="Corrida">Corrida</li>
+            <li data-value="Esportes">Esportes</li>
+            <li data-value="Estratégia">Estratégia</li>
+            <li data-value="Indie">Indie</li>
+            <li data-value="Luta">Luta</li>
+            <li data-value="Musical">Musical</li>
+            <li data-value="Narrativo">Narrativo</li>
+            <li data-value="Plataforma">Plataforma</li>
+            <li data-value="Puzzle">Puzzle</li>
+            <li data-value="RPG">RPG</li>
+            <li data-value="Simulação">Simulação</li>
+            <li data-value="Sobrevivência">Sobrevivência</li>
+            <li data-value="Terror">Terror</li>
+            <li data-value="Tiro">Tiro</li>
+          </ul>
         </div>
       </div>
-    </form>
 
-    <section class="cards_principais">
-      <div class="card_jogos">
-       
+      <div class="filtro">
+        <div class="select">
+          <span class="select-text">Categoria</span>
+          <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
+        </div>
+        <div class="filtro-content" data-filtro-name="categoria">
+          <ul>
+            <li data-value="Singleplayer">Singleplayer</li>
+            <li data-value="Multiplayer Local">Multiplayer Local</li>
+            <li data-value="Multiplayer Online">Multiplayer Online</li>
+            <li data-value="Jogo Nacional">Jogo Nacional</li>
+            <li data-value="Co-op">Co-op</li>
+            <li data-value="PvP">PvP</li>
+            <li data-value="PvE">PvE</li>
+            <li data-value="MMO">MMO</li>
+            <li data-value="Cross-Plataform">Cross-Plataform</li>
+            <li data-value="2D">2D</li>
+            <li data-value="3D">3D</li>
+            <li data-value="2.5D">2.5D</li>
+            <li data-value="Top-Down">Top-Down</li>
+            <li data-value="Side-Scrooling">Side-Scrooling</li>
+            <li data-value="Isométrico">Isométrico</li>
+            <li data-value="Primeira Pessoa">Primeira Pessoa</li>
+            <li data-value="Terceira Pessoa">Terceira Pessoa</li>
+            <li data-value="Linear">Linear</li>
+            <li data-value="Mundo Aberto">Mundo Aberto</li>
+            <li data-value="Sandbox">Sandbox</li>
+            <li data-value="Campanha">Campanha</li>
+            <li data-value="Missões/Fases">Missões/Fases</li>
+            <li data-value="Permadeath">Permadeath</li>
+            <li data-value="Rouguelike">Rouguelike</li>
+          </ul>
+        </div>
       </div>
 
-      <div class="pagination">
-        <div class="first">&#171;</div>
-        <div class="prev">&lt;</div>
-        <div class="numbers">
-          <div>1</div>
+      <div class="filtro">
+        <div class="select">
+          <span class="select-text">Preço</span>
+          <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
         </div>
-        <div class="next">&gt;</div>
-        <div class="last">&#187;</div>
-      </div>
-    </section>
-
-
-    <footer>
-      <p>&copy; 2025 Phantom Games TCC. Todos os direitos reservados.</p>
-      <div class="social-media">
-        <div class="insta">
-          <img src="../../assets/imagens/instagram.png" alt="logo instagram" />
-        </div>
-        <div class="disc">
-          <img src="../../assets/imagens/discord.png" alt="logo discord" />
-        </div>
-        <div class="twitter">
-          <img src="../../assets/imagens/x.png" alt="logo twitter" />
-        </div>
-        <div class="twitch">
-          <img src="../../assets/imagens/twitch.png" alt="logo twitch" />
+        <div class="filtro-content" data-filtro-name="preco">
+          <ul>
+            <li data-value="Grátis">Grátis</li>
+            <li data-value="Até R$20">Até R$20</li>
+            <li data-value="R$20 - R$50">R$20 - R$50</li>
+            <li data-value="R$50 - R$100">R$50 - R$100</li>
+            <li data-value="Acima de R$100">Acima de R$100</li>
+          </ul>
         </div>
       </div>
-    </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script type="module" src="../Script/auth.js"></script>
-    <script type="module" src="../Script/navbar.js"></script>
-    <script src="../Script/dropdawn-filtro.js"></script>
-    <script src="../Script/sliderN.js"></script>
-    <script src="../Script/carregar_jogo.js"></script>
-  </body>
+      <div class="filtro">
+        <div class="select">
+          <span class="select-text">Avaliação</span>
+          <img class="select-icon" src="../../assets/imagens/seta-filtro.png" alt="seta" />
+        </div>
+        <div class="filtro-content" data-filtro-name="avaliacao">
+          <ul>
+            <li data-value="0">Sem Estrelas</li>
+            <li data-value="1-2">1 - 2 Estrelas</li>
+            <li data-value="2-3">2 - 3 Estrelas</li>
+            <li data-value="3-4">3 - 4 Estrelas</li>
+            <li data-value="4-5">4 - 5 Estrelas</li>
+            <li data-value="5">5 Estrelas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <section class="cards_principais">
+    <div class="card_jogos">
+
+    </div>
+
+    <div class="pagination">
+      <div class="first">&#171;</div>
+      <div class="prev">&lt;</div>
+      <div class="numbers">
+        <div>1</div>
+      </div>
+      <div class="next">&gt;</div>
+      <div class="last">&#187;</div>
+    </div>
+  </section>
+
+
+  <footer>
+    <p>&copy; 2025 Phantom Games TCC. Todos os direitos reservados.</p>
+    <div class="social-media">
+      <div class="insta">
+        <img src="../../assets/imagens/instagram.png" alt="logo instagram" />
+      </div>
+      <div class="disc">
+        <img src="../../assets/imagens/discord.png" alt="logo discord" />
+      </div>
+      <div class="twitter">
+        <img src="../../assets/imagens/x.png" alt="logo twitter" />
+      </div>
+      <div class="twitch">
+        <img src="../../assets/imagens/twitch.png" alt="logo twitch" />
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script type="module" src="../Script/auth.js"></script>
+  <script type="module" src="../Script/navbar.js"></script>
+  <script src="../Script/dropdawn-filtro.js"></script>
+  <script src="../Script/sliderN.js"></script>
+  <script src="../Script/carregar_jogo.js"></script>
+</body>
+
 </html>

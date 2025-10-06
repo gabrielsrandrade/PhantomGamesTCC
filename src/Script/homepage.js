@@ -190,16 +190,68 @@ async function fetchAndDisplayPromotions() {
     }
 }
 
+async function fetchAndDisplayNationalGames() {
+    const cardsContainer = document.getElementById("card_jogos4");
+    if (!cardsContainer) return;
+
+    try {
+        const response = await fetch("http://localhost:3000/jogos-nacionais");
+        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
+        const nationalGames = await response.json();
+
+        if (!nationalGames || nationalGames.length === 0) {
+            cardsContainer.innerHTML = '<p class="error-message">Nenhum jogo nacional encontrado.</p>';
+            return;
+        }
+
+        cardsContainer.innerHTML = '';
+        const backendUrl = 'http://localhost:3000';
+
+        nationalGames.forEach(game => {
+            const gameCard = document.createElement("a");
+            gameCard.href = `jogo.html?id=${game.ID_jogo}`;
+            gameCard.className = "card_jogo swiper-slide"; 
+
+            let imageUrl = game.Capa_jogo;
+            if (imageUrl && imageUrl.startsWith('/')) imageUrl = `${backendUrl}${imageUrl}`;
+
+            const estrelasHtml = createRatingStars(game.Media_nota);
+            const precoHtml = createPriceHtml(game.Preco_jogo, game.Desconto_jogo);
+
+            gameCard.innerHTML = `
+                <div class="capa_card" style="background-image: url('${imageUrl}')"></div>
+                <span>${game.Nome_jogo}</span>
+                ${estrelasHtml}
+                <div class="preco">${precoHtml}</div>
+            `;
+            cardsContainer.appendChild(gameCard);
+        });
+
+        new Swiper('.card_jogos4', {
+            slidesPerView: 3, spaceBetween: 41, loop: false, grabCursor: true,
+            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+            breakpoints: { 0: { slidesPerView: 2 }, 520: { slidesPerView: 3 }, 950: { slidesPerView: 3 } },
+        });
+
+    } catch (error) {
+        console.error("Falha ao carregar jogos nacionais:", error);
+        cardsContainer.innerHTML = '<p class="error-message">Erro ao carregar jogos nacionais.</p>';
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     fetchAndDisplayHighlights();
     fetchAndDisplayFreeGames();
     fetchAndDisplayPromotions();
+    fetchAndDisplayNationalGames();
 });
 
 document.addEventListener("DOMContentLoaded", () => {
     fetchAndDisplayHighlights();
     fetchAndDisplayFreeGames();
     fetchAndDisplayPromotions();
+    fetchAndDisplayNationalGames();
+
 });
 
 // Adicione isso aqui para atualizar automaticamente após adição de jogo
@@ -207,4 +259,5 @@ document.addEventListener("gameUpdated", () => {
     fetchAndDisplayHighlights();
     fetchAndDisplayFreeGames();
     fetchAndDisplayPromotions();
+    fetchAndDisplayNationalGames();
 });

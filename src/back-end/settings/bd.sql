@@ -110,7 +110,7 @@ INSERT INTO genero (Nome) VALUES
 
 /* Inserindo os dados iniciais para Categorias */
 INSERT INTO categoria (Nome) VALUES
-('Singleplayer'), ('Multiplayer Local'), ('Multiplayer Online'), ('Co-op'), ('PvP'), ('PvE'), ('MMO'), ('Cross-Plataform'),
+('Singleplayer'), ('Multiplayer Local'), ('Multiplayer Online'), ('Jogo Nacional'), ('Co-op'), ('PvP'), ('PvE'), ('MMO'), ('Cross-Plataform'),
 ('2D'), ('3D'), ('2.5D'), ('Top-Down'), ('Side-Scrooling'), ('Isométrico'), ('Primeira Pessoa'), ('Terceira Pessoa'),
 ('Linear'), ('Mundo Aberto'), ('Sandbox'), ('Campanha'), ('Missões/Fases'), ('Permadeath'), ('Rouguelike');
 

@@ -5,25 +5,25 @@ const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
- const { clerkClient } = require("@clerk/clerk-sdk-node");
+const { clerkClient } = require("@clerk/clerk-sdk-node");
 
- require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 
- const app = express();
- const port = 3000;
+const app = express();
+const port = 3000;
 
- // --- 2. CONFIGURAÇÃO DE SEGURANÇA (CLERK E STRIPE) ---
- const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
- const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+// --- 2. CONFIGURAÇÃO DE SEGURANÇA (CLERK E STRIPE) ---
+const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
- // --- 3. MIDDLEWARES ---
- const corsOptions = { origin: 'http://localhost:5173', methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'], credentials: true };
- app.use(cors(corsOptions));
- app.use(express.json());
- app.use(express.urlencoded({ extended: true }));
- app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// --- 3. MIDDLEWARES ---
+const corsOptions = { origin: 'http://localhost:5173', methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'], credentials: true };
+app.use(cors(corsOptions));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
- // MIDDLEWARE DE AUTENTICAÇÃO CUSTOMIZADO E FINAL
+// MIDDLEWARE DE AUTENTICAÇÃO CUSTOMIZADO E FINAL
 const clerkAuthMiddleware = async (req, res, next) => {
     try {
         const authorizationHeader = req.headers.authorization;
@@ -31,7 +31,7 @@ const clerkAuthMiddleware = async (req, res, next) => {
             req.auth = {};
             return next();
         }
-        
+
         const token = authorizationHeader.split(' ')[1];
         if (!token) {
             req.auth = {};
@@ -39,38 +39,38 @@ const clerkAuthMiddleware = async (req, res, next) => {
         }
 
         const claims = await clerkClient.verifyToken(token, {
-            clockSkewInMs: 60000 
+            clockSkewInMs: 60000
         });
-        
-        req.auth = { 
-            userId: claims.sub, 
+
+        req.auth = {
+            userId: claims.sub,
             claims: claims
         };
 
     } catch (error) {
         console.error("Erro de validação do token (ignorado):", error.message);
-        req.auth = {}; 
+        req.auth = {};
     }
-    
+
     next();
 };
 
- const isAdminMiddleware = async (req, res, next) => {
-     if (!req.auth || !req.auth.userId) return res.status(401).json({ message: "Usuário não autenticado." });
-     const userId = req.auth.userId;
-     let connection;
-     try {
-         connection = await pool.getConnection();
-         const [userRows] = await connection.execute("SELECT is_admin FROM usuario WHERE ID_usuario = ?", [userId]);
-         if (userRows.length === 0 || !userRows[0].is_admin) return res.status(403).json({ message: "Acesso negado. Requer permissão de administrador." });
-         next();
-     } catch (error) {
-         console.error("Erro no middleware de admin:", error);
-         return res.status(500).json({ message: "Erro interno do servidor ao verificar permissões." });
-     } finally {
-         if (connection) connection.release();
-     }
- };
+const isAdminMiddleware = async (req, res, next) => {
+    if (!req.auth || !req.auth.userId) return res.status(401).json({ message: "Usuário não autenticado." });
+    const userId = req.auth.userId;
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        const [userRows] = await connection.execute("SELECT is_admin FROM usuario WHERE ID_usuario = ?", [userId]);
+        if (userRows.length === 0 || !userRows[0].is_admin) return res.status(403).json({ message: "Acesso negado. Requer permissão de administrador." });
+        next();
+    } catch (error) {
+        console.error("Erro no middleware de admin:", error);
+        return res.status(500).json({ message: "Erro interno do servidor ao verificar permissões." });
+    } finally {
+        if (connection) connection.release();
+    }
+};
 
 // --- 4. CONFIGURAÇÃO DE UPLOAD (MULTER) ---
 const storage = multer.diskStorage({
@@ -154,7 +154,7 @@ app.get("/user-game-status/:jogoId", clerkAuthMiddleware, async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Erro em /user-game-status/:", error); 
+        console.error("Erro em /user-game-status/:", error);
         res.status(500).json({ message: "Erro ao buscar status do usuário." });
     } finally {
         if (connection) connection.release();
@@ -174,7 +174,7 @@ app.get("/jogos", async (req, res) => {
 
 app.get("/jogos/:id", async (req, res) => {
     const jogoId = req.params.id;
-    const userId = req.auth?.userId; 
+    const userId = req.auth?.userId;
     let connection;
 
     try {
@@ -186,10 +186,10 @@ app.get("/jogos/:id", async (req, res) => {
         const [generosRows] = await connection.execute("SELECT g.Nome FROM genero_jogos gj JOIN genero g ON gj.ID_genero = g.ID_genero WHERE gj.ID_jogo = ?", [jogoId]);
         const [midiasRows] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
 
-        const jogoCompleto = { 
-            ...jogosRows[0], 
-            categorias: categoriasRows.map(r => r.Nome), 
-            generos: generosRows.map(r => r.Nome), 
+        const jogoCompleto = {
+            ...jogosRows[0],
+            categorias: categoriasRows.map(r => r.Nome),
+            generos: generosRows.map(r => r.Nome),
             midias: midiasRows.map(r => r.URL_midia),
             isInCart: false,
             isInWishlist: false,
@@ -202,7 +202,7 @@ app.get("/jogos/:id", async (req, res) => {
 
             const [wishlistRows] = await connection.execute("SELECT 1 FROM lista_desejos WHERE ID_usuario = ? AND ID_jogo = ?", [userId, jogoId]);
             jogoCompleto.isInWishlist = wishlistRows.length > 0;
-            
+
             // **VERIFICAÇÃO DA BIBLIOTECA**
             const [libraryRows] = await connection.execute("SELECT 1 FROM biblioteca WHERE ID_usuario = ? AND ID_jogo = ?", [userId, jogoId]);
             jogoCompleto.isOwned = libraryRows.length > 0;
@@ -210,12 +210,12 @@ app.get("/jogos/:id", async (req, res) => {
 
         res.status(200).json(jogoCompleto);
 
-    } catch (err) { 
+    } catch (err) {
         console.error("Erro em /jogos/:id:", err);
-        res.status(500).json({ message: "Erro ao buscar detalhes do jogo." }); 
+        res.status(500).json({ message: "Erro ao buscar detalhes do jogo." });
     }
-    finally { 
-        if (connection) connection.release(); 
+    finally {
+        if (connection) connection.release();
     }
 });
 
@@ -233,7 +233,7 @@ app.get("/buscar-jogo", async (req, res) => {
 
 app.get("/filtrar-jogos", async (req, res) => {
     const { genero, categoria, preco, avaliacao } = req.query;
-    
+
     try {
         let sql = `
             SELECT DISTINCT j.* FROM jogos j
@@ -320,7 +320,7 @@ app.get("/filtrar-jogos", async (req, res) => {
         console.log("Parâmetros:", params);
 
         const [rows] = await pool.execute(sql, params);
-        
+
         res.status(200).json(rows);
 
     } catch (err) {
@@ -345,7 +345,7 @@ app.get("/generos", async (req, res) => {
         connection = await pool.getConnection();
         const [generos] = await connection.execute("SELECT Nome FROM genero ORDER BY Nome ASC");
         res.status(200).json(generos.map(g => g.Nome));
-    } catch (err) { res.status(500).json({ message: "Erro ao buscar gêneros." }); } 
+    } catch (err) { res.status(500).json({ message: "Erro ao buscar gêneros." }); }
     finally { if (connection) connection.release(); }
 });
 
@@ -742,7 +742,7 @@ app.post('/criar-sessao-de-pagamento', clerkAuthMiddleware, async (req, res) => 
             const preco = parseFloat(jogo.Preco_jogo);
             const desconto = parseFloat(jogo.Desconto_jogo);
             const precoFinal = desconto > 0 ? preco * (1 - desconto / 100) : preco;
-            const precoEmCentavos = Math.round(precoFinal * 100); 
+            const precoEmCentavos = Math.round(precoFinal * 100);
 
             return {
                 price_data: {
@@ -762,7 +762,7 @@ app.post('/criar-sessao-de-pagamento', clerkAuthMiddleware, async (req, res) => 
             line_items: line_items,
             mode: 'payment',
             metadata: {
-                userId: userId 
+                userId: userId
             },
             success_url: `http://localhost:5173/src/front-end/sucesso.html?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `http://localhost:5173/src/front-end/carrinho.html`,
@@ -800,7 +800,7 @@ app.post('/verificar-pagamento', clerkAuthMiddleware, async (req, res) => {
                 await connection.query('INSERT IGNORE INTO biblioteca (ID_usuario, ID_jogo) VALUES ?', [jogosParaBiblioteca]);
                 await connection.execute('DELETE FROM carrinho_itens WHERE ID_usuario = ?', [userId]);
             }
-            
+
             await connection.commit();
             console.log(`📚 Jogos liberados via verificação manual para o usuário: ${userId}`);
             return res.status(200).json({ status: 'success', message: 'Pagamento verificado e jogos liberados!' });
@@ -871,7 +871,7 @@ app.get('/jogos-destaques', async (req, res) => {
              ORDER BY j.Media_nota DESC, total_comentarios DESC
              LIMIT 7`
         );
-        
+
         res.status(200).json(destaques);
 
     } catch (error) {
@@ -886,7 +886,7 @@ app.get('/jogos-gratis', async (req, res) => {
     let connection;
     try {
         connection = await pool.getConnection();
-        
+
         const query = `
             SELECT 
                 j.ID_jogo, 
@@ -903,9 +903,9 @@ app.get('/jogos-gratis', async (req, res) => {
             ORDER BY j.Nome_jogo ASC 
             LIMIT 7
         `;
-        
+
         const [jogosGratis] = await connection.execute(query);
-        
+
         res.status(200).json(jogosGratis);
 
     } catch (error) {
@@ -929,7 +929,7 @@ app.get('/jogos-promocoes', async (req, res) => {
              ORDER BY Media_nota DESC 
              LIMIT 7`
         );
-        
+
         res.status(200).json(jogosEmPromocao);
 
     } catch (error) {
@@ -945,7 +945,7 @@ app.get('/jogos-carrossel', async (req, res) => {
     let connection;
     try {
         connection = await pool.getConnection();
-        
+
         const query = `
             SELECT 
                 j.ID_jogo, 
@@ -961,14 +961,37 @@ app.get('/jogos-carrossel', async (req, res) => {
             ORDER BY j.Media_nota DESC, j.Preco_jogo DESC
             LIMIT 4
         `;
-        
+
         const [jogosCarrossel] = await connection.execute(query);
-        
+
         res.status(200).json(jogosCarrossel);
 
     } catch (error) {
         console.error("Erro ao buscar jogos para o carrossel:", error);
         res.status(500).json({ message: "Erro ao buscar os jogos para o carrossel." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
+app.get('/jogos-nacionais', async (req, res) => {
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        const [jogosNacionais] = await connection.execute(
+            `SELECT 
+                j.ID_jogo, j.Nome_jogo, j.Capa_jogo, j.Preco_jogo, j.Desconto_jogo, j.Media_nota
+             FROM jogos j
+             JOIN categoria_jogos cj ON j.ID_jogo = cj.ID_jogo
+             WHERE cj.ID_categoria = 4
+             ORDER BY j.Media_nota DESC 
+             LIMIT 3`
+        );
+        console.log("Jogos Nacionais Data:", jogosNacionais); // Add this for debugging
+        res.status(200).json(jogosNacionais);
+    } catch (error) {
+        console.error("Erro ao buscar jogos nacionais:", error);
+        res.status(500).json({ message: "Erro ao buscar os jogos nacionais." });
     } finally {
         if (connection) connection.release();
     }

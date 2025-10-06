@@ -2,7 +2,7 @@
 
 /*swiper genros*/
 
-.filtroGeneros{
+/* .filtroGeneros{
     display: flex;
     flex-direction: column;
     min-width: 91rem;
@@ -58,7 +58,7 @@
             background-image: radial-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(../../assets/imagens/rpg.jpg);
         } 
     }
-}
+} */
 
 /*filtros*/
 
@@ -250,3 +250,7 @@
         .first:hover, .numbers:hover,.prev:hover, .next:hover, .last:hover {
            font-weight: 600;
         }
+
+        footer{
+            margin-top: auto;
+            }
