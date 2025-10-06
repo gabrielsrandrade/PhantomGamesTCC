@@ -5,51 +5,72 @@ const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
-const { ClerkExpressWithAuth } = require("@clerk/clerk-sdk-node");
+ const { clerkClient } = require("@clerk/clerk-sdk-node");
 
-require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
+ require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 
-const app = express();
-const port = 3000;
+ const app = express();
+ const port = 3000;
 
-// --- 2. CONFIGURAÇÃO DE SEGURANÇA (CLERK E STRIPE) ---
-const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-if (!CLERK_SECRET_KEY || !CLERK_SECRET_KEY.startsWith("sk_")) {
-    throw new Error("A chave secreta do Clerk (CLERK_SECRET_KEY) parece estar ausente ou inválida.");
-}
+ // --- 2. CONFIGURAÇÃO DE SEGURANÇA (CLERK E STRIPE) ---
+ const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
+ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// --- 3. MIDDLEWARES ---
-app.use(cors({
-    origin: 'http://localhost:5173', // Permite requisições do seu front-end
-    credentials: true
-}));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+ // --- 3. MIDDLEWARES ---
+ const corsOptions = { origin: 'http://localhost:5173', methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'], credentials: true };
+ app.use(cors(corsOptions));
+ app.use(express.json());
+ app.use(express.urlencoded({ extended: true }));
+ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-
-// Middleware de verificação do Clerk
-const clerkAuthMiddleware = ClerkExpressWithAuth({ secretKey: CLERK_SECRET_KEY });
-// Middleware para verificar se o usuário é admin
-const isAdminMiddleware = async (req, res, next) => {
-    if (!req.auth || !req.auth.userId) {
-        return res.status(401).json({ message: "Usuário não autenticado." });
-    }
-    let connection;
+ // MIDDLEWARE DE AUTENTICAÇÃO CUSTOMIZADO E FINAL
+const clerkAuthMiddleware = async (req, res, next) => {
     try {
-        connection = await pool.getConnection();
-        const [rows] = await connection.execute("SELECT is_admin FROM usuario WHERE ID_usuario = ?", [req.auth.userId]);
-        if (rows.length === 0 || !rows[0].is_admin) {
-            return res.status(403).json({ message: "Acesso negado. Requer permissão de administrador." });
+        const authorizationHeader = req.headers.authorization;
+        if (!authorizationHeader) {
+            req.auth = {};
+            return next();
         }
-        next();
+        
+        const token = authorizationHeader.split(' ')[1];
+        if (!token) {
+            req.auth = {};
+            return next();
+        }
+
+        const claims = await clerkClient.verifyToken(token, {
+            clockSkewInMs: 60000 
+        });
+        
+        req.auth = { 
+            userId: claims.sub, 
+            claims: claims
+        };
+
     } catch (error) {
-        return res.status(500).json({ message: "Erro ao verificar permissões." });
-    } finally {
-        if (connection) connection.release();
+        console.error("Erro de validação do token (ignorado):", error.message);
+        req.auth = {}; 
     }
+    
+    next();
 };
+
+ const isAdminMiddleware = async (req, res, next) => {
+     if (!req.auth || !req.auth.userId) return res.status(401).json({ message: "Usuário não autenticado." });
+     const userId = req.auth.userId;
+     let connection;
+     try {
+         connection = await pool.getConnection();
+         const [userRows] = await connection.execute("SELECT is_admin FROM usuario WHERE ID_usuario = ?", [userId]);
+         if (userRows.length === 0 || !userRows[0].is_admin) return res.status(403).json({ message: "Acesso negado. Requer permissão de administrador." });
+         next();
+     } catch (error) {
+         console.error("Erro no middleware de admin:", error);
+         return res.status(500).json({ message: "Erro interno do servidor ao verificar permissões." });
+     } finally {
+         if (connection) connection.release();
+     }
+ };
 
 // --- 4. CONFIGURAÇÃO DE UPLOAD (MULTER) ---
 const storage = multer.diskStorage({
@@ -107,6 +128,39 @@ app.post("/salvar-usuario", async (req, res) => {
     finally { if (connection) connection.release(); }
 });
 
+app.get("/user-game-status/:jogoId", clerkAuthMiddleware, async (req, res) => {
+    const { jogoId } = req.params;
+    const userId = req.auth?.userId;
+
+    if (!userId) {
+        return res.status(200).json({
+            isInCart: false,
+            isInWishlist: false,
+            isOwned: false
+        });
+    }
+
+    let connection;
+    try {
+        connection = await pool.getConnection();
+        const [cartRows] = await connection.execute("SELECT 1 FROM carrinho_itens WHERE ID_usuario = ? AND ID_jogo = ?", [userId, jogoId]);
+        const [wishlistRows] = await connection.execute("SELECT 1 FROM lista_desejos WHERE ID_usuario = ? AND ID_jogo = ?", [userId, jogoId]);
+        const [libraryRows] = await connection.execute("SELECT 1 FROM biblioteca WHERE ID_usuario = ? AND ID_jogo = ?", [userId, jogoId]);
+
+        res.status(200).json({
+            isInCart: cartRows.length > 0,
+            isInWishlist: wishlistRows.length > 0,
+            isOwned: libraryRows.length > 0
+        });
+
+    } catch (error) {
+        console.error("Erro em /user-game-status/:", error); 
+        res.status(500).json({ message: "Erro ao buscar status do usuário." });
+    } finally {
+        if (connection) connection.release();
+    }
+});
+
 // ROTAS PÚBLICAS DE JOGOS E METADADOS
 app.get("/jogos", async (req, res) => {
     let connection;
@@ -118,7 +172,7 @@ app.get("/jogos", async (req, res) => {
     finally { if (connection) connection.release(); }
 });
 
-app.get("/jogos/:id",ClerkExpressWithAuth(), async (req, res) => {
+app.get("/jogos/:id", async (req, res) => {
     const jogoId = req.params.id;
     const userId = req.auth?.userId; 
     let connection;
@@ -546,7 +600,13 @@ app.post("/carrinho/adicionar", clerkAuthMiddleware, async (req, res) => {
 
 // Rota para BUSCAR todos os jogos no carrinho do usuário logado
 app.get("/carrinho", clerkAuthMiddleware, async (req, res) => {
-    const ID_usuario = req.auth.userId;
+    const ID_usuario = req.auth?.userId;
+
+    // Se não houver usuário autenticado, retorna um carrinho vazio em vez de quebrar
+    if (!ID_usuario) {
+        return res.status(200).json([]);
+    }
+
     let connection;
     try {
         connection = await pool.getConnection();
@@ -613,7 +673,13 @@ app.post("/desejos/adicionar", clerkAuthMiddleware, async (req, res) => {
 
 // Rota para BUSCAR todos os jogos na lista de desejos do usuário
 app.get("/desejos", clerkAuthMiddleware, async (req, res) => {
-    const ID_usuario = req.auth.userId;
+    const ID_usuario = req.auth?.userId;
+
+    // Se não houver usuário autenticado, retorna uma lista vazia
+    if (!ID_usuario) {
+        return res.status(200).json([]);
+    }
+
     let connection;
     try {
         connection = await pool.getConnection();
@@ -753,7 +819,13 @@ app.post('/verificar-pagamento', clerkAuthMiddleware, async (req, res) => {
 });
 
 app.get('/biblioteca', clerkAuthMiddleware, async (req, res) => {
-    const userId = req.auth.userId;
+    const userId = req.auth?.userId;
+
+    // Se não houver usuário autenticado, retorna uma biblioteca vazia
+    if (!userId) {
+        return res.status(200).json([]);
+    }
+
     let connection;
     try {
         connection = await pool.getConnection();
@@ -765,7 +837,7 @@ app.get('/biblioteca', clerkAuthMiddleware, async (req, res) => {
              ORDER BY j.Nome_jogo ASC`,
             [userId]
         );
-        console.log("Dados retornados pela biblioteca:", jogos); // Adicione este log
+        console.log("Dados retornados pela biblioteca:", jogos);
         res.status(200).json(jogos);
     } catch (error) {
         console.error("Erro ao buscar biblioteca:", error);
@@ -848,9 +920,7 @@ app.get('/jogos-promocoes', async (req, res) => {
     let connection;
     try {
         connection = await pool.getConnection();
-        
-        // Busca jogos onde o desconto é maior que zero,
-        // ordena pela maior média de nota e limita a 7 resultados.
+
         const [jogosEmPromocao] = await connection.execute(
             `SELECT 
                 ID_jogo, Nome_jogo, Capa_jogo, Preco_jogo, Desconto_jogo, Media_nota
@@ -902,6 +972,11 @@ app.get('/jogos-carrossel', async (req, res) => {
     } finally {
         if (connection) connection.release();
     }
+});
+
+app.use((req, res, next) => {
+    console.log(`[DEBUG] Rota não encontrada pelo Express: ${req.method} ${req.originalUrl}`);
+    res.status(404).json({ message: `O servidor não encontrou a rota: ${req.originalUrl}` });
 });
 
 // --- INICIALIZAÇÃO DO SERVIDOR ---

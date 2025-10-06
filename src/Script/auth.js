@@ -1,22 +1,8 @@
-// /Script/auth.js
 import { Clerk } from "@clerk/clerk-js";
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 export const clerk = new Clerk(clerkPubKey);
-
-let authData = {
-  isSignedIn: false,
-  isAdmin: false,
-  user: null,
-};
-
-let authReadyResolver;
-const authReadyPromise = new Promise(resolve => {
-  authReadyResolver = resolve;
-});
-
-export const waitForAuthReady = () => authReadyPromise;
 
 async function syncUserToDatabase(user) {
   if (!user) return;
@@ -36,24 +22,40 @@ async function syncUserToDatabase(user) {
   }
 }
 
-clerk.addListener(({ user }) => {
-  authData.user = user;
-  authData.isSignedIn = !!user;
-  authData.isAdmin = user?.publicMetadata?.role === 'admin';
-  
-  console.log(
-    "Estado de autenticação atualizado. Logado:", authData.isSignedIn,
-    "Admin (UI):", authData.isAdmin
-  );
 
-  if (user) {
-    syncUserToDatabase(user);
-  }
-  
-  authReadyResolver(authData); 
-});
+let authData = {
+  isSignedIn: false,
+  isAdmin: false,
+  user: null,
+};
 
-export async function initializeAuth() {
-    await clerk.load();
-    return waitForAuthReady();
-}
+let authReadyPromise = null;
+
+export const initializeAuth = () => {
+    if (authReadyPromise) {
+        return authReadyPromise;
+    }
+
+    authReadyPromise = new Promise(async (resolve) => {
+        clerk.addListener(({ user }) => {
+            console.log("Listener do Clerk acionado. Usuário:", user ? user.id : 'Nenhum');
+            authData.user = user;
+            authData.isSignedIn = !!user;
+            authData.isAdmin = user?.publicMetadata?.role === 'admin';
+            if (user) {
+                syncUserToDatabase(user);
+            }
+        });
+
+        await clerk.load();
+
+        console.log(
+            "Clerk carregado. Estado final:",
+            "Logado:", authData.isSignedIn,
+            "Admin:", authData.isAdmin
+        );
+        resolve(authData);
+    });
+
+    return authReadyPromise;
+};

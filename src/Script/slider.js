@@ -12,10 +12,20 @@ async function fetchDataFromAPI() {
       }
 
       const precoFloat = parseFloat(game.Preco_jogo);
-      let precoFormatado = precoFloat === 0 ? 'Grátis' : `R$ ${precoFloat.toFixed(2).replace('.', ',')}`;
+      const descontoFloat = parseFloat(game.Desconto_jogo);
+      let precoFormatado;
+
+      if (precoFloat === 0) {
+        precoFormatado = 'Grátis';
+      } else if (descontoFloat > 0) {
+        const precoComDesconto = precoFloat * (1 - descontoFloat / 100);
+        precoFormatado = `R$ ${precoComDesconto.toFixed(2).replace('.', ',')}`;
+      } else {
+        precoFormatado = `R$ ${precoFloat.toFixed(2).replace('.', ',')}`;
+      }
 
       return {
-        id: game.ID_jogo, // Guardamos o ID do jogo
+        id: game.ID_jogo,
         url: imageUrl,
         thumbnail: imageUrl,
         price: precoFormatado
@@ -31,7 +41,7 @@ const mainImage = document.getElementById('main-image');
 const priceElement = document.getElementById('price');
 const thumbnailsContainer = document.getElementById('thumbnails');
 const carrosselContainer = document.querySelector('.carrosel');
-const buyNowButton = mainImage.querySelector('button'); // Pega o botão "Compre Agora"
+const buyNowButton = mainImage.querySelector('button');
 let currentIndex = 0;
 let images = [];
 let autoSlideInterval;
@@ -51,21 +61,12 @@ async function initializeCarousel() {
     updateCarousel(0);
     startAutoSlide();
 
-    // Adiciona o evento de clique UMA VEZ
     buyNowButton.addEventListener('click', () => {
       const currentGameId = images[currentIndex].id;
       if (currentGameId) {
         window.location.href = `jogo.html?id=${currentGameId}`;
       }
     });
-
-    async function initializeCarousel() {
-      images = await fetchDataFromAPI();
-      
-      if (images && images.length > 0) {
-        updateCarousel(0);
-        startAutoSlide();
-      }};
 
   } else {
     if (carrosselContainer) {
@@ -78,7 +79,7 @@ function updateCarousel(index) {
   if (!images[index]) return;
 
   mainImage.style.opacity = '0';
-  currentIndex = index; // Atualiza o índice atual
+  currentIndex = index;
 
   setTimeout(() => {
     mainImage.style.backgroundImage = `linear-gradient(to right, rgba(0, 0, 0, 0.39) 30%, rgba(0, 0, 0, 0) 100%), url(${images[index].url})`;
@@ -110,5 +111,5 @@ function updateCarousel(index) {
 initializeCarousel();
 
 document.addEventListener("gameUpdated", () => {
-  initializeCarousel();  // Recarrega o carrossel com dados frescos
+  initializeCarousel();
 });

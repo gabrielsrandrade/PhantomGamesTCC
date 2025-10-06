@@ -1,4 +1,4 @@
-import { clerk, waitForAuthReady } from "./auth.js";
+import { clerk, initializeAuth } from "./auth.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const statusDiv = document.getElementById('status-pagamento');
@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     statusDiv.innerHTML = "<h2>Verificando seu pagamento...</h2><p>Por favor, aguarde.</p>";
 
     try {
-        await waitForAuthReady();
+        await initializeAuth();
 
         if (!clerk.session) {
             throw new Error("Sessão de usuário não encontrada. Por favor, faça o login e contate o suporte se a cobrança foi efetuada.");

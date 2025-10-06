@@ -9,7 +9,7 @@ function showMessage(message, type = "success") {
     document.body.appendChild(modal);
     const close = () => { if (document.body.contains(modal)) document.body.removeChild(modal); };
     modal.querySelector('.close-message-btn').addEventListener('click', close);
-    setTimeout(close, 4000);
+    setTimeout(close, 1000);
 }
 
 function createConfirmModal(message) {
@@ -31,7 +31,6 @@ function createConfirmModal(message) {
     });
 }
 
-// --- MODAL DE EDIÇÃO (COMPLETO E FUNCIONAL) ---
 async function createEditModal(gameData) {
   let allGenres = [],
     allCategories = [];
@@ -195,6 +194,7 @@ async function createEditModal(gameData) {
       });
     }
   };
+  
   renderMediaPreviews();
 
   const closeModal = () => overlay.remove();
@@ -273,7 +273,7 @@ async function createEditModal(gameData) {
     });
 }
 
-// --- FUNÇÕES DE RENDERIZAÇÃO E AÇÕES ---
+//FUNÇÕES DE RENDERIZAÇÃO E AÇÕES
 function renderGameDetails(game) {
   document.title = game.Nome_jogo;
   document.getElementById("nome-jogo").textContent = game.Nome_jogo;
@@ -307,7 +307,7 @@ function renderGameDetails(game) {
     precoSpan.textContent = `R$ ${precoOriginal.toFixed(2).replace(".", ",")}`;
   }
 
-  updateAverageRating(game.Media_nota); // Renderiza a avaliação inicial
+  updateAverageRating(game.Media_nota); 
 
   document.getElementById("genero").innerHTML = (game.generos || [])
     .map((g) => `<span>${g}</span>`)
@@ -518,7 +518,7 @@ async function handleRemoveGame(jogoId) {
   }
 }
 
-// --- FUNÇÕES DE COMENTÁRIOS ---
+//FUNÇÕES DE COMENTÁRIOS
 function renderComments(comments, currentUser, isAdmin) {
   const container = document.querySelector(".comentarios-container");
   container.innerHTML = "";
@@ -560,10 +560,6 @@ function setupCommentForm(isSignedIn, user, isAdmin, jogoId) {
   const submitButton = formContainer.querySelector("button");
   const stars = formContainer.querySelectorAll(".nota .star");
 
-  if (!isSignedIn) {
-    formContainer.style.display = "none";
-    return;
-  }
   formContainer.style.display = "flex";
   formContainer.querySelector(".image-perfil img").src =
     user.imageUrl || "../../assets/imagens/default_avatar.png";
@@ -620,7 +616,6 @@ function setupCommentForm(isSignedIn, user, isAdmin, jogoId) {
 
         if (!response.ok) throw new Error((await response.json()).message);
 
-        showMessage("Comentário enviado com sucesso!");
         commentInput.value = "";
         resetStars();
 
@@ -662,7 +657,6 @@ async function handleRemoveComment(commentId, user, isAdmin, jogoId) {
     if (!response.ok) throw new Error((await response.json()).message);
 
     commentDiv.remove();
-    showMessage("Comentário removido com sucesso!");
 
     const newCommentsRes = await fetch(
       `http://localhost:3000/comentarios/${jogoId}`
@@ -675,27 +669,45 @@ async function handleRemoveComment(commentId, user, isAdmin, jogoId) {
   }
 }
 
-// --- FUNÇÃO PRINCIPAL DE INICIALIZAÇÃO ---
+async function fetchUserGameStatus(gameData, authData) {
+    try {
+        const token = await clerk.session.getToken();
+        const res = await fetch(`http://localhost:3000/user-game-status/${gameData.ID_jogo}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+
+        if (!res.ok) {
+             renderActionButtons(authData.isSignedIn, authData.isAdmin, gameData);
+             return; 
+        }
+
+        const userStatus = await res.json();
+        const fullGameData = { ...gameData, ...userStatus };
+        
+        renderActionButtons(authData.isSignedIn, authData.isAdmin, fullGameData);
+
+    } catch (error) {
+        console.error("Não foi possível buscar o status do usuário para o jogo:", error);
+
+        renderActionButtons(authData.isSignedIn, authData.isAdmin, gameData);
+    }
+}
+
 async function main() {
     const urlParams = new URLSearchParams(window.location.search);
     const jogoId = urlParams.get("id");
+    const mainContainer = document.querySelector("main");
+
     if (!jogoId) {
-        document.querySelector("main").innerHTML = '<p class="error-message">ID do jogo não fornecido.</p>';
+        mainContainer.innerHTML = '<p class="error-message">ID do jogo não fornecido.</p>';
         return;
     }
 
     try {
-        const authData = await initializeAuth();
-        const headers = {};
-        
-        if (authData.isSignedIn) {
-            const token = await clerk.session.getToken();
-            headers['Authorization'] = `Bearer ${token}`;
+        const gameRes = await fetch(`http://localhost:3000/jogos/${jogoId}`);
+        if (!gameRes.ok) {
+            throw new Error("Jogo não encontrado.");
         }
-
-        const gameRes = await fetch(`http://localhost:3000/jogos/${jogoId}`, { headers });
-        
-        if (!gameRes.ok) throw new Error(`Jogo não encontrado (ID: ${jogoId})`);
         const game = await gameRes.json();
         
         const commentsRes = await fetch(`http://localhost:3000/comentarios/${jogoId}`);
@@ -704,13 +716,22 @@ async function main() {
 
         renderGameDetails(game);
         setupSwiperSliders(game);
-        renderActionButtons(authData.isSignedIn, authData.isAdmin, game); // Passa o objeto 'game' completo
-        renderComments(commentsData.comentarios, authData.user, authData.isAdmin);
-        setupCommentForm(authData.isSignedIn, authData.user, authData.isAdmin, jogoId);
+        renderComments(commentsData.comentarios, null, false);
+
+        const authData = await initializeAuth();
+
+        
+        if (authData.isSignedIn) {
+            fetchUserGameStatus(game, authData);
+            renderComments(commentsData.comentarios, authData.user, authData.isAdmin);
+            setupCommentForm(authData.isSignedIn, authData.user, authData.isAdmin, jogoId);
+        } else {
+            renderActionButtons(false, false, game);
+        }
         
     } catch (error) {
         console.error("Erro ao carregar a página do jogo:", error);
-        document.querySelector("main").innerHTML = `<p class="error-message">Não foi possível carregar os detalhes do jogo. ${error.message}</p>`;
+        mainContainer.innerHTML = `<p class="error-message">Não foi possível carregar os detalhes do jogo. ${error.message}</p>`;
     }
 }
 

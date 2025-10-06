@@ -1,4 +1,4 @@
-import { clerk, waitForAuthReady } from "./auth.js";
+import { clerk, initializeAuth } from "./auth.js";
 
 //FUNÇÕES DE UTILIDADE (MODAIS)
 function showMessage(message, type = "success") {
@@ -8,7 +8,7 @@ function showMessage(message, type = "success") {
     document.body.appendChild(modal);
     const close = () => { if (document.body.contains(modal)) document.body.removeChild(modal); };
     modal.querySelector('.close-message-btn').addEventListener('click', close);
-    setTimeout(close, 4000);
+    setTimeout(close, 1000);
 }
 
 function createConfirmModal(message) {
@@ -32,7 +32,7 @@ function createConfirmModal(message) {
 
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const authData = await waitForAuthReady(); 
+    const authData = await initializeAuth(); 
 
     if (!authData.isSignedIn) {
         document.querySelector('.cards_carrinho').innerHTML = '<h2>Sua lista está vazia</h2><p>Você precisa estar logado para ver sua lista de desejos. <a href="login.html">Faça Login</a></p>';

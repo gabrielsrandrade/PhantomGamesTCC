@@ -439,3 +439,7 @@ main .sobre-jogo .detalhes-jogo #avaliacao {
 #confirm-no:hover {
     background-color: #555555;
 }
+
+#adicionar-comentario {
+    display: none;
+}

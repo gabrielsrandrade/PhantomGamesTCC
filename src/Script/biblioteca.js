@@ -1,9 +1,9 @@
-import { clerk, waitForAuthReady } from "./auth.js";
+import { clerk, initializeAuth } from "./auth.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
     // A função setupDropdown() não é chamada aqui, pois você a removeu.
     
-    const authData = await waitForAuthReady();
+    const authData = await initializeAuth();
     const container = document.querySelector('.card_jogos');
 
     if (!authData.isSignedIn) {
@@ -15,25 +15,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 let jogosData = [];
-let currentSort = 'a-z'; // Default ordenação (engloba todas as opções do filtro order-by)
+let currentSort = 'a-z';
 
 async function carregarBiblioteca() {
     const container = document.querySelector('.card_jogos');
     
-    // Adicionamos a busca pelos elementos de UI aqui, pois vamos usá-los no listener
     const select = document.querySelector('.select');
     const dropdown = document.querySelector('.filtro-content');
     const selectValue = document.querySelector('.select-value');
 
      if (select && dropdown) {
         select.addEventListener('click', (event) => {
-            // Impede que o clique no select feche o menu imediatamente
             event.stopPropagation(); 
             dropdown.classList.toggle('show');
         });
     }
 
-    // Adiciona um listener para fechar o dropdown se o usuário clicar fora dele
     document.addEventListener('click', () => {
         if (dropdown && dropdown.classList.contains('show')) {
             dropdown.classList.remove('show');
@@ -59,7 +56,7 @@ async function carregarBiblioteca() {
         container.innerHTML = `<p style="color: red; text-align: center;">${error.message}</p>`;
     }
 
-    // Listener para o evento de filtro (mantido igual)
+    // Listener para o evento de filtro
     document.addEventListener('filterApplied', (event) => {
         const { filterName, filterValue } = event.detail;
         console.log("Evento filterApplied:", { filterName, filterValue });
@@ -92,13 +89,10 @@ async function carregarBiblioteca() {
 }
 
 function sortAndRender() {
-    // Cria uma cópia dos dados para evitar modificar o original
     let sortedJogos = [...jogosData];
 
-    // Log para verificar o valor atual de ordenação
     console.log("Ordenação atual:", currentSort);
 
-    // Aplica a ordenação com base no valor de currentSort
     if (currentSort === 'recent-old') {
         sortedJogos.sort((a, b) => {
             const dateA = a.data_adicao ? new Date(a.data_adicao) : new Date(0);
@@ -111,11 +105,11 @@ function sortAndRender() {
 
             const dateDiff = dateB - dateA;
             if (dateDiff === 0) {
-                return a.Nome_jogo.localeCompare(b.Nome_jogo); // Tie-breaker por nome
+                return a.Nome_jogo.localeCompare(b.Nome_jogo); 
             }
 
             console.log(`Comparando ${a.Nome_jogo} (${dateA.toISOString()}) com ${b.Nome_jogo} (${dateB.toISOString()}): ${dateDiff}`);
-            return dateDiff; // Recente - Antigo
+            return dateDiff;
         });
     } else if (currentSort === 'old-recent') {
         sortedJogos.sort((a, b) => {
@@ -129,11 +123,11 @@ function sortAndRender() {
 
             const dateDiff = dateA - dateB;
             if (dateDiff === 0) {
-                return a.Nome_jogo.localeCompare(b.Nome_jogo); // Tie-breaker por nome
+                return a.Nome_jogo.localeCompare(b.Nome_jogo);
             }
 
             console.log(`Comparando ${a.Nome_jogo} (${dateA.toISOString()}) com ${b.Nome_jogo} (${dateB.toISOString()}): ${dateDiff}`);
-            return dateDiff; // Antigo - Recente
+            return dateDiff;
         });
     } else if (currentSort === 'a-z') {
         sortedJogos.sort((a, b) => a.Nome_jogo.localeCompare(b.Nome_jogo));
@@ -143,10 +137,8 @@ function sortAndRender() {
         console.warn("Valor de ordenação inválido:", currentSort);
     }
 
-    // Log para verificar o resultado da ordenação
     console.log("Jogos ordenados:", sortedJogos);
 
-    // Renderiza os jogos ordenados
     renderJogos(sortedJogos);
 }
 

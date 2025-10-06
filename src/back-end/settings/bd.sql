@@ -37,7 +37,6 @@ CREATE TABLE jogos(
     Media_nota DECIMAL(3,1) NOT NULL DEFAULT 0.0
 );
 
-/* Tabela para armazenar as URLs de imagens e vídeos dos jogos */
 CREATE TABLE midias_jogo(
   ID_midia INT(10) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   ID_jogo INT(5) NOT NULL,

@@ -7,7 +7,6 @@ let gameDataFromFirstPage = {};
 let multiselectGenre;
 let multiselectCategory;
 
-// Função para exibir modais de mensagem simples
 function showCustomMessage(message) {
     const modalContainer = document.createElement("div");
     modalContainer.className = "custom-message-modal";
@@ -23,9 +22,9 @@ function showCustomMessage(message) {
     const close = () => { if (document.body.contains(modalContainer)) document.body.removeChild(modalContainer); };
     closeBtn.addEventListener("click", close);
     modalContainer.addEventListener("click", (e) => { if (e.target === modalContainer) close(); });
+    setTimeout(close, 1000);
 }
 
-// Função principal que cria e gerencia o modal de adicionar jogo
 async function createAddGameModal() {
     let generos = [];
     let categorias = [];
@@ -44,18 +43,15 @@ async function createAddGameModal() {
         return;
     }
 
-    // Gerar as opções de multiselect dinamicamente
     const generosOptionsHTML = generos.map(g => `<span class="multiselect-option" data-value="${g}">${g}</span>`).join("");
     const categoriasOptionsHTML = categorias.map(c => `<span class="multiselect-option" data-value="${c}">${c}</span>`).join("");
 
-    // 2. Criar a estrutura do Modal
     const overlay = document.createElement("div");
     overlay.classList.add("modal-overlay");
 
     const modal = document.createElement("div");
     modal.classList.add("add-game-modal");
 
-    // HTML da primeira página do formulário
     const firstPageHTML = `
         <div class="modal-content" id="first-page">
             <button class="close-modal-btn">&times;</button>
@@ -96,7 +92,6 @@ async function createAddGameModal() {
         </div>
     `;
 
-    // HTML da segunda página do formulário
     const secondPageHTML = `
         <div class="modal-content" id="second-page" style="display: none;">
             <button class="close-modal-btn">&times;</button>
@@ -115,7 +110,6 @@ async function createAddGameModal() {
     document.body.appendChild(overlay);
     document.body.appendChild(modal);
 
-    // 3. Adicionar Lógica e Event Listeners
     const firstPage = modal.querySelector("#first-page");
     const secondPage = modal.querySelector("#second-page");
 
@@ -132,6 +126,19 @@ async function createAddGameModal() {
     modal.querySelectorAll('.close-modal-btn').forEach(btn => btn.addEventListener('click', closeModal));
     overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
     
+    firstPage.querySelector('.clear-btn').addEventListener('click', () => {
+        const form = firstPage.querySelector('form');
+        form.reset(); 
+
+        // Usa o método 'setValues' com um array vazio para limpar a seleção
+        if (multiselectGenre && typeof multiselectGenre.setValues === 'function') {
+            multiselectGenre.setValues([]); 
+        }
+        if (multiselectCategory && typeof multiselectCategory.setValues === 'function') {
+            multiselectCategory.setValues([]);
+        }
+    });
+
     firstPage.querySelector('.next-btn').addEventListener('click', () => {
         const form = firstPage.querySelector('form');
         if (!form.checkValidity()) {
@@ -235,15 +242,12 @@ async function createAddGameModal() {
     });
 }
 
-// Lógica da Barra de Navegação e da Busca
 function handleSearch(event) {
     event.preventDefault();
     const searchInput = document.getElementById("search-input");
     const query = searchInput.value.trim();
 
-    if (!query) { 
-        return;
-    }
+    if (!query) return;
 
     const isNavegarPage = window.location.pathname.includes("navegar.html");
 
@@ -255,7 +259,6 @@ function handleSearch(event) {
     }
 }
 
-
 function renderNavbar({ isSignedIn, isAdmin }) {
     const navbar = document.querySelector(".navbar");
     if (!navbar) return;
@@ -263,7 +266,7 @@ function renderNavbar({ isSignedIn, isAdmin }) {
     let navbarHTML = "";
 
     if (isSignedIn) {
-        if (isAdmin) { // Admin Logado
+        if (isAdmin) {
             navbarHTML = `
                 <div class="logadoA">
                     <ul>
@@ -275,7 +278,7 @@ function renderNavbar({ isSignedIn, isAdmin }) {
                     <button id="add-game-btn">Adicionar Jogo</button>
                     <div id="user-button"></div>
                 </div>`;
-        } else { // Membro Logado
+        } else {
             navbarHTML = `
                 <div class="logadoM">
                     <ul>
@@ -293,7 +296,7 @@ function renderNavbar({ isSignedIn, isAdmin }) {
                     </div>
                 </div>`;
         }
-    } else { // Deslogado
+    } else {
         navbarHTML = `
             <div class="deslogado">
                 <ul>
@@ -322,7 +325,6 @@ function renderNavbar({ isSignedIn, isAdmin }) {
         });
     }
 
-
     const urlParams = new URLSearchParams(window.location.search);
     const query = urlParams.get("query");
     if (searchInput && query) searchInput.value = query;
@@ -338,7 +340,6 @@ function renderNavbar({ isSignedIn, isAdmin }) {
     }
 }
 
-// Ponto de entrada principal do script
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const authData = await initializeAuth();
