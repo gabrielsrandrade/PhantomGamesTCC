@@ -195,14 +195,23 @@ async function fetchAndDisplayNationalGames() {
     if (!cardsContainer) return;
 
     try {
-        const response = await fetch("http://localhost:3000/jogos-nacionais");
+        // Requisição inicial que pode trazer todos os jogos nacionais ou já ordenados/limitados pela API.
+        // Se sua API suportar, use um endpoint como: /jogos-nacionais?_sort=Media_nota&_order=desc&_limit=3
+        const response = await fetch("http://localhost:3000/jogos-nacionais"); 
         if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-        const nationalGames = await response.json();
+        let nationalGames = await response.json();
 
         if (!nationalGames || nationalGames.length === 0) {
             cardsContainer.innerHTML = '<p class="error-message">Nenhum jogo nacional encontrado.</p>';
             return;
         }
+        
+        // Se a API não ordenar ou limitar, fazemos no cliente:
+        // 1. Ordena por Media_nota (maior para o menor)
+        nationalGames.sort((a, b) => (parseFloat(b.Media_nota) || 0) - (parseFloat(a.Media_nota) || 0));
+        // 2. Limita aos 3 primeiros
+        nationalGames = nationalGames.slice(0, 3);
+
 
         cardsContainer.innerHTML = '';
         const backendUrl = 'http://localhost:3000';
@@ -210,7 +219,8 @@ async function fetchAndDisplayNationalGames() {
         nationalGames.forEach(game => {
             const gameCard = document.createElement("a");
             gameCard.href = `jogo.html?id=${game.ID_jogo}`;
-            gameCard.className = "card_jogo swiper-slide"; 
+            // Mantenha a classe 'card_jogo' para herdar estilos visuais comuns
+            gameCard.className = "card_jogo card_jogo_nacional"; 
 
             let imageUrl = game.Capa_jogo;
             if (imageUrl && imageUrl.startsWith('/')) imageUrl = `${backendUrl}${imageUrl}`;
@@ -219,19 +229,16 @@ async function fetchAndDisplayNationalGames() {
             const precoHtml = createPriceHtml(game.Preco_jogo, game.Desconto_jogo);
 
             gameCard.innerHTML = `
-                <div class="capa_card" style="background-image: url('${imageUrl}')"></div>
+                <div class="capa_card capa_nacional" style="background-image: url('${imageUrl}')">  
                 <span>${game.Nome_jogo}</span>
                 ${estrelasHtml}
                 <div class="preco">${precoHtml}</div>
+                </div>
+
             `;
             cardsContainer.appendChild(gameCard);
         });
 
-        new Swiper('.card_jogos4', {
-            slidesPerView: 3, spaceBetween: 41, loop: false, grabCursor: true,
-            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-            breakpoints: { 0: { slidesPerView: 2 }, 520: { slidesPerView: 3 }, 950: { slidesPerView: 3 } },
-        });
 
     } catch (error) {
         console.error("Falha ao carregar jogos nacionais:", error);
