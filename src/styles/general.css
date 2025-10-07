@@ -54,6 +54,16 @@ body {
     min-height: 100vh;
 }
 
+p {
+    color: white;
+}
+
+p.error-message {
+    margin-left: 1rem;
+}
+
+
+
 h1 {
     color: var(--selected-text-color);
     font-weight: 400;
@@ -523,7 +533,7 @@ footer {
     display: flex;
     justify-content: center;
     align-items: center;
-     z-index: 9998;
+    z-index: 9998;
 }
 
 .add-game-modal {
@@ -535,7 +545,7 @@ footer {
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-     z-index: 9999;
+    z-index: 9999;
     max-width: 600px;
     width: 90%;
     color: var(--selected-text-color);
@@ -737,7 +747,7 @@ footer {
 }
 
 .preco-desconto {
-    color:white;
+    color: white;
     font-weight: bold;
 }
 
@@ -753,4 +763,3 @@ footer {
     padding: 2px 4px;
     border-radius: 1rem;
 }
-
