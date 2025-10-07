@@ -22,7 +22,6 @@ selectTriggers.forEach(trigger => {
             selectIcon.alt = "Seta para baixo";
             
             this.classList.remove('is-selected');
-
             filtroContent.classList.remove('show');
 
             document.dispatchEvent(new CustomEvent('filterApplied', {
@@ -33,7 +32,9 @@ selectTriggers.forEach(trigger => {
         }
 
         document.querySelectorAll('.filtro-content.show').forEach(openFiltro => {
-            openFiltro.classList.remove('show');
+            if (openFiltro !== filtroContent) {
+                openFiltro.classList.remove('show');
+            }
         });
 
         filtroContent.classList.toggle('show');
@@ -66,7 +67,10 @@ document.querySelectorAll('.filtro-content li').forEach(item => {
 });
 
 window.addEventListener('click', function(event) {
-    if (!event.target.closest('.filtro')) {
+    const isClickOnSelect = event.target.closest('.select');
+    const isClickInOpenContent = event.target.closest('.filtro-content.show');
+
+    if (!isClickOnSelect && !isClickInOpenContent) {
         document.querySelectorAll('.filtro-content.show').forEach(openFiltro => {
             openFiltro.classList.remove('show');
         });

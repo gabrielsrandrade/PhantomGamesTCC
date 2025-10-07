@@ -195,9 +195,7 @@ async function fetchAndDisplayNationalGames() {
     if (!cardsContainer) return;
 
     try {
-        // Requisição inicial que pode trazer todos os jogos nacionais ou já ordenados/limitados pela API.
-        // Se sua API suportar, use um endpoint como: /jogos-nacionais?_sort=Media_nota&_order=desc&_limit=3
-        const response = await fetch("http://localhost:3000/jogos-nacionais"); 
+        const response = await fetch("http://localhost:3000/jogos-nacionais");
         if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
         let nationalGames = await response.json();
 
@@ -205,13 +203,9 @@ async function fetchAndDisplayNationalGames() {
             cardsContainer.innerHTML = '<p class="error-message">Nenhum jogo nacional encontrado.</p>';
             return;
         }
-        
-        // Se a API não ordenar ou limitar, fazemos no cliente:
-        // 1. Ordena por Media_nota (maior para o menor)
-        nationalGames.sort((a, b) => (parseFloat(b.Media_nota) || 0) - (parseFloat(a.Media_nota) || 0));
-        // 2. Limita aos 3 primeiros
-        nationalGames = nationalGames.slice(0, 3);
 
+        nationalGames.sort((a, b) => (parseFloat(b.Media_nota) || 0) - (parseFloat(a.Media_nota) || 0));
+        nationalGames = nationalGames.slice(0, 3);
 
         cardsContainer.innerHTML = '';
         const backendUrl = 'http://localhost:3000';
@@ -219,26 +213,34 @@ async function fetchAndDisplayNationalGames() {
         nationalGames.forEach(game => {
             const gameCard = document.createElement("a");
             gameCard.href = `jogo.html?id=${game.ID_jogo}`;
-            // Mantenha a classe 'card_jogo' para herdar estilos visuais comuns
-            gameCard.className = "card_jogo card_jogo_nacional"; 
+            gameCard.className = "card_jogo card_jogo_nacional";
 
             let imageUrl = game.Capa_jogo;
-            if (imageUrl && imageUrl.startsWith('/')) imageUrl = `${backendUrl}${imageUrl}`;
+            if (imageUrl && imageUrl.startsWith('/')) {
+                imageUrl = `${backendUrl}${imageUrl}`;
+            }
 
             const estrelasHtml = createRatingStars(game.Media_nota);
             const precoHtml = createPriceHtml(game.Preco_jogo, game.Desconto_jogo);
 
+            // ===== INÍCIO DA MODIFICAÇÃO =====
+            // Agora criamos duas divs para a imagem: uma para o fundo desfocado (bg)
+            // e outra para a imagem nítida no centro (fg).
             gameCard.innerHTML = `
-                <div class="capa_card capa_nacional" style="background-image: url('${imageUrl}')">  
-                <span>${game.Nome_jogo}</span>
-                ${estrelasHtml}
-                <div class="preco">${precoHtml}</div>
+                <div class="capa_nacional">
+                    <div class="capa_card_bg" style="background-image: url(${imageUrl})"></div>
+                    <div class="capa_card_fg" style="background-image: url(${imageUrl})"></div>
+                    <div class="info_overlay">
+                        <span>${game.Nome_jogo}</span>
+                        ${estrelasHtml}
+                        <div class="preco">${precoHtml}</div>
+                    </div>
                 </div>
-
             `;
+            // ===== FIM DA MODIFICAÇÃO =====
+
             cardsContainer.appendChild(gameCard);
         });
-
 
     } catch (error) {
         console.error("Falha ao carregar jogos nacionais:", error);
@@ -253,18 +255,11 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchAndDisplayNationalGames();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-    fetchAndDisplayHighlights();
-    fetchAndDisplayFreeGames();
-    fetchAndDisplayPromotions();
-    fetchAndDisplayNationalGames();
-
-});
-
 // Adicione isso aqui para atualizar automaticamente após adição de jogo
 document.addEventListener("gameUpdated", () => {
     fetchAndDisplayHighlights();
     fetchAndDisplayFreeGames();
     fetchAndDisplayPromotions();
     fetchAndDisplayNationalGames();
+    fetchAndDisplayCarousel();
 });
