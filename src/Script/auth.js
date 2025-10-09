@@ -1,4 +1,6 @@
 import { Clerk } from "@clerk/clerk-js";
+import { dark } from '@clerk/themes';         // Adicionado para o tema escuro
+import { ptBR } from '@clerk/localizations'; // Adicionado para o idioma português
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -21,7 +23,6 @@ async function syncUserToDatabase(user) {
     console.error("Erro de rede ao sincronizar usuário:", error);
   }
 }
-
 
 let authData = {
   isSignedIn: false,
@@ -47,8 +48,15 @@ export const initializeAuth = () => {
             }
         });
 
-        await clerk.load();
+        // A configuração de aparência e idioma foi adicionada aqui
+        await clerk.load({
+            localization: ptBR,
+            appearance: {
+                baseTheme: dark,
+            }
+        });
 
+        // Sua lógica original foi mantida pois está correta
         console.log(
             "Clerk carregado. Estado final:",
             "Logado:", authData.isSignedIn,

@@ -8,7 +8,6 @@ function createPriceHtml(preco, desconto) {
     
     if (descontoFloat > 0) {
         const precoComDesconto = precoFloat * (1 - descontoFloat / 100);
-        // ADICIONAMOS A TAG DE DESCONTO AQUI
         return `
         <span class="promocao">R$ ${precoFloat.toFixed(2).replace('.', ',')}</span>
         <span>R$ ${precoComDesconto.toFixed(2).replace('.', ',')}</span>
@@ -223,9 +222,6 @@ async function fetchAndDisplayNationalGames() {
             const estrelasHtml = createRatingStars(game.Media_nota);
             const precoHtml = createPriceHtml(game.Preco_jogo, game.Desconto_jogo);
 
-            // ===== INÍCIO DA MODIFICAÇÃO =====
-            // Agora criamos duas divs para a imagem: uma para o fundo desfocado (bg)
-            // e outra para a imagem nítida no centro (fg).
             gameCard.innerHTML = `
                 <div class="capa_nacional">
                     <div class="capa_card_bg" style="background-image: url(${imageUrl})"></div>
@@ -237,7 +233,6 @@ async function fetchAndDisplayNationalGames() {
                     </div>
                 </div>
             `;
-            // ===== FIM DA MODIFICAÇÃO =====
 
             cardsContainer.appendChild(gameCard);
         });
@@ -248,65 +243,11 @@ async function fetchAndDisplayNationalGames() {
     }
 }
 
-
-// Adicione esta função ao final do arquivo homepage.js, antes do document.addEventListener
-
-async function fetchAndDisplayCarousel() {
-    const carouselMain = document.querySelector(".carrosel_main_image");
-    const carouselSides = document.querySelectorAll(".carrosel_side_image");
-    const priceDiv = carouselMain.querySelector(".price");
-
-    if (!carouselMain || carouselSides.length !== 3) return;
-
-    try {
-        const response = await fetch("http://localhost:3000/jogos-carrossel");
-        if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-        const carouselGames = await response.json();
-
-        if (!carouselGames || carouselGames.length < 4) {
-            console.warn("Menos de 4 jogos disponíveis para o carrossel.");
-            return;
-        }
-
-        const backendUrl = 'http://localhost:3000';
-
-        // Atualizar a imagem principal
-        let mainImageUrl = carouselGames[0].Primeira_Midia;
-        if (mainImageUrl && mainImageUrl.startsWith('/')) mainImageUrl = `${backendUrl}${mainImageUrl}`;
-        carouselMain.style.backgroundImage = `url('${mainImageUrl}')`;
-
-        // Atualizar o preço da principal com desconto ou grátis
-        priceDiv.innerHTML = createPriceHtml(carouselGames[0].Preco_jogo, carouselGames[0].Desconto_jogo);
-
-        // Tornar a principal clicável
-        carouselMain.onclick = () => {
-            window.location.href = `jogo.html?id=${carouselGames[0].ID_jogo}`;
-        };
-
-        // Atualizar as imagens laterais
-        for (let i = 0; i < 3; i++) {
-            let sideImageUrl = carouselGames[i + 1].Primeira_Midia;
-            if (sideImageUrl && sideImageUrl.startsWith('/')) sideImageUrl = `${backendUrl}${sideImageUrl}`;
-            carouselSides[i].style.backgroundImage = `url('${sideImageUrl}')`;
-
-            // Tornar as laterais clicáveis
-            carouselSides[i].onclick = () => {
-                window.location.href = `jogo.html?id=${carouselGames[i + 1].ID_jogo}`;
-            };
-        }
-
-    } catch (error) {
-        console.error("Falha ao carregar o carrossel principal:", error);
-    }
-}
-
-// Atualize o event listener no final do arquivo para incluir o carrossel
 document.addEventListener("DOMContentLoaded", () => {
     fetchAndDisplayHighlights();
     fetchAndDisplayFreeGames();
     fetchAndDisplayPromotions();
     fetchAndDisplayNationalGames();
-    fetchAndDisplayCarousel(); // Adicione esta chamada
 });
 
 document.addEventListener("gameUpdated", () => {
@@ -314,5 +255,4 @@ document.addEventListener("gameUpdated", () => {
     fetchAndDisplayFreeGames();
     fetchAndDisplayPromotions();
     fetchAndDisplayNationalGames();
-    fetchAndDisplayCarousel(); // Adicione esta chamada
 });

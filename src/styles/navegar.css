@@ -1,67 +1,5 @@
 @import "general.css";
 
-/*swiper genros*/
-
-/* .filtroGeneros{
-    display: flex;
-    flex-direction: column;
-    min-width: 91rem;
-    max-width: 91rem;
-    margin: 5rem auto;
-    gap: 1rem;
-    
-
-    .generos{
-        width: 91rem;
-        display: flex;
-        justify-content: start;
-        align-items: center;
-        padding: 2rem;
-        
-        .g1, .g2, .g3, .g4{
-            width: 21.5rem;
-            height: 12.09rem;
-
-            align-items: center;
-
-            background-size: cover;
-            background-position: center;
-            background-color: var(--navbar-color);
-
-            display: flex;
-            justify-content: space-between;
-            padding-left: 1rem;
-            border-radius: 36px;
-            color: white;
-            font-weight: 400;
-            font-size: 2rem;
-            font-family: "Bebas Neue", sans-serif;
-            cursor: pointer;
-            
-             img{
-                width: auto;
-                height: 11rem;
-                align-self: flex-end;
-            }
-        }
-
-        .g1{
-            background-image: radial-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(../../assets/imagens/ação.jpeg);
-        }
-        .g2{
-            background-image: radial-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(../../assets/imagens/aventura.jpg);
-        }
-        .g3{
-            background-image: radial-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(../../assets/imagens/fps.jpg);
-        }
-        .g4{
-            background-image: radial-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(../../assets/imagens/rpg.jpg);
-        } 
-    }
-} */
-
-/*filtros*/
-
 .filtros{
     display: flex;
     flex-direction: column;
@@ -246,9 +184,22 @@
             font-weight: 400;
             transition: 0.3s;
         }
+        .numbers{
+            display: flex;
+            gap: 0.5rem;
+        }
 
-        .first:hover, .numbers:hover,.prev:hover, .next:hover, .last:hover {
-           font-weight: 600;
+        .first:hover, .prev:hover, .next:hover, .last:hover, .numbers div:hover {
+            font-weight: 600;
+        }
+        .pagination .numbers div.active {
+            font-weight: 700;
+            color: white; 
+            transform: scale(1.1);
+        }
+        .pagination .ellipsis {
+            cursor: default;
+            padding: 0 4px; /* Adiciona um pequeno espaçamento */
         }
 
         footer{

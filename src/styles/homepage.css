@@ -59,6 +59,15 @@ h1 {
                 font-weight: bold;
                 color: white;
                 margin-bottom: 8px;
+                display: flex;
+                gap: 1rem;
+                align-items: end;
+                .promocao {
+                    color: var(--non-selected-color);
+                    text-decoration: line-through;
+                    font-size: 1rem;
+                }
+
             }
         }
 

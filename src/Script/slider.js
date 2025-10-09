@@ -1,3 +1,23 @@
+function formatCarouselPriceHtml(game) {
+  const precoFloat = parseFloat(game.Preco_jogo);
+  const descontoFloat = parseFloat(game.Desconto_jogo);
+
+  if (isNaN(precoFloat) || precoFloat === 0) {
+    return '<span class="preco-gratis">Grátis</span>';
+  }
+
+  if (descontoFloat > 0) {
+    const precoComDesconto = precoFloat * (1 - descontoFloat / 100);
+    return `
+      <span class="promocao">R$ ${precoFloat.toFixed(2).replace('.', ',')}</span>
+      <span>R$ ${precoComDesconto.toFixed(2).replace('.', ',')}</span>
+    `;
+  }
+
+  return `<span>R$ ${precoFloat.toFixed(2).replace('.', ',')}</span>`;
+}
+
+
 async function fetchDataFromAPI() {
   try {
     const response = await fetch('http://localhost:3000/jogos-carrossel');
@@ -11,24 +31,11 @@ async function fetchDataFromAPI() {
         imageUrl = `${backendUrl}${imageUrl}`;
       }
 
-      const precoFloat = parseFloat(game.Preco_jogo);
-      const descontoFloat = parseFloat(game.Desconto_jogo);
-      let precoFormatado;
-
-      if (precoFloat === 0) {
-        precoFormatado = 'Grátis';
-      } else if (descontoFloat > 0) {
-        const precoComDesconto = precoFloat * (1 - descontoFloat / 100);
-        precoFormatado = `R$ ${precoComDesconto.toFixed(2).replace('.', ',')}`;
-      } else {
-        precoFormatado = `R$ ${precoFloat.toFixed(2).replace('.', ',')}`;
-      }
-
       return {
         id: game.ID_jogo,
         url: imageUrl,
         thumbnail: imageUrl,
-        price: precoFormatado
+        price: formatCarouselPriceHtml(game)
       };
     });
   } catch (error) {
@@ -60,14 +67,6 @@ async function initializeCarousel() {
   if (images && images.length > 0) {
     updateCarousel(0);
     startAutoSlide();
-
-    buyNowButton.addEventListener('click', () => {
-      const currentGameId = images[currentIndex].id;
-      if (currentGameId) {
-        window.location.href = `jogo.html?id=${currentGameId}`;
-      }
-    });
-
   } else {
     if (carrosselContainer) {
       carrosselContainer.innerHTML = '<p style="color:white; text-align:center; width:100%; height: 36rem; display: flex; align-items: center; justify-content: center;">Não foi possível carregar os jogos do carrossel.</p>';
@@ -83,7 +82,8 @@ function updateCarousel(index) {
 
   setTimeout(() => {
     mainImage.style.backgroundImage = `linear-gradient(to right, rgba(0, 0, 0, 0.39) 30%, rgba(0, 0, 0, 0) 100%), url(${images[index].url})`;
-    priceElement.textContent = images[index].price;
+
+    priceElement.innerHTML = images[index].price;
 
     const nextIndices = [
       (index + 1) % images.length,
@@ -107,6 +107,13 @@ function updateCarousel(index) {
     });
   }, 200);
 }
+
+buyNowButton.addEventListener('click', () => {
+  const currentGameId = images[currentIndex].id;
+  if (currentGameId) {
+    window.location.href = `jogo.html?id=${currentGameId}`;
+  }
+});
 
 initializeCarousel();
 

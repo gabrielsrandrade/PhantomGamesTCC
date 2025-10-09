@@ -12,11 +12,10 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../../.env') });
 const app = express();
 const port = 3000;
 
-// --- 2. CONFIGURAÇÃO DE SEGURANÇA (CLERK E STRIPE) ---
-const CLERK_SECRET_KEY = process.env.CLERK_SECRET_KEY;
+// CONFIGURAÇÃO DE SEGURANÇA
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
-// --- 3. MIDDLEWARES ---
+// MIDDLEWARES 
 const corsOptions = { origin: 'http://localhost:5173', methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'], credentials: true };
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -72,7 +71,7 @@ const isAdminMiddleware = async (req, res, next) => {
     }
 };
 
-// --- 4. CONFIGURAÇÃO DE UPLOAD (MULTER) ---
+// CONFIGURAÇÃO DE UPLOAD (MULTER) 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const uploadsDir = path.join(__dirname, "uploads");
@@ -86,7 +85,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// --- 5. CONFIGURAÇÃO DO BANCO DE DADOS ---
+// CONFIGURAÇÃO DO BANCO DE DADOS
 const dbConfig = {
     host: "localhost",
     user: "root",
@@ -193,7 +192,7 @@ app.get("/jogos/:id", async (req, res) => {
             midias: midiasRows.map(r => r.URL_midia),
             isInCart: false,
             isInWishlist: false,
-            isOwned: false // Adicionamos este campo
+            isOwned: false 
         };
 
         if (userId) {
@@ -278,7 +277,6 @@ app.get("/filtrar-jogos", async (req, res) => {
             }
         }
 
-        // ##### LÓGICA DE AVALIAÇÃO COM A OPÇÃO "SEM ESTRELAS" #####
         if (avaliacao) {
             if (avaliacao === '0') {
                 // "Sem Estrelas": Apenas jogos com nota 0
@@ -307,7 +305,6 @@ app.get("/filtrar-jogos", async (req, res) => {
             }
         }
 
-        // Monta a query final
         if (joins.length > 0) {
             sql += [...new Set(joins)].join(" ");
         }
@@ -516,7 +513,6 @@ app.put("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, upload.array("midi
 
             await connection.execute(`DELETE FROM midias_jogo WHERE ID_jogo = ? AND URL_midia IN (${placeholders})`, [jogoId, ...urlsParaDeletar]);
 
-            // Deleta os arquivos físicos do servidor
             urlsParaDeletar.forEach(url => {
                 const fullPath = path.join(__dirname, url);
                 if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
@@ -547,7 +543,6 @@ app.delete("/jogos/:id", clerkAuthMiddleware, isAdminMiddleware, async (req, res
         connection = await pool.getConnection();
         await connection.beginTransaction();
 
-        // Deletar arquivos de mídia do servidor
         const [midias] = await connection.execute("SELECT URL_midia FROM midias_jogo WHERE ID_jogo = ?", [jogoId]);
         midias.forEach(midia => {
             const fullPath = path.join(__dirname, midia.URL_midia);
@@ -584,7 +579,7 @@ app.post("/carrinho/adicionar", clerkAuthMiddleware, async (req, res) => {
     let connection;
     try {
         connection = await pool.getConnection();
-        // INSERT IGNORE não insere se a chave primária (ID_usuario, ID_jogo) já existir.
+
         await connection.execute(
             "INSERT IGNORE INTO carrinho_itens (ID_usuario, ID_jogo) VALUES (?, ?)",
             [ID_usuario, ID_jogo]
@@ -602,7 +597,6 @@ app.post("/carrinho/adicionar", clerkAuthMiddleware, async (req, res) => {
 app.get("/carrinho", clerkAuthMiddleware, async (req, res) => {
     const ID_usuario = req.auth?.userId;
 
-    // Se não houver usuário autenticado, retorna um carrinho vazio em vez de quebrar
     if (!ID_usuario) {
         return res.status(200).json([]);
     }
@@ -625,7 +619,7 @@ app.get("/carrinho", clerkAuthMiddleware, async (req, res) => {
     }
 });
 
-// Rota para REMOVER um jogo do carrinho (vamos precisar dela na página do carrinho)
+// Rota para REMOVER um jogo do carrinho 
 app.delete("/carrinho/remover/:jogoId", clerkAuthMiddleware, async (req, res) => {
     const { jogoId } = req.params;
     const ID_usuario = req.auth.userId;
@@ -657,7 +651,6 @@ app.post("/desejos/adicionar", clerkAuthMiddleware, async (req, res) => {
     let connection;
     try {
         connection = await pool.getConnection();
-        // Usamos INSERT IGNORE para não dar erro se o jogo já estiver na lista
         await connection.execute(
             "INSERT IGNORE INTO lista_desejos (ID_usuario, ID_jogo) VALUES (?, ?)",
             [ID_usuario, ID_jogo]
@@ -675,7 +668,6 @@ app.post("/desejos/adicionar", clerkAuthMiddleware, async (req, res) => {
 app.get("/desejos", clerkAuthMiddleware, async (req, res) => {
     const ID_usuario = req.auth?.userId;
 
-    // Se não houver usuário autenticado, retorna uma lista vazia
     if (!ID_usuario) {
         return res.status(200).json([]);
     }
@@ -725,7 +717,6 @@ app.post('/criar-sessao-de-pagamento', clerkAuthMiddleware, async (req, res) => 
     try {
         connection = await pool.getConnection();
 
-        // 1. Busca os jogos do carrinho para calcular o total
         const [jogosNoCarrinho] = await connection.execute(
             `SELECT j.Nome_jogo, j.Preco_jogo, j.Desconto_jogo FROM jogos j
              JOIN carrinho_itens ci ON j.ID_jogo = ci.ID_jogo
@@ -737,7 +728,6 @@ app.post('/criar-sessao-de-pagamento', clerkAuthMiddleware, async (req, res) => 
             return res.status(400).json({ error: { message: "Seu carrinho está vazio." } });
         }
 
-        // 2. Cria os 'line_items' para a API do Stripe
         const line_items = jogosNoCarrinho.map(jogo => {
             const preco = parseFloat(jogo.Preco_jogo);
             const desconto = parseFloat(jogo.Desconto_jogo);
@@ -756,7 +746,6 @@ app.post('/criar-sessao-de-pagamento', clerkAuthMiddleware, async (req, res) => 
             };
         });
 
-        // 3. Cria a sessão de checkout no Stripe
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ['card'],
             line_items: line_items,
@@ -768,7 +757,6 @@ app.post('/criar-sessao-de-pagamento', clerkAuthMiddleware, async (req, res) => 
             cancel_url: `http://localhost:5173/src/front-end/carrinho.html`,
         });
 
-        // 4. Envia o ID da sessão de volta para o front-end
         res.json({ id: session.id });
 
     } catch (error) {
@@ -785,12 +773,9 @@ app.post('/verificar-pagamento', clerkAuthMiddleware, async (req, res) => {
     let connection;
 
     try {
-        // 1. Pergunta ao Stripe sobre a sessão
         const session = await stripe.checkout.sessions.retrieve(sessionId);
 
-        // 2. Verifica se o status do pagamento é "pago"
         if (session.payment_status === 'paid' && session.metadata.userId === userId) {
-            // Se o pagamento foi bem-sucedido, executa a mesma lógica do webhook
             connection = await pool.getConnection();
             await connection.beginTransaction();
 
@@ -805,7 +790,6 @@ app.post('/verificar-pagamento', clerkAuthMiddleware, async (req, res) => {
             console.log(`📚 Jogos liberados via verificação manual para o usuário: ${userId}`);
             return res.status(200).json({ status: 'success', message: 'Pagamento verificado e jogos liberados!' });
         } else {
-            // Se o pagamento não foi bem-sucedido ou o ID do usuário não bate
             return res.status(400).json({ status: 'failed', message: 'Verificação de pagamento falhou.' });
         }
 
@@ -821,7 +805,6 @@ app.post('/verificar-pagamento', clerkAuthMiddleware, async (req, res) => {
 app.get('/biblioteca', clerkAuthMiddleware, async (req, res) => {
     const userId = req.auth?.userId;
 
-    // Se não houver usuário autenticado, retorna uma biblioteca vazia
     if (!userId) {
         return res.status(200).json([]);
     }
@@ -851,11 +834,6 @@ app.get('/jogos-destaques', async (req, res) => {
     let connection;
     try {
         connection = await pool.getConnection();
-
-        // 1. Calcular um peso de popularidade: 
-        // Aqui, combinamos a Média da Nota (já presente na tabela 'jogos') com a 
-        // Contagem de Comentários para dar um peso maior aos jogos mais comentados e bem avaliados.
-        // LIMIT 7 garante no máximo 7 jogos para o Swiper.
         const [destaques] = await connection.execute(
             `SELECT 
                 j.ID_jogo, 
@@ -987,7 +965,7 @@ app.get('/jogos-nacionais', async (req, res) => {
              ORDER BY j.Media_nota DESC 
              LIMIT 3`
         );
-        console.log("Jogos Nacionais Data:", jogosNacionais); // Add this for debugging
+        console.log("Jogos Nacionais Data:", jogosNacionais); 
         res.status(200).json(jogosNacionais);
     } catch (error) {
         console.error("Erro ao buscar jogos nacionais:", error);
