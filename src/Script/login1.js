@@ -1,18 +1,16 @@
-import { Clerk } from "@clerk/clerk-js"
-import { dark } from '@clerk/themes'
-import { ptBR } from '@clerk/localizations'
+import { clerk, clerkReady } from "../Script/auth.js";
 
-const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+async function setupLoginPage() {
+    await clerkReady;
 
-const clerk = new Clerk(clerkPubKey)
-await clerk.load({
-  signUpUrl: '../front-end/cadastro.html' ,
-  localization: ptBR,
-  appearance: {
-    baseTheme: dark,
-  }
-})
-
-const signInDiv = document.getElementById('sign-in')
-
-clerk.mountSignIn(signInDiv)
+    if (clerk.user) {
+        window.location.href = '/src/front-end/homepage.html';
+        return;
+    }
+    
+    const signInDiv = document.getElementById('sign-in');
+    if (signInDiv) {
+        clerk.mountSignIn(signInDiv);
+    }
+}
+setupLoginPage();

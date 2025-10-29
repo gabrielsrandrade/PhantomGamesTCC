@@ -1,10 +1,25 @@
+// auth.js
 import { Clerk } from "@clerk/clerk-js";
-import { dark } from '@clerk/themes';         // Adicionado para o tema escuro
-import { ptBR } from '@clerk/localizations'; // Adicionado para o idioma português
+import { dark } from '@clerk/themes';
+import { ptBR } from '@clerk/localizations';
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 export const clerk = new Clerk(clerkPubKey);
+
+export const clerkReady = clerk.load({
+    localization: ptBR,
+    appearance: {
+        baseTheme: dark,
+    },
+    
+
+    signInUrl: '/src/front-end/login.html',
+    signUpUrl: '/src/front-end/cadastro.html',
+    afterSignInUrl: '/src/front-end/homepage.html',
+    afterSignUpUrl: '/src/front-end/homepage.html',
+});
+
 
 async function syncUserToDatabase(user) {
   if (!user) return;
@@ -38,6 +53,9 @@ export const initializeAuth = () => {
     }
 
     authReadyPromise = new Promise(async (resolve) => {
+        // Espera o clerkReady (que está lá em cima) terminar
+        await clerkReady; 
+
         clerk.addListener(({ user }) => {
             console.log("Listener do Clerk acionado. Usuário:", user ? user.id : 'Nenhum');
             authData.user = user;
@@ -48,15 +66,11 @@ export const initializeAuth = () => {
             }
         });
 
-        // A configuração de aparência e idioma foi adicionada aqui
-        await clerk.load({
-            localization: ptBR,
-            appearance: {
-                baseTheme: dark,
-            }
-        });
+        // Atualiza o estado inicial
+        authData.user = clerk.user;
+        authData.isSignedIn = !!clerk.user;
+        authData.isAdmin = clerk.user?.publicMetadata?.role === 'admin';
 
-        // Sua lógica original foi mantida pois está correta
         console.log(
             "Clerk carregado. Estado final:",
             "Logado:", authData.isSignedIn,

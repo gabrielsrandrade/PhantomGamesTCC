@@ -59,7 +59,10 @@
                 }
             }
             .capa_card{
-                height: 15rem;
+                min-height: 15rem;
+                max-height: 15rem;
+                min-width: 11rem;
+                max-width: 11rem;
                 
                 img{
                     width: 100%;
