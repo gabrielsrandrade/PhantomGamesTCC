@@ -34,7 +34,7 @@ async function createAddGameModal() {
             fetch('http://localhost:3000/categorias')
         ]);
         if (!generosRes.ok || !categoriasRes.ok) throw new Error('Falha ao carregar dados para o formulário.');
-        
+
         generos = await generosRes.json();
         categorias = await categoriasRes.json();
     } catch (error) {
@@ -125,14 +125,14 @@ async function createAddGameModal() {
 
     modal.querySelectorAll('.close-modal-btn').forEach(btn => btn.addEventListener('click', closeModal));
     overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
-    
+
     firstPage.querySelector('.clear-btn').addEventListener('click', () => {
         const form = firstPage.querySelector('form');
-        form.reset(); 
+        form.reset();
 
         // Usa o método 'setValues' com um array vazio para limpar a seleção
         if (multiselectGenre && typeof multiselectGenre.setValues === 'function') {
-            multiselectGenre.setValues([]); 
+            multiselectGenre.setValues([]);
         }
         if (multiselectCategory && typeof multiselectCategory.setValues === 'function') {
             multiselectCategory.setValues([]);
@@ -214,7 +214,7 @@ async function createAddGameModal() {
         formData.append("Faixa_etaria", gameDataFromFirstPage.Faixa_etaria);
         formData.append("generos", JSON.stringify(gameDataFromFirstPage.generos));
         formData.append("categorias", JSON.stringify(gameDataFromFirstPage.categorias));
-        
+
         selectedMediaFiles.forEach(file => formData.append("Midias_jogo", file));
 
         try {
@@ -289,10 +289,11 @@ function renderNavbar({ isSignedIn, isAdmin }) {
                         <li><a href="biblioteca.html">Biblioteca</a></li>
                     </ul>
                     <form class="search-bar" id="search-form"><input type="search" placeholder="Pesquisar..." id="search-input"></form>
-                    <div class="left">
-                        <a href="lista-desejos.html"><img class="carrinho" src="../../assets/imagens/lista-desejos.png" alt="Carrinho"></a>
-                        <a href="carrinho.html"><img class="carrinho" src="../../assets/imagens/carrinho.png" alt="Carrinho"></a>
-                        <div id="user-button"></div>
+<div class="left">
+    <a href="lista-desejos.html" id="wishlist-link"><img class="carrinho" src="../../assets/imagens/lista-desejos.png" alt="Lista de Desejos"></a>
+    <a href="carrinho.html" id="cart-link"><img class="carrinho" src="../../assets/imagens/carrinho.png" alt="Carrinho"></a>
+    <div id="user-button"></div>
+</div>
                     </div>
                 </div>`;
         }
@@ -314,7 +315,7 @@ function renderNavbar({ isSignedIn, isAdmin }) {
 
     const searchForm = document.getElementById("search-form");
     if (searchForm) searchForm.addEventListener("submit", handleSearch);
-    
+
     const searchInput = document.getElementById("search-input");
     if (searchInput && window.location.pathname.includes('navegar.html')) {
         searchInput.addEventListener('input', () => {
@@ -340,12 +341,46 @@ function renderNavbar({ isSignedIn, isAdmin }) {
     }
 }
 
+function setActiveLink() {
+    const path = window.location.pathname;
+
+    // Links de navegação padrão
+    const navLinks = document.querySelectorAll('.navbar ul a'); // Apenas os links da lista (Descobrir, Navegar, etc.)
+
+    navLinks.forEach(link => {
+        link.classList.remove('active-page');
+        if (path.includes(link.getAttribute('href')) && link.getAttribute('href') !== '#') {
+            link.classList.add('active-page');
+        }
+        if (link.getAttribute('href') === 'homepage.html' && (path === '/' || path.includes('/homepage.html'))) { // Ajustei para homepage.html
+            link.classList.add('active-page');
+        }
+    });
+
+    // Lógica para os ícones (Carrinho e Lista de Desejos)
+    const cartLink = document.getElementById('cart-link');
+    const wishlistLink = document.getElementById('wishlist-link');
+
+    // Remove as classes de todos os ícones primeiro
+    if (cartLink) cartLink.classList.remove('active-icon');
+    if (wishlistLink) wishlistLink.classList.remove('active-icon');
+
+    // Verifica qual página está ativa e aplica a classe
+    if (path.includes('carrinho.html') && cartLink) {
+        cartLink.classList.add('active-icon');
+    } else if (path.includes('lista-desejos.html') && wishlistLink) {
+        wishlistLink.classList.add('active-icon');
+    }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         const authData = await initializeAuth();
         renderNavbar(authData);
+        setActiveLink();
     } catch (error) {
         console.error("Falha na inicialização:", error);
-        renderNavbar({ isSignedIn: false, isAdmin: false });
+        renderNavbar(false, false);
+        setActiveLink();
     }
-});
+}); 
