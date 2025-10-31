@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextBtn = paginationContainer.querySelector(".next");
     const lastBtn = paginationContainer.querySelector(".last");
 
-    const gamesPerPage = 20 ;
+    const gamesPerPage = 15;
     let allGames = [];
     let currentPage = 1;
     let totalPages = 0;
