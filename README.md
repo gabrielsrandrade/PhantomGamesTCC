@@ -78,6 +78,6 @@ npm run dev
 
 ## 👥 Autores
 
-* **Fabricio Marconato Garcia** — Designer UI/UX & Desenvolvedor Full Stack — [GitHub]([https://github.com/seu-usuario-1](https://github.com/Dheiko))
-* **Gabriel Henrique Oliveira** — Desenvolvedor Front-end & Back-end — [GitHub]([https://github.com/seu-usuario-2](https://github.com/OGabriel0))
-* **Gabriel Santana de Andrade** — DBA & Back-end — [GitHub]([https://github.com/seu-usuario-3](https://github.com/gabrielsrandrade))
+* **Fabricio Marconato Garcia** — Designer UI/UX & Desenvolvedor Full Stack — [GitHub](https://github.com/Dheiko)
+* **Gabriel Henrique Oliveira** — Desenvolvedor Front-end & Back-end — [GitHub](https://github.com/OGabriel0)
+* **Gabriel Santana de Andrade** — DBA & Back-end — [GitHub](https://github.com/gabrielsrandrade)
